@@ -91,7 +91,7 @@ app.get('/hosts', async (req, res) => {
   });
 
   //___________________________________ sending visits ________________________________________________
-  app.get('/visits', async (req, res) => {
+  app.get('/api/visits', async (req, res) => {
 	const rows = await process.postgresql.query('SELECT * FROM register');
 	res.status(200).json(rows);
   });
@@ -135,21 +135,20 @@ app.post('/api/registers', async (req, res) => {
 		visitor_name: req.body.visitor_name,
 		visitor_email: req.body.email,
 		visitor_no: req.body.visitor_no,
-		checked_in: req.body.checked_in,
 		checked_out: req.body.checked_out,
 		role: req.body.role
 		
 	};
 
-	// const visitor = await process.postgresql.query('SELECT * FROM visitors WHERE name=$1 AND email=$2' , [visit.visitor_name, visit.visitor_email],); 
-	// if(!visitor){
-	// 	await process.postgresql.query(`INSERT INTO visitors (name, email_id, mobile_no) VALUES ('${visit.visitor_name}', '${visit.visitor_email}', '${visit.visitor_no}') ON CONFLICT DO NOTHING;`).then((err,result) => {
-	// 		if (err) throw err;
-	// 	});
-	// }
-	// await process.postgresql.query(`INSERT INTO register (host_id,host_name,visitor_name, visitor_email,checked_in, visitor_no, role) VALUES ('${visit.host_id}', '${visit.host_name}','${visit.visitor_name}','${visit.visitor_email}','${visit.visitor_no}', '${visit.checked_in}', '${visit.visitor_no}') ON CONFLICT DO NOTHING;`).then((err,result) => {
-	// 	if (err) throw err;
-	// });
+	const visitor = await process.postgresql.query('SELECT * FROM visitors WHERE name=$1 AND email=$2' , [visit.visitor_name, visit.visitor_email],); 
+	if(!visitor){
+		await process.postgresql.query(`INSERT INTO visitors (name, email_id, mobile_no) VALUES ('${visit.visitor_name}', '${visit.visitor_email}', '${visit.visitor_no}') ON CONFLICT DO NOTHING;`).then((err,result) => {
+			if (err) throw err;
+		});
+	}
+	await process.postgresql.query(`INSERT INTO register (host_id,host_name,visitor_name, visitor_email, visitor_no, role) VALUES ('${visit.host_id}', '${visit.host_name}','${visit.visitor_name}','${visit.visitor_email}','${visit.visitor_no}', '${visit.role}') ON CONFLICT DO NOTHING;`).then((err,result) => {
+		if (err) throw err;
+	});
 	// const host=  await process.postgresql.query('SELECT * FROM hosts WHERE id=$1' , [visit.host_id],); 
 	// let htmlBody = "New visitor information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
     //     htmlBody +=  htmlBody += "Name : " + visit.visitor_name + " \n " + "\n" + 
@@ -198,6 +197,20 @@ app.put('/api/registers/:id', async (req, res) => {
 		if (err) throw err;
 	});
 	 res.status(200).send('Visit Edited!');
+
+	
+  });
+
+  //___________________________________ Editing a visit checkout ________________________________________________
+app.put('/api/registers/checkout/:id', async (req, res) => {
+	const pk=req.params['id'];
+	const visit = {
+		checked_out: req.body.checked_out,
+	}
+	await process.postgresql.query('UPDATE "register" SET "checked_out"=$1  WHERE id=$2', [visit.checked_out,pk]).then((err,result) => {
+		if (err) throw err;
+	});
+	 res.status(200).send('Checkout time Edited!');
 
 	
   });

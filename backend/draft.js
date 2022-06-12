@@ -1,4 +1,6 @@
 //  ____________________________Database___________________________
+// const { Client } = require('pg');
+
 
 // const client = new Client({
 //     host: '127.0.0.1',
@@ -21,9 +23,31 @@
 //     }
 // };
 
-// execute(text).then(result => {
+// const createregister =`
+// CREATE TABLE IF NOT EXISTS register(
+// 	id SERIAL NOT NULL PRIMARY KEY,
+//     host_id INT DEFAULT NULL,
+// 	host_name TEXT DEFAULT NULL,
+// 	visitor_name TEXT NOT NULL,
+// 	visitor_email TEXT NOT NULL,
+// 	visitor_no INT DEFAULT NULL,
+// 	checked_in TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+//  	checked_out TIMESTAMPTZ ,
+// 	role TEXT NOT NULL
+// )
+// `;
+
+// ["1","John Doe","Anny Clyve", "annyclyve@gmail.com","0787695111", "2022-05-05T22:05:06.95","2022-05-05T23:05:06.95","Utility worker","1"]
+// const check_in="18:35:13.97";
+// const pk=2;
+// const text1=`
+// UPDATE register SET host_id =1, host_name =John Doe, visitor_name ="Anny Clyve", visitor_email = "annyclyve@gmail.com", visitor_no = "0787695111", checked_in="2022-05-05T22:05:06.95", checked_out="2022-05-05T23:05:06.95", role="Utility worker" WHERE id='${pk}'`;
+
+// const text="INSERT INTO register (host_id,host_name,visitor_name, visitor_email, visitor_no,checked_in, role) VALUES ('1', 'John Doe','Hannah Clyve','hannahclyve@gmail.com','0787695113', '2022-05-05T22:05:06.95', 'Engineer') ON CONFLICT DO NOTHING;"
+// execute(createregister).then(result => {
 // 		if (result) {
 // 			console.log('Table created');
+// 			console.log(result);
 // 		}
 // 	});
 

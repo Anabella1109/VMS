@@ -9,8 +9,8 @@
 // 	visitor_name TEXT NOT NULL,
 // 	visitor_email TEXT NOT NULL,
 // 	visitor_no INT DEFAULT NULL,
-// 	checked_in TIMESTAMP NOT NULL,
-//  	checked_out TIMESTAMP ,
+// 	checked_in DEFAULT CURRENT_TIMESTAMP NOT NULL,
+//  	checked_out TIMESTAMPTZ ,
 // 	role TEXT NOT NULL
 // )
 // `;
