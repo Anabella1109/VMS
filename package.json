@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "pg:init": "pg_ctl init -D data",
     "pg:start": "pg_ctl -t 1000 -D data start",
@@ -17,10 +16,12 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.20.0",
+    "csv": "^6.1.2",
     "express": "^4.18.1",
     "nodemailer": "^6.7.5",
     "openssl-nodejs": "^1.0.5",
     "pg": "^8.7.3",
-    "qrcode": "^1.5.0"
+    "qrcode": "^1.5.0",
+    "twilio": "^3.77.3"
   }
 }

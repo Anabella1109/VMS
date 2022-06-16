@@ -1,21 +1,29 @@
-// const express = require("express");
+const express = require("express");
 // import postgresql from 'postgresql';
-import express from 'express';
-import postgresql from './postgresql.js';
-import qrcode  from 'qrcode';
-import nodemailer from 'nodemailer';
-import bodyParser from 'body-parser';
+// import express from 'express';
+// import postgresql from './postgresql.js';
+// import qrcode  from 'qrcode';
+// import nodemailer from 'nodemailer';
+// import bodyParser from 'body-parser';
 // import openssl from 'openssl-nodejs';
-import config from './config.json' assert { type: 'json' };
-// const bodyParser= require('body-parser');
-// const nodemailer= require('nodemailer');
-// const QRCode= require('qrcode');
+// import config from './config.json' assert { type: 'json' };
+const bodyParser= require('body-parser');
+const nodemailer= require('nodemailer');
+const QRCode= require('qrcode');
+const postgresql=require('./postgresql.js');
+const config=require('./config.json');
+const crypto = require('crypto');
+const fs = require('fs');
+const {stringify} = require('csv-stringify');
 
 const PORT = process.env.PORT || 3001;
+const accountSid = config.twilio.accountSid;
+const authToken = config.twilio.authToken;
+const client = require('twilio')(accountSid, authToken);
 
 // const { Client } = require('pg');
 
-const QRCode=qrcode;
+// const QRCode=qrcode;
 
 
 
@@ -49,6 +57,8 @@ const router = express.Router();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+
+
 app.get('/',function(req,res){
 	res.send("hey")
   });
@@ -61,7 +71,11 @@ app.get("/api", (req, res) => {
 
 app.get('/hosts', async (req, res) => {
 	const rows = await process.postgresql.query('SELECT * FROM hosts');
-	// await process.postgresql.query('DELETE FROM "hosts" WHERE "id" = $1', [8]);
+	stringify(rows, {
+		header: true
+	}, function (err, output) {
+		fs.writeFile('/someData.csv', output);
+	})
 	res.status(200).send(JSON.stringify(rows));
   });
 
@@ -69,6 +83,7 @@ app.get('/hosts', async (req, res) => {
 	const rows = await process.postgresql.query('SELECT * FROM hosts');
 	res.json(rows);
   });
+
 
   //___________________________________ Sending single host ________________________________________________
   app.get('/api/hosts/:id', async (req, res) => {
@@ -93,8 +108,65 @@ app.get('/hosts', async (req, res) => {
   //___________________________________ sending visits ________________________________________________
   app.get('/api/visits', async (req, res) => {
 	const rows = await process.postgresql.query('SELECT * FROM register');
+	console.log(rows);
+	rows.map(row =>{
+
+		const dat=row.checked_in.toUTCString();
+		const time= row.checked_in.toLocaleTimeString();
+		console.log(dat);
+		console.log(time);
+		const dattime=dat+'T'+time;
+		console.log(dattime);
+
+	})
 	res.status(200).json(rows);
   });
+
+  //___________________________________ register user ________________________________________________
+app.post('/api/registeruser', async(req,res)=>{
+const user={
+	email: req.body.email,
+	pass: req.body.password
+}
+  await process.postgresql.query(`INSERT INTO users (email, password) VALUES (
+	'${user.email}',
+	crypt('${user.pass}', gen_salt('bf'))
+  );`).then((err,result) => {
+			if (err) throw err;
+		});
+		 res.status(200).send('User registered!')
+});
+
+ //___________________________________ login user ________________________________________________
+ app.post('/api/login/admin', async(req,res)=>{
+	const user={
+		email: req.body.email,
+		pass: req.body.password
+	}
+	  const newuser=await process.postgresql.query(`SELECT * 
+	  FROM users
+	 WHERE email = '${user.email}' 
+	   AND password = crypt('${user.pass}', password);`).then((err,result) => {
+				if (err) throw err;
+			});
+			 res.json(newuser)
+	});
+
+ //___________________________________ login host ________________________________________________
+ app.post('/api/login/host', async(req,res)=>{
+	const user={
+		email: req.body.email,
+		pass: req.body.password
+	}
+	  const host=await process.postgresql.query(`SELECT * 
+	  FROM hosts
+	 WHERE email = '${user.email}' 
+	   AND password = '${user.pass}'`).then((err,result) => {
+				if (err) throw err;
+			});
+			 res.json(host)
+	});
+
 
 //   app.post('/api/visitors', async (req, res) => {
 // 	const { name, email_id, checked_in,mobile_no } = req.body;
@@ -172,6 +244,24 @@ app.post('/api/registers', async (req, res) => {
 	// 		  console.log('Email sent: ' + info.response);
 	// 		}
 	// 	  });
+
+// 	client.messages
+// 	.create({
+// 	   body: htmlBody,
+// 	   from: config.twilio.from_number,
+// 	   to: host.mobile_no
+// 	 })
+// 	.then((err,message) =>{
+// 	if(err){
+// console.log(err);}
+
+// 	else{ console.log(message.sid)};
+
+
+
+
+
+// })
 	 res.status(200).send('Visit registered!');
 
 	 
@@ -217,14 +307,28 @@ app.put('/api/registers/checkout/:id', async (req, res) => {
 
 //___________________________________ regitering a host ________________________________________________
 app.post('/api/hosts', async (req, res) => {
+    const pass=crypto.randomBytes(8).toString('hex');
 	const host = {
 		name: req.body.name,
 		email_id: req.body.email_id,
-		mobile_no: req.body.mobile_no
+		mobile_no: req.body.mobile_no,
+		password: pass
 	}
-	 await process.postgresql.query(`INSERT INTO hosts (name, email_id, mobile_no) VALUES ('${host.name}', '${host.email_id}', '${host.mobile_no}') ON CONFLICT DO NOTHING;`).then((err,result) => {
+	 await process.postgresql.query(`INSERT INTO hosts (name, email_id, mobile_no,password) VALUES ('${host.name}', '${host.email_id}', '${host.mobile_no}','${host.password}') ON CONFLICT DO NOTHING;`).then((err,result) => {
 		if (err) throw err;
 	});
+
+	let MobileBody = "Your login information : ";
+	MobileBody +=" Email : " + host.email_id + " " +
+	"Password :" + host.password;
+
+	client.messages
+  .create({
+     body: MobileBody,
+     from: config.twilio.from_number,
+     to: host.mobile_no
+   })
+  .then(message => console.log(message.sid));
 	 res.status(200).send('Host registered!');
 
 	
@@ -247,20 +351,20 @@ app.post('/api/hosts/:id', async (req, res) => {
   });
 
  //___________________________________ generating qrcode ________________________________________________
-  app.post('/qrgenerate', async(req,res) => {
+  app.get('/qrgenerate', async(req,res) => {
 	// openssl('openssl req -config csr.cnf -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout key.key -out certificate.crt');
-	const visitor = {
-		name: req.body.name,
-		email_id: req.body.email_id,
-		check_in: req.body.check_in,
-		mobile_no: req.body.mobile_no
-	}
 	// const visitor = {
-	// 	name: 'Anny',
-	// 	email_id: 'annylex@gmail.com',
-	// 	check_in: '2022-06-25T15:00',
-	// 	mobile_no: '0788898989'
+	// 	name: req.body.name,
+	// 	email_id: req.body.email_id,
+	// 	check_in: req.body.check_in,
+	// 	mobile_no: req.body.mobile_no
 	// }
+	const visitor = {
+		name: 'Anny',
+		email_id: 'annylex@gmail.com',
+		check_in: '2022-06-25T15:00',
+		mobile_no: '+2500787695111'
+	}
 
 	let stringdata = JSON.stringify(visitor)
 
@@ -277,25 +381,40 @@ app.post('/api/hosts/:id', async (req, res) => {
 QRCode.toDataURL(stringdata, function (err, code) {
     if(err) return console.log("error occurred")
 
-	let htmlBody = "New visitor information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
-        htmlBody += code;
+	// let htmlBody = "New visitor information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
+    //     htmlBody += code;
       
         
-        var mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
-        {
-          from: "bellaxbx1109@gmail.com",
-          to: visitor.email_id,
-          subject: "Qr Code.",
-          html: htmlBody,
-        };
+        // var mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
+        // {
+        //   from: "bellaxbx1109@gmail.com",
+        //   to: visitor.email_id,
+        //   subject: "Qr Code.",
+        //   html: htmlBody,
+        // };
 
-		transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
-			if (error) {
-			  console.log(error);
-			} else {
-			  console.log('Email sent: ' + info.response);
-			}
-		  });
+		// transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
+		// 	if (error) {
+		// 	  console.log(error);
+		// 	} else {
+		// 	  console.log('Email sent: ' + info.response);
+		// 	}
+		//   });
+
+		  let MobileBody = "Your login information : ";
+		  MobileBody +="Hiiiii";
+	  
+		  client.messages
+		.create({
+		   body: MobileBody,
+		   from: config.twilio.from_number,
+		   to: visitor.mobile_no
+		 })
+		.then((err,message) =>{
+		if(err){
+ console.log(err);}
+
+		else{ console.log(message.sid)};
  
     // Printing the code
     // console.log(code)
@@ -306,6 +425,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
 
 
   });
+});
  
   //___________________________________ editing a visitor ________________________________________________
   app.put('/api/visitors/:id', async (req, res) => {
@@ -334,6 +454,15 @@ QRCode.toDataURL(stringdata, function (err, code) {
 	const rows = await process.postgresql.query('SELECT * FROM register WHERE id=$1', [pk]);
 	res.json(rows);
   });
+
+     //___________________________________ Sending a visit ________________________________________________
+	 app.post('/api/registers/:date/:time', async (req, res) => {
+		const date=req.params['date'];
+		const time= req.params['time'];
+
+		const rows = await process.postgresql.query('SELECT * FROM register WHERE id=$1', [pk]);
+		res.json(rows);
+	  });
 
  //___________________________________ Deleting a single visitor ________________________________________________
  app.delete('/api/visitors/:id', async (req, res) => {

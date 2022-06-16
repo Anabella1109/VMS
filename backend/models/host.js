@@ -6,5 +6,6 @@
 	// 	name TEXT NOT NULL,
 	// 	email_id TEXT NOT NULL, 
 	// 	mobile_no INT DEFAULT NULL
+	// password TEXT NOT NULL,
 	    
     // );`;

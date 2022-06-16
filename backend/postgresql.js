@@ -1,9 +1,11 @@
-import postgresql from 'pg';
-import os from 'os';
+// import postgresql from 'pg';
+// import os from 'os';
+const postgresql= require('pg');
+const os= require('os');
 
 const { Pool } = postgresql;
 
-export default (callback = null) => {
+module.exports= (callback = null) => {
   const pool = new Pool({
     user: process.env.NODE_ENV === 'development' && (os.userInfo() || {}).username || '',
     database: 'app',
