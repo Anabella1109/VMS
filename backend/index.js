@@ -1,5 +1,4 @@
 const express = require("express");
-// import postgresql from 'postgresql';
 // import express from 'express';
 // import postgresql from './postgresql.js';
 // import qrcode  from 'qrcode';
@@ -15,6 +14,8 @@ const config=require('./config.json');
 const crypto = require('crypto');
 const fs = require('fs');
 const {stringify} = require('csv-stringify');
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+const fastcsv= require('fast-csv');
 
 const PORT = process.env.PORT || 3001;
 const accountSid = config.twilio.accountSid;
@@ -51,15 +52,21 @@ postgresql(async (connection) => {
 
 
 const app = express();
-// const path = require('path');
-const router = express.Router();
+const path = require('path');
+// const router = express.Router();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use("/public",express.static(__dirname+'/public'));
 
 
 
 app.get('/',function(req,res){
+	const checked_in= new Date();
+	const checkin_date= checked_in.toLocaleDateString();
+	const checkin_time= checked_in.toLocaleTimeString();
+	console.log(checkin_date);
+	console.log(checkin_time);
 	res.send("hey")
   });
 
@@ -67,17 +74,12 @@ app.get("/api", (req, res) => {
 	res.json({ message: "Hello from server!" });
   });
 
+//___________________________________ HOSTS ________________________________________________
+
+
 //___________________________________ Send hosts ________________________________________________
 
-app.get('/hosts', async (req, res) => {
-	const rows = await process.postgresql.query('SELECT * FROM hosts');
-	stringify(rows, {
-		header: true
-	}, function (err, output) {
-		fs.writeFile('/someData.csv', output);
-	})
-	res.status(200).send(JSON.stringify(rows));
-  });
+
 
   app.get('/api/hosts', async (req, res) => {
 	const rows = await process.postgresql.query('SELECT * FROM hosts');
@@ -92,6 +94,78 @@ app.get('/hosts', async (req, res) => {
 	res.json(rows);
   });
 
+   //___________________________________ login host ________________________________________________
+ app.post('/api/login/host', async(req,res)=>{
+	const user={
+		email: req.body.email,
+		pass: req.body.password
+	}
+	  const host=await process.postgresql.query(`SELECT * 
+	  FROM hosts
+	 WHERE email = '${user.email}' 
+	   AND password = '${user.pass}'`).then((err,result) => {
+				if (err) throw err;
+			});
+			 res.json(host)
+	});
+
+
+//___________________________________ regitering a host ________________________________________________
+app.post('/api/hosts', async (req, res) => {
+    const pass=crypto.randomBytes(8).toString('hex');
+	const host = {
+		name: req.body.name,
+		email_id: req.body.email_id,
+		mobile_no: req.body.mobile_no,
+		password: pass
+	}
+	 await process.postgresql.query(`INSERT INTO hosts (name, email_id, mobile_no,password) VALUES ('${host.name}', '${host.email_id}', '${host.mobile_no}','${host.password}') ON CONFLICT DO NOTHING;`).then((err,result) => {
+		if (err) throw err;
+	});
+
+	let MobileBody = "Your login information : ";
+	MobileBody +=" Email : " + host.email_id + " " +
+	"Password :" + host.password;
+
+	client.messages
+  .create({
+     body: MobileBody,
+     from: config.twilio.from_number,
+     to: host.mobile_no
+   })
+  .then(message => console.log(message.sid));
+	 res.status(200).send('Host registered!');
+
+	
+  });
+
+  //___________________________________ editing a host ________________________________________________
+app.post('/api/hosts/:id', async (req, res) => {
+	const pk=req.params['id'];
+	const host = {
+		name: req.body.name,
+		email_id: req.body.email_id,
+		mobile_no: req.body.mobile_no
+	}
+	 await process.postgresql.query('UPDATE "hosts" SET "name" = $1, "email_id" = $2, "mobile_no" = $3 WHERE id=$4', [host.name,host.email_id,host.mobile_no,pk]).then((err,result) => {
+		if (err) throw err;
+	});
+	 res.status(200).send('Host registered!');
+
+	
+  });
+   //___________________________________ Deleting a single host ________________________________________________
+ app.delete('/api/visitors/:id', async (req, res) => {
+	const pk=req.params['id'];
+	await process.postgresql.query('DELETE FROM "hosts" WHERE "id" = $1', [pk]);
+	res.send('Host deleted');
+  });
+
+
+
+
+ //___________________________________ VISITORS ________________________________________________
+
   //___________________________________ sending visitors ________________________________________________
   app.get('/visitors', async (req, res) => {
 	const rows = await process.postgresql.query('SELECT * FROM visitors');
@@ -104,6 +178,51 @@ app.get('/hosts', async (req, res) => {
 
 	
   });
+  
+//___________________________________ regitering a visitor ________________________________________________
+app.post('/api/visitors', async (req, res) => {
+	const visitor = {
+		name: req.body.name,
+		email_id: req.body.email_id,
+		mobile_no: req.body.mobile_no
+	}
+	 await process.postgresql.query(`INSERT INTO visitors (name, email_id, mobile_no) VALUES ('${visitor.name}', '${visitor.email_id}', '${visitor.mobile_no}') ON CONFLICT DO NOTHING;`).then((err,result) => {
+		if (err) throw err;
+	});
+	 res.status(200).send('Visitor registered!');
+
+	
+  });
+
+    //___________________________________ editing a visitor ________________________________________________
+	app.put('/api/visitors/:id', async (req, res) => {
+		const pk=req.params['id'];
+		const visitor = {
+			name: req.body.name,
+			email_id: req.body.email_id,
+			mobile_no: req.body.mobile_no
+		}
+		await process.postgresql.query('UPDATE "visitors" SET "name" = $1, "email_id" = $2,"mobile_no" = $3 WHERE id=$4', [visitor.name,visitor.email_id,visitor.mobile_no,pk]).then((err,result) => {
+			if (err) throw err;
+		});
+		res.status(200).send('Visitor Updated!');
+	  });
+	 
+	  //___________________________________ Sending a single visitor ________________________________________________
+	  app.get('/api/visitors/:id', async (req, res) => {
+		const pk=req.params['id'];
+		const rows = await process.postgresql.query('SELECT * FROM visitors WHERE id=$1', [pk]);
+		res.json(rows);
+	  });
+	
+	   //___________________________________ Deleting a single visitor ________________________________________________
+ app.delete('/api/visitors/:id', async (req, res) => {
+	const pk=req.params['id'];
+	await process.postgresql.query('DELETE FROM "visitors" WHERE "id" = $1', [pk]);
+	res.send('Visitor deleted');
+  });
+
+   //___________________________________VISITS ________________________________________________
 
   //___________________________________ sending visits ________________________________________________
   app.get('/api/visits', async (req, res) => {
@@ -122,92 +241,29 @@ app.get('/hosts', async (req, res) => {
 	res.status(200).json(rows);
   });
 
-  //___________________________________ register user ________________________________________________
-app.post('/api/registeruser', async(req,res)=>{
-const user={
-	email: req.body.email,
-	pass: req.body.password
-}
-  await process.postgresql.query(`INSERT INTO users (email, password) VALUES (
-	'${user.email}',
-	crypt('${user.pass}', gen_salt('bf'))
-  );`).then((err,result) => {
-			if (err) throw err;
-		});
-		 res.status(200).send('User registered!')
-});
-
- //___________________________________ login user ________________________________________________
- app.post('/api/login/admin', async(req,res)=>{
-	const user={
-		email: req.body.email,
-		pass: req.body.password
-	}
-	  const newuser=await process.postgresql.query(`SELECT * 
-	  FROM users
-	 WHERE email = '${user.email}' 
-	   AND password = crypt('${user.pass}', password);`).then((err,result) => {
-				if (err) throw err;
-			});
-			 res.json(newuser)
-	});
-
- //___________________________________ login host ________________________________________________
- app.post('/api/login/host', async(req,res)=>{
-	const user={
-		email: req.body.email,
-		pass: req.body.password
-	}
-	  const host=await process.postgresql.query(`SELECT * 
-	  FROM hosts
-	 WHERE email = '${user.email}' 
-	   AND password = '${user.pass}'`).then((err,result) => {
-				if (err) throw err;
-			});
-			 res.json(host)
-	});
-
-
-//   app.post('/api/visitors', async (req, res) => {
-// 	const { name, email_id, checked_in,mobile_no } = req.body;
-// 	const visitor = {
-// 		name: name,
-// 		email_id: email_id,
-// 		checked_in: checked_in,
-// 		mobile_no: mobile_no
-// 	}
-// 	 await process.postgresql.query(`INSERT INTO visitors (name, email_id,checked_in, mobile_no) VALUES ('${visitor.name}', '${visitor.email_id}', '${visitor.checked_in}', '${visitor.mobile_no}') ON CONFLICT DO NOTHING;`).then((err,result) => {
-// 		if (err) throw err;
-// 	});
-// 	 res.status(200).send('Visitor registered!');
-
+    //___________________________________ sending visits by date ________________________________________________
+	app.get('/api/visits/:date', async (req, res) => {
+		const date=req.params['date'];
+		const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1', [date]);
 	
-//   });
+		res.status(200).json(rows);
+	  });
 
-//___________________________________ regitering a visitor ________________________________________________
-  app.post('/api/visitors', async (req, res) => {
-	const visitor = {
-		name: req.body.name,
-		email_id: req.body.email_id,
-		mobile_no: req.body.mobile_no
-	}
-	 await process.postgresql.query(`INSERT INTO visitors (name, email_id, mobile_no) VALUES ('${visitor.name}', '${visitor.email_id}', '${visitor.mobile_no}') ON CONFLICT DO NOTHING;`).then((err,result) => {
-		if (err) throw err;
-	});
-	 res.status(200).send('Visitor registered!');
-
-	
-  });
-  
-//___________________________________ regitering a visit ________________________________________________
-app.post('/api/registers', async (req, res) => {
+//___________________________________ registering a visit ________________________________________________
+app.post('/api/visits', async (req, res) => {
+	const checked_in= new Date();
+	const checkin_date= checked_in.toLocaleDateString();
+	const checkin_time= checked_in.toLocaleTimeString();
+	// console.log(checkin_date);
+	// console.log(checkin_time);
 	const visit = {
 		host_id: req.body.host_id,
 		host_name: req.body.host_name,
 		visitor_name: req.body.visitor_name,
 		visitor_email: req.body.email,
 		visitor_no: req.body.visitor_no,
-		checked_out: req.body.checked_out,
+		date:checkin_date,
+		checked_in: checkin_time,
 		role: req.body.role
 		
 	};
@@ -218,7 +274,7 @@ app.post('/api/registers', async (req, res) => {
 			if (err) throw err;
 		});
 	}
-	await process.postgresql.query(`INSERT INTO register (host_id,host_name,visitor_name, visitor_email, visitor_no, role) VALUES ('${visit.host_id}', '${visit.host_name}','${visit.visitor_name}','${visit.visitor_email}','${visit.visitor_no}', '${visit.role}') ON CONFLICT DO NOTHING;`).then((err,result) => {
+	await process.postgresql.query(`INSERT INTO register (host_id,host_name,visitor_name, visitor_email, visitor_no,date,checked_in role) VALUES ('${visit.host_id}', '${visit.host_name}','${visit.visitor_name}','${visit.visitor_email}','${visit.visitor_no}','${visit.date}','${visit.checked_in}', '${visit.role}') ON CONFLICT DO NOTHING;`).then((err,result) => {
 		if (err) throw err;
 	});
 	// const host=  await process.postgresql.query('SELECT * FROM hosts WHERE id=$1' , [visit.host_id],); 
@@ -278,12 +334,13 @@ app.put('/api/registers/:id', async (req, res) => {
 		visitor_name: req.body.visitor_name,
 		visitor_email: req.body.email,
 		visitor_no: req.body.visitor_no,
+		date: req.body.date,
 		checked_in: req.body.checked_in,
 		checked_out: req.body.checked_out,
 		role: req.body.role
 		
 	}
-	await process.postgresql.query('UPDATE "register" SET "host_id" = $1, "host_name" = $2, "visitor_name" = $3, "visitor_email" = $4, "visitor_no" = $5, "checked_in"= $6, "checked_out"=$7, "role"=$8  WHERE id=$9', [visit.host_id,visit.host_name,visit.visitor_name, visit.visitor_email,visit.visitor_no, visit.checked_in, visit.checked_out,visit.role,pk]).then((err,result) => {
+	await process.postgresql.query('UPDATE "register" SET "host_id" = $1, "host_name" = $2, "visitor_name" = $3, "visitor_email" = $4, "visitor_no" = $5,"date" = $10, "checked_in"= $6, "checked_out"=$7, "role"=$8  WHERE id=$9', [visit.host_id,visit.host_name,visit.visitor_name, visit.visitor_email,visit.visitor_no, visit.checked_in, visit.checked_out,visit.role,pk,visit.date]).then((err,result) => {
 		if (err) throw err;
 	});
 	 res.status(200).send('Visit Edited!');
@@ -294,8 +351,10 @@ app.put('/api/registers/:id', async (req, res) => {
   //___________________________________ Editing a visit checkout ________________________________________________
 app.put('/api/registers/checkout/:id', async (req, res) => {
 	const pk=req.params['id'];
+	const checkout= new Date();
+	const checkout_time= checkout.toLocaleTimeString();
 	const visit = {
-		checked_out: req.body.checked_out,
+		checked_out: checkout_time,
 	}
 	await process.postgresql.query('UPDATE "register" SET "checked_out"=$1  WHERE id=$2', [visit.checked_out,pk]).then((err,result) => {
 		if (err) throw err;
@@ -305,52 +364,90 @@ app.put('/api/registers/checkout/:id', async (req, res) => {
 	
   });
 
-//___________________________________ regitering a host ________________________________________________
-app.post('/api/hosts', async (req, res) => {
-    const pass=crypto.randomBytes(8).toString('hex');
-	const host = {
-		name: req.body.name,
-		email_id: req.body.email_id,
-		mobile_no: req.body.mobile_no,
-		password: pass
+     //___________________________________ Sending a single visit ________________________________________________
+	 app.get('/api/registers/:id', async (req, res) => {
+		const pk=req.params['id'];
+		const rows = await process.postgresql.query('SELECT * FROM register WHERE id=$1', [pk]);
+		res.json(rows);
+	  });
+	
+		 //___________________________________ Sending a visit ________________________________________________
+		 app.post('/api/registers/:date/:time', async (req, res) => {
+			const date=req.params['date'];
+			const time= req.params['time'];
+	
+			const rows = await process.postgresql.query('SELECT * FROM register WHERE id=$1', [pk]);
+			res.json(rows);
+		  });
+	
+	
+	
+	  
+	   //___________________________________ Deleting a single visit ________________________________________________
+	 app.delete('/api/registers/:id', async (req, res) => {
+		const pk=req.params['id'];
+		await process.postgresql.query('DELETE FROM "register" WHERE "id" = $1', [pk]);
+		res.send('Record deleted');
+	  });
+
+
+
+//___________________________________ USER/ ADMIN ________________________________________________
+
+  //___________________________________ register user ________________________________________________
+app.post('/api/registeruser', async(req,res)=>{
+const user={
+	email: req.body.email,
+	pass: req.body.password
+}
+  await process.postgresql.query(`INSERT INTO users (email, password) VALUES (
+	'${user.email}',
+	crypt('${user.pass}', gen_salt('bf'))
+  );`).then((err,result) => {
+			if (err) throw err;
+		});
+		 res.status(200).send('User registered!')
+});
+
+ //___________________________________ login user ________________________________________________
+ app.post('/api/login/admin', async(req,res)=>{
+	const user={
+		email: req.body.email,
+		pass: req.body.password
 	}
-	 await process.postgresql.query(`INSERT INTO hosts (name, email_id, mobile_no,password) VALUES ('${host.name}', '${host.email_id}', '${host.mobile_no}','${host.password}') ON CONFLICT DO NOTHING;`).then((err,result) => {
-		if (err) throw err;
+	  const newuser=await process.postgresql.query(`SELECT * 
+	  FROM users
+	 WHERE email = '${user.email}' 
+	   AND password = crypt('${user.pass}', password);`).then((err,result) => {
+				if (err) throw err;
+			});
+			 res.json(newuser)
 	});
 
-	let MobileBody = "Your login information : ";
-	MobileBody +=" Email : " + host.email_id + " " +
-	"Password :" + host.password;
 
-	client.messages
-  .create({
-     body: MobileBody,
-     from: config.twilio.from_number,
-     to: host.mobile_no
-   })
-  .then(message => console.log(message.sid));
-	 res.status(200).send('Host registered!');
-
-	
-  });
-
-  //___________________________________ editing a host ________________________________________________
-app.post('/api/hosts/:id', async (req, res) => {
-	const pk=req.params['id'];
-	const host = {
-		name: req.body.name,
-		email_id: req.body.email_id,
-		mobile_no: req.body.mobile_no
-	}
-	 await process.postgresql.query('UPDATE "hosts" SET "name" = $1, "email_id" = $2, "mobile_no" = $3 WHERE id=$4', [host.name,host.email_id,host.mobile_no,pk]).then((err,result) => {
-		if (err) throw err;
-	});
-	 res.status(200).send('Host registered!');
+//   app.post('/api/visitors', async (req, res) => {
+// 	const { name, email_id, checked_in,mobile_no } = req.body;
+// 	const visitor = {
+// 		name: name,
+// 		email_id: email_id,
+// 		checked_in: checked_in,
+// 		mobile_no: mobile_no
+// 	}
+// 	 await process.postgresql.query(`INSERT INTO visitors (name, email_id,checked_in, mobile_no) VALUES ('${visitor.name}', '${visitor.email_id}', '${visitor.checked_in}', '${visitor.mobile_no}') ON CONFLICT DO NOTHING;`).then((err,result) => {
+// 		if (err) throw err;
+// 	});
+// 	 res.status(200).send('Visitor registered!');
 
 	
-  });
+//   });
 
- //___________________________________ generating qrcode ________________________________________________
+  
+
+
+//___________________________________ QRCODE ________________________________________________
+
+
+//___________________________________ generating qrcode ________________________________________________
   app.get('/qrgenerate', async(req,res) => {
 	// openssl('openssl req -config csr.cnf -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout key.key -out certificate.crt');
 	// const visitor = {
@@ -427,63 +524,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
   });
 });
  
-  //___________________________________ editing a visitor ________________________________________________
-  app.put('/api/visitors/:id', async (req, res) => {
-	const pk=req.params['id'];
-	const visitor = {
-		name: req.body.name,
-		email_id: req.body.email_id,
-		mobile_no: req.body.mobile_no
-	}
-	await process.postgresql.query('UPDATE "visitors" SET "name" = $1, "email_id" = $2,"mobile_no" = $3 WHERE id=$4', [visitor.name,visitor.email_id,visitor.mobile_no,pk]).then((err,result) => {
-		if (err) throw err;
-	});
-	res.status(200).send('Visitor Updated!');
-  });
- 
-  //___________________________________ Sending a single visitor ________________________________________________
-  app.get('/api/visitors/:id', async (req, res) => {
-	const pk=req.params['id'];
-	const rows = await process.postgresql.query('SELECT * FROM visitors WHERE id=$1', [pk]);
-	res.json(rows);
-  });
 
-   //___________________________________ Sending a single visit ________________________________________________
-   app.get('/api/registers/:id', async (req, res) => {
-	const pk=req.params['id'];
-	const rows = await process.postgresql.query('SELECT * FROM register WHERE id=$1', [pk]);
-	res.json(rows);
-  });
-
-     //___________________________________ Sending a visit ________________________________________________
-	 app.post('/api/registers/:date/:time', async (req, res) => {
-		const date=req.params['date'];
-		const time= req.params['time'];
-
-		const rows = await process.postgresql.query('SELECT * FROM register WHERE id=$1', [pk]);
-		res.json(rows);
-	  });
-
- //___________________________________ Deleting a single visitor ________________________________________________
- app.delete('/api/visitors/:id', async (req, res) => {
-	const pk=req.params['id'];
-	await process.postgresql.query('DELETE FROM "visitors" WHERE "id" = $1', [pk]);
-	res.send('Visitor deleted');
-  });
-
- //___________________________________ Deleting a single host ________________________________________________
- app.delete('/api/visitors/:id', async (req, res) => {
-	const pk=req.params['id'];
-	await process.postgresql.query('DELETE FROM "hosts" WHERE "id" = $1', [pk]);
-	res.send('Host deleted');
-  });
-  
-   //___________________________________ Deleting a single visit ________________________________________________
- app.delete('/api/registers/:id', async (req, res) => {
-	const pk=req.params['id'];
-	await process.postgresql.query('DELETE FROM "register" WHERE "id" = $1', [pk]);
-	res.send('Record deleted');
-  });
 
 
 
