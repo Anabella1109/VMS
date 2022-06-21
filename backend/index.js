@@ -16,6 +16,12 @@ const fs = require('fs');
 const {stringify} = require('csv-stringify');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const fastcsv= require('fast-csv');
+const Vonage = require('@vonage/server-sdk')
+
+const vonage = new Vonage({
+  apiKey: "c264a6ec",
+  apiSecret: "O8JEN8Rm6CQOn5UR"
+})
 
 const PORT = process.env.PORT || 3001;
 const accountSid = config.twilio.accountSid;
@@ -277,7 +283,7 @@ app.post('/api/visits', async (req, res) => {
 	await process.postgresql.query(`INSERT INTO register (host_id,host_name,visitor_name, visitor_email, visitor_no,date,checked_in role) VALUES ('${visit.host_id}', '${visit.host_name}','${visit.visitor_name}','${visit.visitor_email}','${visit.visitor_no}','${visit.date}','${visit.checked_in}', '${visit.role}') ON CONFLICT DO NOTHING;`).then((err,result) => {
 		if (err) throw err;
 	});
-	// const host=  await process.postgresql.query('SELECT * FROM hosts WHERE id=$1' , [visit.host_id],); 
+	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE id=$1' , [visit.host_id],); 
 	// let htmlBody = "New visitor information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
     //     htmlBody +=  htmlBody += "Name : " + visit.visitor_name + " \n " + "\n" + 
     //     " Email : " + visit.visitor_email + " \n " + "\n" +
@@ -312,6 +318,26 @@ app.post('/api/visits', async (req, res) => {
 // console.log(err);}
 
 // 	else{ console.log(message.sid)};
+
+
+const from = "250787380054";
+const to =`250${host.mobile_no}`;
+const text =` A new  guest has arrived
+Name: ${visit.visitor_name} 
+   Number: ${visit.visitor_no}
+   email: ${visit.visitor_email}`;
+
+vonage.message.sendSms(from, to, text, (err, responseData) => {
+    if (err) {
+        console.log(err);
+    } else {
+        if(responseData.messages[0]['status'] === "0") {
+            console.log("Message sent successfully.");
+        } else {
+            console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
+        }
+    }
+});
 
 
 
@@ -460,7 +486,7 @@ const user={
 		name: 'Anny',
 		email_id: 'annylex@gmail.com',
 		check_in: '2022-06-25T15:00',
-		mobile_no: '+2500787695111'
+		mobile_no: '787695111'
 	}
 
 	let stringdata = JSON.stringify(visitor)
@@ -498,23 +524,40 @@ QRCode.toDataURL(stringdata, function (err, code) {
 		// 	}
 		//   });
 
-		  let MobileBody = "Your login information : ";
-		  MobileBody +="Hiiiii";
-	  
-		  client.messages
-		.create({
-		   body: MobileBody,
-		   from: config.twilio.from_number,
-		   to: visitor.mobile_no
-		 })
-		.then((err,message) =>{
-		if(err){
- console.log(err);}
+	// 	let MobileBody = "New guest : ";
+	// 	MobileBody +=`Name: ${visitor.name} 
+	// 	   Number: ${visitor.mobile_no}
+	// 	   email: ${visitor.email_id}`;
+	// 	;
+	
+	// 	client.messages
+	//   .create({
+	// 	 body: MobileBody,
+	// 	 from: config.twilio.from_number,
+	// 	 to: visitor.mobile_no
+	//    })
+	//   .then(message => console.log(message.sid));
+		
 
-		else{ console.log(message.sid)};
- 
+// 		const from = "250787380054";
+// const to = `250${visitor.mobile_no}`;
+// const text =`Name: ${visitor.name} 
+//    Number: ${visitor.mobile_no}
+//    email: ${visitor.email_id}`;
+
+// vonage.message.sendSms(from, to, text, (err, responseData) => {
+//     if (err) {
+//         console.log(err);
+//     } else {
+//         if(responseData.messages[0]['status'] === "0") {
+//             console.log("Message sent successfully.");
+//         } else {
+//             console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
+//         }
+//     }
+// });
     // Printing the code
-    // console.log(code)
+    // console.log(`250${visitor.mobile_no}`)
 	res.send(code)
 
 	
@@ -522,7 +565,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
 
 
   });
-});
+
  
 
 
