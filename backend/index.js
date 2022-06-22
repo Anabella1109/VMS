@@ -13,8 +13,8 @@ const postgresql=require('./postgresql.js');
 const config=require('./config.json');
 const crypto = require('crypto');
 const fs = require('fs');
-const {stringify} = require('csv-stringify');
-const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+// const {stringify} = require('csv-stringify');
+// const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const fastcsv= require('fast-csv');
 const Vonage = require('@vonage/server-sdk')
 
@@ -42,7 +42,7 @@ const client = require('twilio')(accountSid, authToken);
 let transporter = nodemailer.createTransport({
 	host: config.email_setting.host,
 	port: 587,
-	secure: true,
+	secure: false,
 	requireTLS: true,
 	auth: {
 	  user: config.email_setting.email,
@@ -484,7 +484,7 @@ const user={
 	// }
 	const visitor = {
 		name: 'Anny',
-		email_id: 'annylex@gmail.com',
+		email_id: 'tuyisenge1109@gmail.com',
 		check_in: '2022-06-25T15:00',
 		mobile_no: '787695111'
 	}
@@ -504,25 +504,25 @@ const user={
 QRCode.toDataURL(stringdata, function (err, code) {
     if(err) return console.log("error occurred")
 
-	// let htmlBody = "New visitor information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
-    //     htmlBody += code;
+	let htmlBody = "New visitor information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
+        htmlBody += code;
       
         
-        // var mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
-        // {
-        //   from: "bellaxbx1109@gmail.com",
-        //   to: visitor.email_id,
-        //   subject: "Qr Code.",
-        //   html: htmlBody,
-        // };
+        var mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
+        {
+          from: config.email_setting.email,
+          to: visitor.email_id,
+          subject: "Qr Code.",
+          html: htmlBody,
+        };
 
-		// transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
-		// 	if (error) {
-		// 	  console.log(error);
-		// 	} else {
-		// 	  console.log('Email sent: ' + info.response);
-		// 	}
-		//   });
+		transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
+			if (error) {
+			  console.log(error);
+			} else {
+			  console.log('Email sent: ' + info.response);
+			}
+		  });
 
 	// 	let MobileBody = "New guest : ";
 	// 	MobileBody +=`Name: ${visitor.name} 
