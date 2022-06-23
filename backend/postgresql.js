@@ -2,14 +2,16 @@
 // import os from 'os';
 const postgresql= require('pg');
 const os= require('os');
+const config=require('./config.json');
 
 const { Pool } = postgresql;
 
 module.exports= (callback = null) => {
   const pool = new Pool({
-    user: process.env.NODE_ENV === 'development' && (os.userInfo() || {}).username || '',
-    database: 'app',
-    password: 'bellamava',
+    // user: process.env.NODE_ENV === 'development' && (os.userInfo() || {}).username || '',
+    user:config.postgres.user,
+    database: config.postgres.database,
+    password: config.postgres.password,
     host: '127.0.0.1',
     port: 5432,
   });

@@ -1,11 +1,4 @@
 const express = require("express");
-// import express from 'express';
-// import postgresql from './postgresql.js';
-// import qrcode  from 'qrcode';
-// import nodemailer from 'nodemailer';
-// import bodyParser from 'body-parser';
-// import openssl from 'openssl-nodejs';
-// import config from './config.json' assert { type: 'json' };
 const bodyParser= require('body-parser');
 const nodemailer= require('nodemailer');
 const QRCode= require('qrcode');
@@ -13,14 +6,14 @@ const postgresql=require('./postgresql.js');
 const config=require('./config.json');
 const crypto = require('crypto');
 const fs = require('fs');
-// const {stringify} = require('csv-stringify');
-// const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+const {stringify} = require('csv-stringify');
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const fastcsv= require('fast-csv');
 const Vonage = require('@vonage/server-sdk')
 
 const vonage = new Vonage({
-  apiKey: "c264a6ec",
-  apiSecret: "O8JEN8Rm6CQOn5UR"
+  apiKey: config.vonage.apiKey,
+  apiSecret:config.vonage.apiSecret
 })
 
 const PORT = process.env.PORT || 3001;
@@ -116,7 +109,7 @@ app.get("/api", (req, res) => {
 	});
 
 
-//___________________________________ regitering a host ________________________________________________
+//___________________________________ registering a host ________________________________________________
 app.post('/api/hosts', async (req, res) => {
     const pass=crypto.randomBytes(8).toString('hex');
 	const host = {
@@ -129,24 +122,53 @@ app.post('/api/hosts', async (req, res) => {
 		if (err) throw err;
 	});
 
-	let MobileBody = "Your login information : ";
-	MobileBody +=" Email : " + host.email_id + " " +
-	"Password :" + host.password;
+	let htmlBody = "Your new login information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
+	htmlBody += "Email : " + host.email_id + " \n " + "\n" + 
+	" password : " +host.password ;
+  
+	
+	var mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
+	{
+	  from: config.email_setting.email,
+	  to: host.email_id,
+	  subject: "Login information.",
+	  html: htmlBody,
+	};
 
-	client.messages
-  .create({
-     body: MobileBody,
-     from: config.twilio.from_number,
-     to: host.mobile_no
-   })
-  .then(message => console.log(message.sid));
+	transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
+		if (error) {
+		  console.log(error);
+		} else {
+		  console.log('Email sent: ' + info.response);
+		}
+	  });
+
+
+const from = "250787380054";
+const to =`250${host.mobile_no}`;
+const text =` Your new login information
+Email: ${host.email_id} 
+   Password: ${host.password}
+  `;
+
+vonage.message.sendSms(from, to, text, (err, responseData) => {
+    if (err) {
+        console.log(err);
+    } else {
+        if(responseData.messages[0]['status'] === "0") {
+            console.log("Message sent successfully.");
+        } else {
+            console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
+        }
+    }
+});
 	 res.status(200).send('Host registered!');
 
 	
   });
 
   //___________________________________ editing a host ________________________________________________
-app.post('/api/hosts/:id', async (req, res) => {
+app.put('/api/hosts/:id', async (req, res) => {
 	const pk=req.params['id'];
 	const host = {
 		name: req.body.name,
@@ -156,15 +178,29 @@ app.post('/api/hosts/:id', async (req, res) => {
 	 await process.postgresql.query('UPDATE "hosts" SET "name" = $1, "email_id" = $2, "mobile_no" = $3 WHERE id=$4', [host.name,host.email_id,host.mobile_no,pk]).then((err,result) => {
 		if (err) throw err;
 	});
-	 res.status(200).send('Host registered!');
+	 res.status(200).send(JSON.stringify('Host edited!'));
+
+	
+  });
+
+  //___________________________________ editing a host password ________________________________________________
+  app.patch('/api/hosts/:id', async (req, res) => {
+	const pk=req.params['id'];
+	const host = {
+		password:req.body.password
+	}
+	 await process.postgresql.query('UPDATE "hosts" SET "password" = $1 WHERE id=$2', [host.passsword,pk]).then((err,result) => {
+		if (err) throw err;
+	});
+	 res.status(200).send(JSON.stringify('Password changed'));
 
 	
   });
    //___________________________________ Deleting a single host ________________________________________________
- app.delete('/api/visitors/:id', async (req, res) => {
+ app.delete('/api/hosts/:id', async (req, res) => {
 	const pk=req.params['id'];
 	await process.postgresql.query('DELETE FROM "hosts" WHERE "id" = $1', [pk]);
-	res.send('Host deleted');
+	res.json('Host deleted');
   });
 
 
@@ -195,7 +231,7 @@ app.post('/api/visitors', async (req, res) => {
 	 await process.postgresql.query(`INSERT INTO visitors (name, email_id, mobile_no) VALUES ('${visitor.name}', '${visitor.email_id}', '${visitor.mobile_no}') ON CONFLICT DO NOTHING;`).then((err,result) => {
 		if (err) throw err;
 	});
-	 res.status(200).send('Visitor registered!');
+	 res.status(200).send(JSON.stringify('Visitor registered!'));
 
 	
   });
@@ -211,7 +247,7 @@ app.post('/api/visitors', async (req, res) => {
 		await process.postgresql.query('UPDATE "visitors" SET "name" = $1, "email_id" = $2,"mobile_no" = $3 WHERE id=$4', [visitor.name,visitor.email_id,visitor.mobile_no,pk]).then((err,result) => {
 			if (err) throw err;
 		});
-		res.status(200).send('Visitor Updated!');
+		res.status(200).send(JSON.stringify('Visitor updated!'));
 	  });
 	 
 	  //___________________________________ Sending a single visitor ________________________________________________
@@ -233,17 +269,6 @@ app.post('/api/visitors', async (req, res) => {
   //___________________________________ sending visits ________________________________________________
   app.get('/api/visits', async (req, res) => {
 	const rows = await process.postgresql.query('SELECT * FROM register');
-	console.log(rows);
-	rows.map(row =>{
-
-		const dat=row.checked_in.toUTCString();
-		const time= row.checked_in.toLocaleTimeString();
-		console.log(dat);
-		console.log(time);
-		const dattime=dat+'T'+time;
-		console.log(dattime);
-
-	})
 	res.status(200).json(rows);
   });
 
@@ -255,13 +280,20 @@ app.post('/api/visitors', async (req, res) => {
 		res.status(200).json(rows);
 	  });
 
+    //___________________________________ sending active visitors ________________________________________________
+	app.get('/api/visits/:date', async (req, res) => {
+		// const date=req.params['date'];
+		const checked_out=null;
+		const rows = await process.postgresql.query('SELECT * FROM register WHERE checked_out=$1', [checked_out]);
+	
+		res.status(200).json(rows);
+	  });
+
 //___________________________________ registering a visit ________________________________________________
 app.post('/api/visits', async (req, res) => {
 	const checked_in= new Date();
 	const checkin_date= checked_in.toLocaleDateString();
 	const checkin_time= checked_in.toLocaleTimeString();
-	// console.log(checkin_date);
-	// console.log(checkin_time);
 	const visit = {
 		host_id: req.body.host_id,
 		host_name: req.body.host_name,
@@ -280,44 +312,33 @@ app.post('/api/visits', async (req, res) => {
 			if (err) throw err;
 		});
 	}
-	await process.postgresql.query(`INSERT INTO register (host_id,host_name,visitor_name, visitor_email, visitor_no,date,checked_in role) VALUES ('${visit.host_id}', '${visit.host_name}','${visit.visitor_name}','${visit.visitor_email}','${visit.visitor_no}','${visit.date}','${visit.checked_in}', '${visit.role}') ON CONFLICT DO NOTHING;`).then((err,result) => {
+	await process.postgresql.query(`INSERT INTO register (host_id,host_name,visitor_name, visitor_email, visitor_no,date,checked_in, role) VALUES ('${visit.host_id}', '${visit.host_name}','${visit.visitor_name}','${visit.visitor_email}','${visit.visitor_no}','${visit.date}','${visit.checked_in}', '${visit.role}') ON CONFLICT DO NOTHING;`).then((err,result) => {
 		if (err) throw err;
 	});
-	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE id=$1' , [visit.host_id],); 
-	// let htmlBody = "New visitor information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
-    //     htmlBody +=  htmlBody += "Name : " + visit.visitor_name + " \n " + "\n" + 
-    //     " Email : " + visit.visitor_email + " \n " + "\n" +
-    //     "Mobile Number : " +visit.visitor_no + " \n " + "\n" +
-    //     " Check In Date Time :" +visit.checked_in;
+	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE id=$1' , [visit.host_id]); 
+	let htmlBody = "New visitor information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
+        htmlBody += "Name : " + visit.visitor_name + " \n " + "\n" + 
+        " Email : " + visit.visitor_email + " \n " + "\n" +
+        "Mobile Number : " +visit.visitor_no + " \n " + "\n" +
+        " Check In Time :" +visit.checked_in;
       
         
-    //     var mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
-    //     {
-    //       from: "bellaxbx1109@gmail.com",
-    //       to: host.email,
-    //       subject: "New guest for you has arrived.",
-    //       html: htmlBody,
-    //     };
+        var mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
+        {
+          from: config.email_setting.email,
+          to: host.email,
+          subject: "New guest for you has arrived.",
+          html: htmlBody,
+        };
 
-	// 	transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
-	// 		if (error) {
-	// 		  console.log(error);
-	// 		} else {
-	// 		  console.log('Email sent: ' + info.response);
-	// 		}
-	// 	  });
+		transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
+			if (error) {
+			  console.log(error);
+			} else {
+			  console.log('Email sent: ' + info.response);
+			}
+		  });
 
-// 	client.messages
-// 	.create({
-// 	   body: htmlBody,
-// 	   from: config.twilio.from_number,
-// 	   to: host.mobile_no
-// 	 })
-// 	.then((err,message) =>{
-// 	if(err){
-// console.log(err);}
-
-// 	else{ console.log(message.sid)};
 
 
 const from = "250787380054";
@@ -352,7 +373,7 @@ vonage.message.sendSms(from, to, text, (err, responseData) => {
   });
 
 //___________________________________ Editing a visit ________________________________________________
-app.put('/api/registers/:id', async (req, res) => {
+app.put('/api/visits/:id', async (req, res) => {
 	const pk=req.params['id'];
 	const visit = {
 		host_id: req.body.host_id,
@@ -369,13 +390,13 @@ app.put('/api/registers/:id', async (req, res) => {
 	await process.postgresql.query('UPDATE "register" SET "host_id" = $1, "host_name" = $2, "visitor_name" = $3, "visitor_email" = $4, "visitor_no" = $5,"date" = $10, "checked_in"= $6, "checked_out"=$7, "role"=$8  WHERE id=$9', [visit.host_id,visit.host_name,visit.visitor_name, visit.visitor_email,visit.visitor_no, visit.checked_in, visit.checked_out,visit.role,pk,visit.date]).then((err,result) => {
 		if (err) throw err;
 	});
-	 res.status(200).send('Visit Edited!');
+	 res.status(200).send(JSON.stringify('Visit edited'));
 
 	
   });
 
   //___________________________________ Editing a visit checkout ________________________________________________
-app.put('/api/registers/checkout/:id', async (req, res) => {
+app.patch('/api/visit/checkout/:id', async (req, res) => {
 	const pk=req.params['id'];
 	const checkout= new Date();
 	const checkout_time= checkout.toLocaleTimeString();
@@ -385,24 +406,24 @@ app.put('/api/registers/checkout/:id', async (req, res) => {
 	await process.postgresql.query('UPDATE "register" SET "checked_out"=$1  WHERE id=$2', [visit.checked_out,pk]).then((err,result) => {
 		if (err) throw err;
 	});
-	 res.status(200).send('Checkout time Edited!');
+	 res.status(200).send(JSON.stringify('Checked out'));
 
 	
   });
 
      //___________________________________ Sending a single visit ________________________________________________
-	 app.get('/api/registers/:id', async (req, res) => {
+	 app.get('/api/visits/:id', async (req, res) => {
 		const pk=req.params['id'];
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE id=$1', [pk]);
 		res.json(rows);
 	  });
 	
-		 //___________________________________ Sending a visit ________________________________________________
-		 app.post('/api/registers/:date/:time', async (req, res) => {
+		 //___________________________________ Sending a visit by date and time ________________________________________________
+		 app.get('/api/visits/:date/:time', async (req, res) => {
 			const date=req.params['date'];
 			const time= req.params['time'];
 	
-			const rows = await process.postgresql.query('SELECT * FROM register WHERE id=$1', [pk]);
+			const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1 AND time=$2', [date, time]);
 			res.json(rows);
 		  });
 	
@@ -410,7 +431,7 @@ app.put('/api/registers/checkout/:id', async (req, res) => {
 	
 	  
 	   //___________________________________ Deleting a single visit ________________________________________________
-	 app.delete('/api/registers/:id', async (req, res) => {
+	 app.delete('/api/visits/:id', async (req, res) => {
 		const pk=req.params['id'];
 		await process.postgresql.query('DELETE FROM "register" WHERE "id" = $1', [pk]);
 		res.send('Record deleted');
@@ -432,7 +453,7 @@ const user={
   );`).then((err,result) => {
 			if (err) throw err;
 		});
-		 res.status(200).send('User registered!')
+		 res.status(200).send(JSON.stringify('User registered'))
 });
 
  //___________________________________ login user ________________________________________________
@@ -451,22 +472,6 @@ const user={
 	});
 
 
-//   app.post('/api/visitors', async (req, res) => {
-// 	const { name, email_id, checked_in,mobile_no } = req.body;
-// 	const visitor = {
-// 		name: name,
-// 		email_id: email_id,
-// 		checked_in: checked_in,
-// 		mobile_no: mobile_no
-// 	}
-// 	 await process.postgresql.query(`INSERT INTO visitors (name, email_id,checked_in, mobile_no) VALUES ('${visitor.name}', '${visitor.email_id}', '${visitor.checked_in}', '${visitor.mobile_no}') ON CONFLICT DO NOTHING;`).then((err,result) => {
-// 		if (err) throw err;
-// 	});
-// 	 res.status(200).send('Visitor registered!');
-
-	
-//   });
-
   
 
 
@@ -474,46 +479,46 @@ const user={
 
 
 //___________________________________ generating qrcode ________________________________________________
-  app.get('/qrgenerate', async(req,res) => {
+  app.post('/qrgenerate', async(req,res) => {
 	// openssl('openssl req -config csr.cnf -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout key.key -out certificate.crt');
-	// const visitor = {
-	// 	name: req.body.name,
-	// 	email_id: req.body.email_id,
-	// 	check_in: req.body.check_in,
-	// 	mobile_no: req.body.mobile_no
-	// }
 	const visitor = {
-		name: 'Anny',
-		email_id: 'tuyisenge1109@gmail.com',
-		check_in: '2022-06-25T15:00',
-		mobile_no: '787695111'
-	}
+		name: req.body.name,
+		email_id: req.body.email_id,
+		date:req.body.date,
+		time: req.body.time,
+		mobile_no: req.body.mobile_no
+	};
 
 	let stringdata = JSON.stringify(visitor)
 
-	QRCode.toString(stringdata,{type:'terminal'},
-                    function (err, QRcode) {
+// 	QRCode.toString(stringdata,{type:'terminal'},
+//                     function (err, QRcode) {
  
-    if(err) return console.log("error occurred")
+//     if(err) return console.log("error occurred")
  
-    // Printing the generated code
-    console.log(QRcode)
-})
+//     // Printing the generated code
+//     console.log(QRcode)
+// })
    
 // Converting the data into base64
 QRCode.toDataURL(stringdata, function (err, code) {
     if(err) return console.log("error occurred")
 
-	let htmlBody = "New visitor information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
-        htmlBody += code;
-      
-        
-        var mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
+        let mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
         {
           from: config.email_setting.email,
           to: visitor.email_id,
           subject: "Qr Code.",
-          html: htmlBody,
+		  text: 'Dear guest, find attached the qr code for your visit to AmaliTech',
+		  attachDataUrls: true,
+        //   html:'<img src= '+code+'> ',
+		  attachments: [
+			{
+				filename: 'qrcode.png',
+            contentType: 'image',
+          path: `${code}`
+			}
+		]
         };
 
 		transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
@@ -524,41 +529,8 @@ QRCode.toDataURL(stringdata, function (err, code) {
 			}
 		  });
 
-	// 	let MobileBody = "New guest : ";
-	// 	MobileBody +=`Name: ${visitor.name} 
-	// 	   Number: ${visitor.mobile_no}
-	// 	   email: ${visitor.email_id}`;
-	// 	;
-	
-	// 	client.messages
-	//   .create({
-	// 	 body: MobileBody,
-	// 	 from: config.twilio.from_number,
-	// 	 to: visitor.mobile_no
-	//    })
-	//   .then(message => console.log(message.sid));
-		
 
-// 		const from = "250787380054";
-// const to = `250${visitor.mobile_no}`;
-// const text =`Name: ${visitor.name} 
-//    Number: ${visitor.mobile_no}
-//    email: ${visitor.email_id}`;
-
-// vonage.message.sendSms(from, to, text, (err, responseData) => {
-//     if (err) {
-//         console.log(err);
-//     } else {
-//         if(responseData.messages[0]['status'] === "0") {
-//             console.log("Message sent successfully.");
-//         } else {
-//             console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
-//         }
-//     }
-// });
-    // Printing the code
-    // console.log(`250${visitor.mobile_no}`)
-	res.send(code)
+	res.status(200).json('Qr code sent')
 
 	
 })

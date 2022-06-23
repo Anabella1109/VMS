@@ -221,3 +221,53 @@ execute(createregister).then(result => {
 //   });
 
 
+// 	client.messages
+// 	.create({
+// 	   body: htmlBody,
+// 	   from: config.twilio.from_number,
+// 	   to: host.mobile_no
+// 	 })
+// 	.then((err,message) =>{
+// 	if(err){
+// console.log(err);}
+
+// 	else{ console.log(message.sid)};
+
+
+
+	// 	let MobileBody = "New guest : ";
+	// 	MobileBody +=`Name: ${visitor.name} 
+	// 	   Number: ${visitor.mobile_no}
+	// 	   email: ${visitor.email_id}`;
+	// 	;
+	
+	// 	client.messages
+	//   .create({
+	// 	 body: MobileBody,
+	// 	 from: config.twilio.from_number,
+	// 	 to: visitor.mobile_no
+	//    })
+	//   .then(message => console.log(message.sid));
+		
+
+// 		const from = "250787380054";
+// const to = `250${visitor.mobile_no}`;
+// const text =`Name: ${visitor.name} 
+//    Number: ${visitor.mobile_no}
+//    email: ${visitor.email_id}`;
+
+// vonage.message.sendSms(from, to, text, (err, responseData) => {
+//     if (err) {
+//         console.log(err);
+//     } else {
+//         if(responseData.messages[0]['status'] === "0") {
+//             console.log("Message sent successfully.");
+//         } else {
+//             console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
+//         }
+//     }
+// });
+    // Printing the code
+    // console.log(`250${visitor.mobile_no}`)
+
+
