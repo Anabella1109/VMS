@@ -63,11 +63,6 @@ app.use("/public",express.static(__dirname+'/public'));
 	// console.log(checkin_time);
 	// res.send('hey')
 //   });
-
-app.get("/", (req, res) => {
-	res.json({ message: "Hello from server!" });
-  });
-
 //___________________________________ Connection to database ________________________________________________
 postgresql(async (connection) => {
 	await connection.query( `
@@ -101,13 +96,19 @@ postgresql(async (connection) => {
 		role TEXT NOT NULL
 	)
 	`);
-	await connection.query("CREATE EXTENSION pgcrypto;");
+	// await connection.query("CREATE EXTENSION pgcrypto;");
 	await connection.query(`CREATE TABLE users (
 	   id SERIAL PRIMARY KEY,
 	   email TEXT NOT NULL UNIQUE,
 	   password TEXT NOT NULL
 	 );`);
  });
+
+app.get("/", (req, res) => {
+	res.json({ message: "Hello from server!" });
+  });
+
+
 
 
 
