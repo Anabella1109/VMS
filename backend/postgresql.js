@@ -9,10 +9,10 @@ const { Pool } = postgresql;
 module.exports= (callback = null) => {
   const pool = new Pool({
     // user: process.env.NODE_ENV === 'development' && (os.userInfo() || {}).username || '',
-    user:config.postgres.user,
-    database: config.postgres.database,
-    password: config.postgres.password,
-    host:'postgres',
+    user:"xvujbztpejdfwj",
+    database: "ddf452db7gm1eb",
+    password:"d18bd13ce9c7b7906612dd23f104e43c8fafd1d6b0828639ac4a054ef967a982",
+    host:'ec2-23-23-151-191.compute-1.amazonaws.com',
     port:  5432,
   });
 
