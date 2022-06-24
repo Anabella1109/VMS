@@ -46,7 +46,43 @@ let transporter = nodemailer.createTransport({
 
 //___________________________________ Connection to database ________________________________________________
 postgresql(async (connection) => {
-
+     await connection.query( `
+	 CREATE TABLE IF NOT EXISTS visitors (
+		 id  SERIAL NOT NULL PRIMARY KEY,
+		 name TEXT NOT NULL,
+		 email_id TEXT NOT NULL,
+		 mobile_no INT DEFAULT NULL
+		 
+	 );`);
+	 await connection.query( `
+	 CREATE TABLE IF NOT EXISTS hosts (
+		 id  SERIAL NOT NULL PRIMARY KEY,
+		 name TEXT NOT NULL,
+		 email_id TEXT NOT NULL, 
+		 mobile_no INT DEFAULT NULL
+	 password TEXT NOT NULL,
+		 
+	 );`);
+	 await connection.query( `
+	 CREATE TABLE IF NOT EXISTS register(
+		 id SERIAL NOT NULL PRIMARY KEY,
+		 host_id INT DEFAULT NULL,
+		 host_name TEXT DEFAULT NULL,
+		 visitor_name TEXT NOT NULL,
+		 visitor_email TEXT NOT NULL,
+		 visitor_no INT DEFAULT NULL,
+		 date TEXT NOT NULL,
+		 checked_in TEXT NOT NULL,
+		  checked_out TEXT ,
+		 role TEXT NOT NULL
+	 )
+	 `);
+	 await connection.query("CREATE EXTENSION pgcrypto;");
+	 await connection.query(`CREATE TABLE users (
+		id SERIAL PRIMARY KEY,
+		email TEXT NOT NULL UNIQUE,
+		password TEXT NOT NULL
+	  );`);
   });
 
 
