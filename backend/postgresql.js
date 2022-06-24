@@ -12,8 +12,8 @@ module.exports= (callback = null) => {
     user:config.postgres.user,
     database: config.postgres.database,
     password: config.postgres.password,
-    host:process.env.POSTGRES_HOST,
-    port: process.env.POSTGRES_PORT,
+    host:'postgres',
+    port:  5432,
   });
 
   const connection = {
