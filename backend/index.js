@@ -66,7 +66,7 @@ app.get('/',function(req,res){
 	const checkin_time= checked_in.toLocaleTimeString();
 	console.log(checkin_date);
 	console.log(checkin_time);
-	res.send("hey")
+	res.send(checkin_date)
   });
 
 app.get("/api", (req, res) => {
@@ -120,48 +120,49 @@ app.post('/api/hosts', async (req, res) => {
 	}
 	 await process.postgresql.query(`INSERT INTO hosts (name, email_id, mobile_no,password) VALUES ('${host.name}', '${host.email_id}', '${host.mobile_no}','${host.password}') ON CONFLICT DO NOTHING;`).then((err,result) => {
 		if (err) throw err;
+		if (result){let htmlBody = "Your new login information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
+		htmlBody += "Email : " + host.email_id + " \n " + "\n" + 
+		" password : " +host.password ;
+	  
+		
+		var mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
+		{
+		  from: config.email_setting.email,
+		  to: host.email_id,
+		  subject: "Login information.",
+		  html: htmlBody,
+		};
+	
+		transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
+			if (error) {
+			  console.log(error);
+			} else {
+			  console.log('Email sent: ' + info.response);
+			}
+		  });
+	
+	
+	const from = "250787380054";
+	const to =`250${host.mobile_no}`;
+	const text =` Your new login information
+	Email: ${host.email_id} 
+	   Password: ${host.password}
+	  `;
+	
+	vonage.message.sendSms(from, to, text, (err, responseData) => {
+		if (err) {
+			console.log(err);
+		} else {
+			if(responseData.messages[0]['status'] === "0") {
+				console.log("Message sent successfully.");
+			} else {
+				console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
+			}
+		}
+	});};
 	});
 
-	let htmlBody = "Your new login information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
-	htmlBody += "Email : " + host.email_id + " \n " + "\n" + 
-	" password : " +host.password ;
-  
 	
-	var mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
-	{
-	  from: config.email_setting.email,
-	  to: host.email_id,
-	  subject: "Login information.",
-	  html: htmlBody,
-	};
-
-	transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
-		if (error) {
-		  console.log(error);
-		} else {
-		  console.log('Email sent: ' + info.response);
-		}
-	  });
-
-
-const from = "250787380054";
-const to =`250${host.mobile_no}`;
-const text =` Your new login information
-Email: ${host.email_id} 
-   Password: ${host.password}
-  `;
-
-vonage.message.sendSms(from, to, text, (err, responseData) => {
-    if (err) {
-        console.log(err);
-    } else {
-        if(responseData.messages[0]['status'] === "0") {
-            console.log("Message sent successfully.");
-        } else {
-            console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
-        }
-    }
-});
 	 res.status(200).send('Host registered!');
 
 	
