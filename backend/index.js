@@ -61,12 +61,12 @@ app.use("/public",express.static(__dirname+'/public'));
 
 
 app.get('/',function(req,res){
-	const checked_in= new Date();
-	const checkin_date= checked_in.toLocaleDateString();
-	const checkin_time= checked_in.toLocaleTimeString();
-	console.log(checkin_date);
-	console.log(checkin_time);
-	res.send(checkin_date)
+	// const checked_in= new Date();
+	// const checkin_date= checked_in.toLocaleDateString();
+	// const checkin_time= checked_in.toLocaleTimeString();
+	// console.log(checkin_date);
+	// console.log(checkin_time);
+	res.send('hey')
   });
 
 app.get("/api", (req, res) => {
