@@ -14,6 +14,9 @@ module.exports= (callback = null) => {
     password:"d18bd13ce9c7b7906612dd23f104e43c8fafd1d6b0828639ac4a054ef967a982",
     host:'ec2-23-23-151-191.compute-1.amazonaws.com',
     port:  5432,
+    ssl: {
+      rejectUnauthorized: false
+    }
   });
 
   const connection = {
