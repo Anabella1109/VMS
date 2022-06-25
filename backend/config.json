@@ -2,7 +2,7 @@
     
     "email_setting":{
     	"email":"amalitech2@outlook.com",
-		  "password":"amali1234",
+		  "password":"xxxxxxxx",
 		  "host":"smtp.outlook.com"
     },
 	"twilio":{
@@ -11,13 +11,8 @@
     	"from_number":"+19107883930"
     },
 	"vonage":{
-		"apiKey":"c264a6ec",
-		"apiSecret": "O8JEN8Rm6CQOn5UR"
-	},
-	"postgres":{
-		"user":"Bella",
-		"database":"app",
-		"password":"bellamava"
+		"apiKey":"c264a6",
+		"apiSecret": "O8JEN8Rm6"
 	}
 
 }

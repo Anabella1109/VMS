@@ -86,6 +86,12 @@ execute(createregister).then(result => {
 	});
 
 
+	// "postgres":{
+	// 	"user":"Bella",
+	// 	"database":"app",
+	// 	"password":"bellamava"
+	// }
+
 // _____________________________________________seeding and creation______________________________
 	// await connection.query('CREATE TABLE IF NOT EXISTS books (id bigserial primary key, title text, author text);');
 	// await connection.query('CREATE UNIQUE INDEX IF NOT EXISTS title ON books (title);');
