@@ -69,7 +69,7 @@ postgresql(async (connection) => {
  });
 
 app.get("/", (req, res) => {
-	res.json({ message: "Hello from server!" });
+	res.sendFile('index.html');
   });
 
 
