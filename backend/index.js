@@ -303,6 +303,7 @@ app.post('/api/visits', async (req, res) => {
 		visitor_no: req.body.visitor_no,
 		date:checkin_date,
 		checked_in: checkin_time,
+		checked_out:null,
 		role: req.body.role
 		
 	};
