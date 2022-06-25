@@ -308,7 +308,7 @@ app.post('/api/visits', async (req, res) => {
 		
 	};
 
-	const visitor = await process.postgresql.query('SELECT * FROM visitors WHERE name=$1 AND email=$2' , [visit.visitor_name, visit.visitor_email],); 
+	const visitor = await process.postgresql.query('SELECT * FROM visitors WHERE name=$1 AND email_id=$2' , [visit.visitor_name, visit.visitor_email],); 
 	if(!visitor){
 		await process.postgresql.query(`INSERT INTO visitors (name, email_id, mobile_no) VALUES ('${visit.visitor_name}', '${visit.visitor_email}', '${visit.visitor_no}') ON CONFLICT DO NOTHING;`).then((err,result) => {
 			if (err) throw err;
