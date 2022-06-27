@@ -584,6 +584,39 @@ app.get('/api/pdf/visits', async(req,res)=>{
 	  
 	 
 	});
+
+
+// _____________________________________________csv______________________________________________________________________
+app.post('api/csv/hosts', async (req, res) => {
+	const rows = await process.postgresql.query('SELECT * FROM hosts');
+	const csvWriter = createCsvWriter({
+		path:__dirname+'/public/hosts.csv',
+		header: [
+			{id: 'id', title: 'ID'},
+			{id: 'name', title: 'NAME'},
+			{id: 'email', title: 'EMAIL'},
+			{id: 'mobile_no', title: 'PHONE NUMBER'}
+		]
+	});
+	 
+	const records = await process.postgresql.query('SELECT * FROM hosts');
+	 
+	csvWriter.writeRecords(records)       // returns a promise
+		.then(() => {
+			console.log('...Done');
+		});
+
+	const src = fs.createReadStream(__dirname+'/public/hosts.csv');
+	const name= new Date().toLocaleDateString();
+	res.writeHead(200, {
+		'Content-Type': 'application/csv',
+		'Content-Disposition': `attachment; filename= ${name} report.pdf`,
+		'Content-Transfer-Encoding': 'Binary'
+	  });
+	
+	  src.pipe(res); 
+  });
+
 	
 
 
