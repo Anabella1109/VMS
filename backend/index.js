@@ -651,7 +651,7 @@ app.get('/api/csv/hosts', async (req, res) => {
 	// const rows = await process.postgresql.query('SELECT * FROM register');
 	const name= new Date().toLocaleDateString();
 	const csvWriter = createCsvWriter({
-		path:__dirname+`/public/${name}visits.csv`,
+		path:__dirname+`/public/visits.csv`,
 		header: [
 			{id: 'host_name', title: 'HOST'},
 			{id: 'visitor_name', title: ' VISITOR NAME'},
@@ -672,7 +672,7 @@ app.get('/api/csv/hosts', async (req, res) => {
 			console.log('...Done');
 		});
 
-	const src = fs.createReadStream(__dirname+`/public/${name}visits.csv`);
+	const src = fs.createReadStream(__dirname+`/public/visits.csv`);
 	
 	res.writeHead(200, {
 		'Content-Type': 'application/csv',
