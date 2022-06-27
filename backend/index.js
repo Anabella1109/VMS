@@ -342,7 +342,7 @@ app.post('/api/visits', async (req, res) => {
 
 
 const from = "250787380054";
-const to =`250${host.mobile_no}`;
+const to =`250${host[0].mobile_no}`;
 const text =` A new  guest has arrived
 Name: ${visit.visitor_name} 
    Number: ${visit.visitor_no}
