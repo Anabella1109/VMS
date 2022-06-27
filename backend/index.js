@@ -580,8 +580,6 @@ app.get('/api/pdf/visits', async(req,res)=>{
 	
 	  src.pipe(res);
 	  doc.end();
-
-	  
 	 
 	});
 
