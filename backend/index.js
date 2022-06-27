@@ -325,7 +325,7 @@ app.post('/api/visits', async (req, res) => {
         var mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
         {
           from: config.email_setting.email,
-          to: host.email,
+          to: host.email_id,
           subject: "New guest for you has arrived.",
           html: htmlBody,
         };
