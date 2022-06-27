@@ -300,7 +300,7 @@ app.post('/api/visits', async (req, res) => {
 		host_id: req.body.host_id,
 		host_name: req.body.host_name,
 		visitor_name: req.body.visitor_name,
-		visitor_email: req.body.email,
+		visitor_email: req.body.visitor_email,
 		visitor_no: req.body.visitor_no,
 		date:checkin_date,
 		checked_in: checkin_time,
