@@ -285,7 +285,7 @@ app.post('/api/visitors', async (req, res) => {
     //___________________________________ sending active visitors ________________________________________________
 	app.get('/api/active/visits', async (req, res) => {
 		// const date=req.params['date'];
-		const checked_out=null;
+		const checked_out="null";
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE checked_out=$1', [checked_out]);
 	
 		res.status(200).json(rows);
@@ -546,8 +546,8 @@ app.get('/api/pdf/visits', async(req,res)=>{
 		headers: [
 		  { label: "Host", property: 'host_name', width: 60, renderer: null },
 		  { label: "Visitor name", property: 'visitor_name', width:60, renderer: null }, 
-		  { label: "Visitor email", property: 'visitor_email', width: 100, renderer: null }, 
-		  { label: "Visitor mobile", property: 'visitor_no', width: 100, renderer: null }, 
+		  { label: "Visitor email", property: 'visitor_email', width: 80, renderer: null }, 
+		  { label: "Visitor mobile", property: 'visitor_no', width: 80, renderer: null }, 
 		  { label: "Date", property: 'date', width: 80, renderer: null },
 		  { label: "Check in time", property: 'checked_in', width: 80, renderer: null }, 
 		  { label: "Check out time", property: 'checked_out', width: 80, renderer: null },
@@ -568,8 +568,19 @@ app.get('/api/pdf/visits', async(req,res)=>{
 		},
 	  });
 	  // done!
-	  doc.pipe(res);
+	//   doc.pipe(res);
+	doc.pipe(fs.createWriteStream(__dirname+'/public/visits.pdf'));
 	  doc.end();
+
+	  const src = fs.createReadStream(__dirname+'/public/visits.pdf');
+	  const name= new Date().toLocaleDateString();
+	  res.writeHead(200, {
+		  'Content-Type': 'application/pdf',
+		  'Content-Disposition': `attachment; filename= ${name} report.pdf`,
+		  'Content-Transfer-Encoding': 'Binary'
+		});
+	  
+		src.pipe(res); 
 	 
 	});
 	

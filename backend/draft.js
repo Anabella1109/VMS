@@ -208,15 +208,15 @@ execute(createregister).then(result => {
 // 			console.log('...Done');
 // 		});
 
-// 	const src = fs.createReadStream(__dirname+'/public/hosts.csv');
-// 	const name= new Date().toLocaleDateString();
-// 	res.writeHead(200, {
-// 		'Content-Type': 'application/pdf',
-// 		'Content-Disposition': `attachment; filename= ${name} report.pdf`,
-// 		'Content-Transfer-Encoding': 'Binary'
-// 	  });
+	// const src = fs.createReadStream(__dirname+'/public/hosts.csv');
+	// const name= new Date().toLocaleDateString();
+	// res.writeHead(200, {
+	// 	'Content-Type': 'application/pdf',
+	// 	'Content-Disposition': `attachment; filename= ${name} report.pdf`,
+	// 	'Content-Transfer-Encoding': 'Binary'
+	//   });
 	
-// 	  src.pipe(res); 
+	//   src.pipe(res); 
 //   });
 
 // axios.get(url, {
