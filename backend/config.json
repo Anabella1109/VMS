@@ -3,7 +3,7 @@
     
     "email_setting":{
     	"email":"amalitech2@outlook.com",
-		  "password":"xxxxxxxx",
+		  "password":"amali1234",
 		  "host":"smtp.outlook.com"
     },
 	"twilio":{
