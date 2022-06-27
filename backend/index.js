@@ -10,6 +10,7 @@ const {stringify} = require('csv-stringify');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const fastcsv= require('fast-csv');
 const Vonage = require('@vonage/server-sdk')
+const PDFDocument = require("pdfkit-table");
 
 const vonage = new Vonage({
   apiKey: config.vonage.apiKey,
@@ -538,6 +539,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
 // ___________________________________________pdf________________________________________________________________
 app.get('/api/pdf/visits', async(req,res)=>{
 	const rows = await process.postgresql.query('SELECT * FROM register');
+	let doc = new PDFDocument({ margin: 30, size: 'A4' });
 	const table = {
 		title: "Visits",
 		subtitle: "visitors report",
