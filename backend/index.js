@@ -570,17 +570,18 @@ app.get('/api/pdf/visits', async(req,res)=>{
 	  // done!
 	//   doc.pipe(res);
 	doc.pipe(fs.createWriteStream(__dirname+'/public/visits.pdf'));
+	const src = fs.createReadStream(__dirname+'/public/visits.pdf');
+	const name= new Date().toLocaleDateString();
+	res.writeHead(200, {
+		'Content-Type': 'application/pdf',
+		'Content-Disposition': `attachment; filename= ${name} report.pdf`,
+		'Content-Transfer-Encoding': 'Binary'
+	  });
+	
+	  src.pipe(res);
 	  doc.end();
 
-	  const src = fs.createReadStream(__dirname+'/public/visits.pdf');
-	  const name= new Date().toLocaleDateString();
-	  res.writeHead(200, {
-		  'Content-Type': 'application/pdf',
-		  'Content-Disposition': `attachment; filename= ${name} report.pdf`,
-		  'Content-Transfer-Encoding': 'Binary'
-		});
 	  
-		src.pipe(res); 
 	 
 	});
 	
