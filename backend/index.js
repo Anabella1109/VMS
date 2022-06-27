@@ -617,6 +617,42 @@ app.get('/api/csv/hosts', async (req, res) => {
 	  src.pipe(res); 
   });
 
+
+  app.get('/api/csv/visits', async (req, res) => {
+	const rows = await process.postgresql.query('SELECT * FROM register');
+	const name= new Date().toLocaleDateString();
+	const csvWriter = createCsvWriter({
+		path:__dirname+`/public/${name}visits.csv`,
+		header: [
+			{id: 'host_name', title: 'HOST'},
+			{id: 'visitor_name', title: ' VISITOR NAME'},
+			{id: 'visitor_email', title: 'VISITOR EMAIL'},
+			{id: 'visitor_no', title: 'VISITOR MOBILE'},
+			{id: 'date', title: 'DATE'},
+			{id: 'checked_in', title: 'CHECK IN'},
+			{id: 'checked_out', title: 'CHECK OUT'},
+			{id: 'role', title: 'PURPOSE'},
+
+		]
+	});
+	 
+	const records = await process.postgresql.query('SELECT * FROM register');
+	 
+	csvWriter.writeRecords(records)       // returns a promise
+		.then(() => {
+			console.log('...Done');
+		});
+
+	const src = fs.createReadStream(__dirname+`/public/${name}visits.csv`);
+	
+	res.writeHead(200, {
+		'Content-Type': 'application/csv',
+		'Content-Disposition': `attachment; filename= ${name} report.csv`,
+		'Content-Transfer-Encoding': 'Binary'
+	  });
+	
+	  src.pipe(res); 
+  });
 	
 
 
