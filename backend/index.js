@@ -314,7 +314,8 @@ app.post('/api/visits', async (req, res) => {
 		await process.postgresql.query(`INSERT INTO visitors (name, email_id, mobile_no) VALUES ('${visit.visitor_name}', '${visit.visitor_email}', '${visit.visitor_no}') ON CONFLICT DO NOTHING;`);
 	}
 	await process.postgresql.query(`INSERT INTO register (host_id,host_name,visitor_name, visitor_email, visitor_no,date,checked_in,checked_out, role) VALUES ('${visit.host_id}', '${visit.host_name}','${visit.visitor_name}','${visit.visitor_email}','${visit.visitor_no}','${visit.date}','${visit.checked_in}','${visit.checked_out}', '${visit.role}') ON CONFLICT DO NOTHING;`);
-	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE id=$1' , [visit.host_id]); 
+	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE id=$1' , [visit.host_id]);
+	console.log(host); 
 	let htmlBody = "New visitor information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
         htmlBody += "Name : " + visit.visitor_name + " \n " + "\n" + 
         " Email : " + visit.visitor_email + " \n " + "\n" +
