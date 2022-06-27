@@ -274,7 +274,7 @@ app.post('/api/visitors', async (req, res) => {
   });
 
     //___________________________________ sending visits by date ________________________________________________
-	app.get('/api/visits/:date', async (req, res) => {
+	app.get('/api/date/visits/:date', async (req, res) => {
 		const date=req.params['date'];
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1', [date]);
 	
@@ -282,7 +282,7 @@ app.post('/api/visitors', async (req, res) => {
 	  });
 
     //___________________________________ sending active visitors ________________________________________________
-	app.get('/api/visits/active', async (req, res) => {
+	app.get('/api/active/visits', async (req, res) => {
 		// const date=req.params['date'];
 		const checked_out=null;
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE checked_out=$1', [checked_out]);
@@ -536,7 +536,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
   });
 
 // ___________________________________________pdf________________________________________________________________
-app.get('/api/visits/pdf', async(req,res)=>{
+app.get('/api/pdf/visits', async(req,res)=>{
 	const rows = await process.postgresql.query('SELECT * FROM register');
 	const table = {
 		title: "Visits",
