@@ -585,6 +585,91 @@ app.get('/api/pdf/visits', async(req,res)=>{
 	});
 
 
+	app.get('/api/pdf/visitors', async(req,res)=>{
+		const rows = await process.postgresql.query('SELECT * FROM visitors');
+		const name= new Date().toLocaleDateString();
+		let doc = new PDFDocument({ margin: 30, size: 'A4' });
+		const table = {
+			title: "Visitors",
+			subtitle: `${name} report`,
+			headers: [
+			  { label: "ID", property: 'id', width: 60, renderer: null },
+			  { label: "Name", property: 'name', width:150, renderer: null }, 
+			  { label: "Email", property: 'email_id', width: 150, renderer: null }, 
+			  { label: "Phone nnumber", property: 'mobile_no', width: 150, renderer: null }, 
+			],
+			// complex data
+			datas:rows,
+			// simeple data
+	
+		  };
+		  // the magic
+		  doc.table(table, {
+			prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
+			prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
+			  doc.font("Helvetica").fontSize(8);
+			  indexColumn === 0 && doc.addBackground(rectRow, 'blue', 0.15);
+			},
+		  });
+		  // done!
+		//   doc.pipe(res);
+		doc.pipe(fs.createWriteStream(__dirname+'/public/visitors.pdf'));
+		const src = fs.createReadStream(__dirname+'/public/visitors.pdf');
+		
+		res.writeHead(200, {
+			'Content-Type': 'application/pdf',
+			'Content-Disposition': `attachment; filename= ${name} report.pdf`,
+			'Content-Transfer-Encoding': 'Binary'
+		  });
+		
+		  src.pipe(res);
+		  doc.end();
+		 
+		});
+	
+
+		app.get('/api/pdf/hosts', async(req,res)=>{
+			const rows = await process.postgresql.query('SELECT * FROM hosts');
+			const name= new Date().toLocaleDateString();
+			let doc = new PDFDocument({ margin: 30, size: 'A4' });
+			const table = {
+				title: "Hosts",
+				subtitle: `${name} report`,
+				headers: [
+				  { label: "ID", property: 'id', width: 60, renderer: null },
+				  { label: "Name", property: 'name', width:150, renderer: null }, 
+				  { label: "Email", property: 'email_id', width: 150, renderer: null }, 
+				  { label: "Phone nnumber", property: 'mobile_no', width: 150, renderer: null }, 
+				],
+				// complex data
+				datas:rows,
+				// simeple data
+		
+			  };
+			  // the magic
+			  doc.table(table, {
+				prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
+				prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
+				  doc.font("Helvetica").fontSize(8);
+				  indexColumn === 0 && doc.addBackground(rectRow, 'blue', 0.15);
+				},
+			  });
+			  // done!
+			//   doc.pipe(res);
+			doc.pipe(fs.createWriteStream(__dirname+'/public/hosts.pdf'));
+			const src = fs.createReadStream(__dirname+'/public/hosts.pdf');
+			
+			res.writeHead(200, {
+				'Content-Type': 'application/pdf',
+				'Content-Disposition': `attachment; filename= ${name} report.pdf`,
+				'Content-Transfer-Encoding': 'Binary'
+			  });
+			
+			  src.pipe(res);
+			  doc.end();
+			 
+			});
+
 // _____________________________________________csv______________________________________________________________________
 app.get('/api/csv/hosts', async (req, res) => {
 	const rows = await process.postgresql.query('SELECT * FROM hosts');
