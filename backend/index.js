@@ -610,7 +610,7 @@ app.get('/api/csv/hosts', async (req, res) => {
 	const name= new Date().toLocaleDateString();
 	res.writeHead(200, {
 		'Content-Type': 'application/csv',
-		'Content-Disposition': `attachment; filename= ${name} report.pdf`,
+		'Content-Disposition': `attachment; filename= ${name} report.csv`,
 		'Content-Transfer-Encoding': 'Binary'
 	  });
 	
