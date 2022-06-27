@@ -566,7 +566,9 @@ app.get('/api/visits/pdf', async(req,res)=>{
 		},
 	  });
 	  // done!
+	  doc.pipe(res);
 	  doc.end();
+	 
 	});
 	
 
