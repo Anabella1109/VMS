@@ -69,7 +69,7 @@ postgresql(async (connection) => {
  });
 
 app.get("/", (req, res) => {
-	res.SEND('hey');
+	res.send('hey');
   });
 
 
