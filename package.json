@@ -23,6 +23,7 @@
     "fast-csv": "^4.3.6",
     "nodemailer": "^6.7.5",
     "openssl-nodejs": "^1.0.5",
+    "pdfkit-table": "^0.1.99",
     "pg": "^8.7.3",
     "qrcode": "^1.5.0",
     "twilio": "^3.77.3"

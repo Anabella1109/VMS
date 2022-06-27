@@ -533,8 +533,43 @@ QRCode.toDataURL(stringdata, function (err, code) {
 	
 })
 
-
   });
+
+// ___________________________________________pdf________________________________________________________________
+app.get('/api/visits/pdf', async(req,res)=>{
+	const rows = await process.postgresql.query('SELECT * FROM register');
+	const table = {
+		title: "Visits",
+		subtitle: "visitors report",
+		headers: [
+		  { label: "Host", property: 'host_name', width: 60, renderer: null },
+		  { label: "Visitor name", property: 'visitor_name', width:60, renderer: null }, 
+		  { label: "Visitor email", property: 'visitor_email', width: 100, renderer: null }, 
+		  { label: "Visitor mobile", property: 'visitor_no', width: 100, renderer: null }, 
+		  { label: "Date", property: 'date', width: 80, renderer: null },
+		  { label: "Check in time", property: 'checked_in', width: 80, renderer: null }, 
+		  { label: "Check out time", property: 'checked_out', width: 80, renderer: null },
+		  { label: "Role", property: 'role', width: 80, renderer: null },
+		 
+		],
+		// complex data
+		datas:rows,
+		// simeple data
+
+	  };
+	  // the magic
+	  doc.table(table, {
+		prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
+		prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
+		  doc.font("Helvetica").fontSize(8);
+		  indexColumn === 0 && doc.addBackground(rectRow, 'blue', 0.15);
+		},
+	  });
+	  // done!
+	  doc.end();
+	});
+	
+
 
  
 
