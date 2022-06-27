@@ -7,11 +7,94 @@
 	<title>Document</title>
 </head>
 <body>
-	<h1>/api/visits: view all visits</h1>
-	<h1>/api/visitors: view all visitors</h1>
-	<h1>/api/hosts: view all hosts</h1>
-	<h1>/api/visits/:id : view single visit</h1> 
-	<h1>/api/visitors/id: view single visitor</h1>
+	<h1>/api/visits </h1>
+	  <ul>
+	
+		<li> GET: view all visits</li>
+		<li> POST: add new visit(checkin)</li>
+		  <p>parameters: host_id, host_name, visitor_name,visitor_email, visitor_no, role</p>
+	
+	  </ul>
+ 
+	  <h1>/api/visits/:id :</h1> 
+	<ul>
+		<li>GET: view single visit</li>
+		<li> PUT: edit single visit</li>
+		<li>DELETE : delete single visit</li>
+	  </ul>
+
+	  <h1>/api/visits/:date </h1>
+	  <ul>
+	
+		<li> GET: view visits by date</li>
+	
+	  </ul>
+	 
+	  <h1>/api/visits/active </h1>
+	  <ul>
+	
+		<li> GET: view all active visits{haven't checked out)</li>
+	
+	  </ul>
+	  <h1>/api/visits/checkout/:id</h1>
+	  <ul>
+		<li>PATCH: checkout</li>
+		
+	  </ul>
+
+	  <h1>/api/visits/:date/:time</h1>
+	  <ul>
+		<li>GET: view visits by date and checkin time</li>
+		
+	  </ul>
+      <b><i><h1>VISITORS</h1></i></b>
+	<h1>/api/visitors</h1>
+	<ul>
+		<li>GET:  view all visitors
+		</li>
+		<li>POST: register a visitor</li>
+		<p>parameters: name, email_id, mobile_no</p>
+		
+	  </ul>
+
+	  <h1>/api/visitors/:id</h1>
+	  <ul>
+		  <li>GET : view single visitor</li>
+		  <li> PUT: edit single visitor</li>
+		  <li> DELETE: delete single visitor</li>
+		</ul>
+
+		<b><i><h1>HOSTS</h1></i></b>
+
+	<h1>/api/hosts:</h1>
+	<ul>
+		<li> GET :  view all hosts</li>
+		<li>POST: register a host</li>
+		<p>parameters: name, email_id, mobile_no</p>
+	  </ul>
+
+	  <h1>/api/hosts/:id</h1>
+	  <ul>
+		  <li>GET : view single host</li>
+		  <li> PUT: edit single host</li>
+		  <li> DELETE: delete single host</li>
+		  <li>PATCH: edit host password</li>
+		  <p>parameter:password</p>
+		</ul>
+	<h1>/api/login/host</h1>
+	<ul>
+		<li>POST: authenticate host</li>
+	</ul>
+
+	<h1>/api/registeruser</h1>
+	<ul>
+		<li>POST: register admin</li>
+		<p>parameters: email, password</p>
+	</ul>
+	<h1>/api/login/admin</h1>
+	<ul>
+		<li>POST: authenticate admin</li>
+	</ul>
 	<h1>/qrgenerate: booking and sending qr code</h1>
 	
 </body>

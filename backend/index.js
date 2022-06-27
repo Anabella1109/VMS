@@ -69,7 +69,7 @@ postgresql(async (connection) => {
  });
 
 app.get("/", (req, res) => {
-	res.json('hey');
+	res.SEND('hey');
   });
 
 
@@ -282,7 +282,7 @@ app.post('/api/visitors', async (req, res) => {
 	  });
 
     //___________________________________ sending active visitors ________________________________________________
-	app.get('/api/visits/:date', async (req, res) => {
+	app.get('/api/visits/active', async (req, res) => {
 		// const date=req.params['date'];
 		const checked_out=null;
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE checked_out=$1', [checked_out]);
@@ -394,7 +394,7 @@ app.put('/api/visits/:id', async (req, res) => {
   });
 
   //___________________________________ Editing a visit checkout ________________________________________________
-app.patch('/api/visit/checkout/:id', async (req, res) => {
+app.patch('/api/visits/checkout/:id', async (req, res) => {
 	const pk=req.params['id'];
 	const checkout= new Date();
 	const checkout_time= checkout.toLocaleTimeString();
@@ -421,7 +421,7 @@ app.patch('/api/visit/checkout/:id', async (req, res) => {
 			const date=req.params['date'];
 			const time= req.params['time'];
 	
-			const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1 AND time=$2', [date, time]);
+			const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1 AND checked_in=$2', [date, time]);
 			res.json(rows);
 		  });
 	
