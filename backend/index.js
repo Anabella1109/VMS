@@ -668,21 +668,21 @@ app.get('/api/csv/hosts', async (req, res) => {
 	 
 	const records = await process.postgresql.query('SELECT * FROM register');
 	 
-	// csvWriter.writeRecords(records)       // returns a promise
-	// 	.then(() => {
-	// 		console.log('...Done');
-	// 	});
+	csvWriter.writeRecords(records)       // returns a promise
+		.then(() => {
+			console.log('...Done');
+		});
 
-	// const src = fs.createReadStream(__dirname+`/public/${name}visits.csv`);
+	const src = fs.createReadStream(__dirname+`/public/${name}visits.csv`);
 	
-	// res.writeHead(200, {
-	// 	'Content-Type': 'application/csv',
-	// 	'Content-Disposition': `attachment; filename= ${name} report.csv`,
-	// 	'Content-Transfer-Encoding': 'Binary'
-	//   });
+	res.writeHead(200, {
+		'Content-Type': 'application/csv',
+		'Content-Disposition': `attachment; filename= ${name} report.csv`,
+		'Content-Transfer-Encoding': 'Binary'
+	  });
 	
-	//   src.pipe(res); 
-	  res.send(Buffer.from(records));
+	  src.pipe(res); 
+	//   res.send(Buffer.from(records));
   });
 	
 
