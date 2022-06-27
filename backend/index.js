@@ -587,7 +587,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 
 
 // _____________________________________________csv______________________________________________________________________
-app.post('/api/csv/hosts', async (req, res) => {
+app.get('/api/csv/hosts', async (req, res) => {
 	const rows = await process.postgresql.query('SELECT * FROM hosts');
 	const csvWriter = createCsvWriter({
 		path:__dirname+'/public/hosts.csv',
