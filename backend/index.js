@@ -594,7 +594,7 @@ app.get('/api/csv/hosts', async (req, res) => {
 		header: [
 			{id: 'id', title: 'ID'},
 			{id: 'name', title: 'NAME'},
-			{id: 'email', title: 'EMAIL'},
+			{id: 'email_id', title: 'EMAIL'},
 			{id: 'mobile_no', title: 'PHONE NUMBER'}
 		]
 	});
@@ -617,9 +617,39 @@ app.get('/api/csv/hosts', async (req, res) => {
 	  src.pipe(res); 
   });
 
+  app.get('/api/csv/visitors', async (req, res) => {
+	// const rows = await process.postgresql.query('SELECT * FROM visitors');
+	const csvWriter = createCsvWriter({
+		path:__dirname+'/public/visitors.csv',
+		header: [
+			{id: 'id', title: 'ID'},
+			{id: 'name', title: 'NAME'},
+			{id: 'email_id', title: 'EMAIL'},
+			{id: 'mobile_no', title: 'PHONE NUMBER'}
+		]
+	});
+	 
+	const records = await process.postgresql.query('SELECT * FROM visitors');
+	 
+	csvWriter.writeRecords(records)       // returns a promise
+		.then(() => {
+			console.log('...Done');
+		});
+
+	const src = fs.createReadStream(__dirname+'/public/hosts.csv');
+	const name= new Date().toLocaleDateString();
+	res.writeHead(200, {
+		'Content-Type': 'application/csv',
+		'Content-Disposition': `attachment; filename= ${name} report.csv`,
+		'Content-Transfer-Encoding': 'Binary'
+	  });
+	
+	  src.pipe(res); 
+  });
+
 
   app.get('/api/csv/visits', async (req, res) => {
-	const rows = await process.postgresql.query('SELECT * FROM register');
+	// const rows = await process.postgresql.query('SELECT * FROM register');
 	const name= new Date().toLocaleDateString();
 	const csvWriter = createCsvWriter({
 		path:__dirname+`/public/${name}visits.csv`,
@@ -638,20 +668,21 @@ app.get('/api/csv/hosts', async (req, res) => {
 	 
 	const records = await process.postgresql.query('SELECT * FROM register');
 	 
-	csvWriter.writeRecords(records)       // returns a promise
-		.then(() => {
-			console.log('...Done');
-		});
+	// csvWriter.writeRecords(records)       // returns a promise
+	// 	.then(() => {
+	// 		console.log('...Done');
+	// 	});
 
-	const src = fs.createReadStream(__dirname+`/public/${name}visits.csv`);
+	// const src = fs.createReadStream(__dirname+`/public/${name}visits.csv`);
 	
-	res.writeHead(200, {
-		'Content-Type': 'application/csv',
-		'Content-Disposition': `attachment; filename= ${name} report.csv`,
-		'Content-Transfer-Encoding': 'Binary'
-	  });
+	// res.writeHead(200, {
+	// 	'Content-Type': 'application/csv',
+	// 	'Content-Disposition': `attachment; filename= ${name} report.csv`,
+	// 	'Content-Transfer-Encoding': 'Binary'
+	//   });
 	
-	  src.pipe(res); 
+	//   src.pipe(res); 
+	  res.send(Buffer.from(records));
   });
 	
 
