@@ -489,6 +489,7 @@ const user={
 	   AND password = crypt('${user.pass}', password);`)
 	   if(newuser.length !=0){
 			 res.json(newuser)
+			 console.log(newuser)
 	   };
 	});
 
