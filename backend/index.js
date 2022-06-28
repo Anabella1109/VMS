@@ -62,7 +62,7 @@ const corsOptions ={
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/public",express.static(__dirname+'/public'));
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(sessions({
     secret: process.env.SECRET,
     saveUninitialized:true,
