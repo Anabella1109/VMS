@@ -12,7 +12,7 @@ module.exports= (callback = null) => {
     user: process.env.DATABASE_USER,
     database: process.env.DATABASE ,
     password:process.env.DATABASE_PASSWORD,
-    host: process.env.DATABASE_HOST,
+    host:process.env.DATABASE_HOST,
     port:  5432,
     ssl: {
       rejectUnauthorized: false

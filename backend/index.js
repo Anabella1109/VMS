@@ -103,6 +103,7 @@ app.get("/", (req, res) => {
 
 
   app.get('/api/hosts', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const rows = await process.postgresql.query('SELECT * FROM hosts');
 	res.json(rows);
   });
@@ -110,6 +111,7 @@ app.get("/", (req, res) => {
 
   //___________________________________ Sending single host ________________________________________________
   app.get('/api/hosts/:id', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params['id'];
 	const rows = await process.postgresql.query('SELECT * FROM hosts WHERE id=$1', [pk]);
 	res.json(rows);
@@ -117,6 +119,7 @@ app.get("/", (req, res) => {
 
    //___________________________________ login host ________________________________________________
  app.post('/api/login/host', async(req,res)=>{
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const user={
 		email: req.body.email,
 		pass: req.body.password
@@ -133,6 +136,7 @@ app.get("/", (req, res) => {
 
 //___________________________________ registering a host ________________________________________________
 app.post('/api/hosts', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
     const pass=crypto.randomBytes(8).toString('hex');
 	const host = {
 		name: req.body.name,
@@ -192,6 +196,7 @@ app.post('/api/hosts', async (req, res) => {
 
   //___________________________________ editing a host ________________________________________________
 app.put('/api/hosts/:id', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params['id'];
 	const host = {
 		name: req.body.name,
@@ -208,6 +213,7 @@ app.put('/api/hosts/:id', async (req, res) => {
 
   //___________________________________ editing a host password ________________________________________________
   app.patch('/api/hosts/:id', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params['id'];
 	const host = {
 		password:req.body.password
@@ -221,6 +227,7 @@ app.put('/api/hosts/:id', async (req, res) => {
   });
    //___________________________________ Deleting a single host ________________________________________________
  app.delete('/api/hosts/:id', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params['id'];
 	await process.postgresql.query('DELETE FROM "hosts" WHERE "id" = $1', [pk]);
 	res.json('Host deleted');
@@ -238,6 +245,7 @@ app.put('/api/hosts/:id', async (req, res) => {
   });
 
   app.get('/api/visitors', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const rows = await process.postgresql.query('SELECT * FROM visitors');
 	res.json(rows);
 
@@ -246,6 +254,7 @@ app.put('/api/hosts/:id', async (req, res) => {
   
 //___________________________________ regitering a visitor ________________________________________________
 app.post('/api/visitors', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const visitor = {
 		name: req.body.name,
 		email_id: req.body.email_id,
@@ -261,6 +270,7 @@ app.post('/api/visitors', async (req, res) => {
 
     //___________________________________ editing a visitor ________________________________________________
 	app.put('/api/visitors/:id', async (req, res) => {
+		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const pk=req.params['id'];
 		const visitor = {
 			name: req.body.name,
@@ -275,6 +285,7 @@ app.post('/api/visitors', async (req, res) => {
 	 
 	  //___________________________________ Sending a single visitor ________________________________________________
 	  app.get('/api/visitors/:id', async (req, res) => {
+		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const pk=req.params['id'];
 		const rows = await process.postgresql.query('SELECT * FROM visitors WHERE id=$1', [pk]);
 		res.json(rows);
@@ -282,6 +293,7 @@ app.post('/api/visitors', async (req, res) => {
 	
 	   //___________________________________ Deleting a single visitor ________________________________________________
  app.delete('/api/visitors/:id', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params['id'];
 	await process.postgresql.query('DELETE FROM "visitors" WHERE "id" = $1', [pk]);
 	res.send('Visitor deleted');
@@ -291,12 +303,14 @@ app.post('/api/visitors', async (req, res) => {
 
   //___________________________________ sending visits ________________________________________________
   app.get('/api/visits', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const rows = await process.postgresql.query('SELECT * FROM register');
 	res.status(200).json(rows);
   });
 
     //___________________________________ sending visits by date ________________________________________________
 	app.get('/api/date/visits/:date', async (req, res) => {
+		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const date=req.params['date'];
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1', [date]);
 	
@@ -305,6 +319,7 @@ app.post('/api/visitors', async (req, res) => {
 
     //___________________________________ sending active visitors ________________________________________________
 	app.get('/api/active/visits', async (req, res) => {
+		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		// const date=req.params['date'];
 		const checked_out="null";
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE checked_out=$1', [checked_out]);
@@ -314,6 +329,7 @@ app.post('/api/visitors', async (req, res) => {
 
 //___________________________________ registering a visit ________________________________________________
 app.post('/api/visits', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const checked_in= new Date();
 	const checkin_date= checked_in.toLocaleDateString();
 	const checkin_time= checked_in.toLocaleTimeString();
@@ -395,6 +411,7 @@ vonage.message.sendSms(from, to, text, (err, responseData) => {
 
 //___________________________________ Editing a visit ________________________________________________
 app.put('/api/visits/:id', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params['id'];
 	const visit = {
 		host_id: req.body.host_id,
@@ -418,6 +435,7 @@ app.put('/api/visits/:id', async (req, res) => {
 
   //___________________________________ Editing a visit checkout ________________________________________________
 app.patch('/api/visits/checkout/:id', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params['id'];
 	const checkout= new Date();
 	const checkout_time= checkout.toLocaleTimeString();
@@ -434,6 +452,7 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 
      //___________________________________ Sending a single visit ________________________________________________
 	 app.get('/api/visits/:id', async (req, res) => {
+		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const pk=req.params['id'];
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE id=$1', [pk]);
 		res.json(rows);
@@ -441,6 +460,7 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 	
 		 //___________________________________ Sending a visit by date and time ________________________________________________
 		 app.get('/api/visits/:date/:time', async (req, res) => {
+			res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 			const date=req.params['date'];
 			const time= req.params['time'];
 	
@@ -453,6 +473,7 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 	  
 	   //___________________________________ Deleting a single visit ________________________________________________
 	 app.delete('/api/visits/:id', async (req, res) => {
+		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const pk=req.params['id'];
 		await process.postgresql.query('DELETE FROM "register" WHERE "id" = $1', [pk]);
 		res.send('Record deleted');
@@ -464,6 +485,7 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 
   //___________________________________ register user ________________________________________________
 app.post('/api/registeruser', async(req,res)=>{
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 const user={
 	email: req.body.email,
 	pass: req.body.password
@@ -494,6 +516,7 @@ const user={
 // 	});
 
 	app.post('/api/login/admin', async(req,res)=>{
+		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const user={
 			email: req.body.email,
 			pass: req.body.password
@@ -535,6 +558,7 @@ const user={
 
 //___________________________________ generating qrcode ________________________________________________
   app.post('/qrgenerate', async(req,res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	// openssl('openssl req -config csr.cnf -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout key.key -out certificate.crt');
 	const visitor = {
 		name: req.body.name,
@@ -594,6 +618,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
 
 // ___________________________________________pdf________________________________________________________________
 app.get('/api/pdf/visits', async(req,res)=>{
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const rows = await process.postgresql.query('SELECT * FROM register');
 	let doc = new PDFDocument({ margin: 30, size: 'A4' });
 	const table = {
@@ -641,6 +666,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 
 
 	app.get('/api/pdf/visitors', async(req,res)=>{
+		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const rows = await process.postgresql.query('SELECT * FROM visitors');
 		const name= new Date().toLocaleDateString();
 		let doc = new PDFDocument({ margin: 30, size: 'A4' });
@@ -684,6 +710,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 	
 
 		app.get('/api/pdf/hosts', async(req,res)=>{
+			res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 			const rows = await process.postgresql.query('SELECT * FROM hosts');
 			const name= new Date().toLocaleDateString();
 			let doc = new PDFDocument({ margin: 30, size: 'A4' });
@@ -727,6 +754,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 
 // _____________________________________________csv______________________________________________________________________
 app.get('/api/csv/hosts', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const rows = await process.postgresql.query('SELECT * FROM hosts');
 	const csvWriter = createCsvWriter({
 		path:__dirname+'/public/hosts.csv',
@@ -757,6 +785,7 @@ app.get('/api/csv/hosts', async (req, res) => {
   });
 
   app.get('/api/csv/visitors', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	// const rows = await process.postgresql.query('SELECT * FROM visitors');
 	const name= new Date().toLocaleDateString();
 	const csvWriter = createCsvWriter({
@@ -789,6 +818,7 @@ app.get('/api/csv/hosts', async (req, res) => {
 
 
   app.get('/api/csv/visits', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	// const rows = await process.postgresql.query('SELECT * FROM register');
 	const name= new Date().toLocaleDateString();
 	const csvWriter = createCsvWriter({
