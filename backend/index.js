@@ -502,7 +502,7 @@ const user={
 		  FROM users
 		 WHERE email = '${user.email}' 
 		   AND password = crypt('${user.pass}', password);`).then((err,result) => {
-					if (err) throw err;
+					
 					if (result){
 						session=req.session;
                         session.userid=user.email;
