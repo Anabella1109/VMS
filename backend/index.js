@@ -16,8 +16,8 @@ const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
 
 const vonage = new Vonage({
-  apiKey: config.vonage.apiKey,
-  apiSecret:config.vonage.apiSecret
+  apiKey: process.env.API_KEY,
+  apiSecret:process.env.API_SECRET
 })
 
 const PORT = process.env.PORT || 3001;
@@ -43,8 +43,8 @@ let transporter = nodemailer.createTransport({
 	secure: false,
 	requireTLS: true,
 	auth: {
-	  user: config.email_setting.email,
-	  pass: config.email_setting.password,
+	  user: process.env.EMAIL,
+	  pass: process.env.EMAIL_PASSWORD,
 	},
   });
   
@@ -64,7 +64,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/public",express.static(__dirname+'/public'));
 app.use(cors(corsOptions));
 app.use(sessions({
-    secret: config.session.secret,
+    secret: process.env.SECRET,
     saveUninitialized:true,
     cookie: { maxAge: oneDay },
     resave: false
@@ -517,6 +517,11 @@ const user={
 	
 				});
 				 
+		});
+
+		app.get('/api/admin/logout',(req,res) => {
+			req.session.destroy();
+			res.json('user logged out');
 		});
 
 

@@ -2,7 +2,7 @@
 {
     
     "email_setting":{
-    	"email":"amalitech2@outlook.com",
+    	"email":"amali@outlook.com",
 		  "password":"xxxxxxxx",
 		  "host":"smtp.outlook.com"
     },
@@ -16,7 +16,7 @@
 		"apiSecret": "O8JEN8Rm6CQO"
 	},
 	"session":{
-		"secret":"1234567890abcdefghijklmnopqrstuvwxyz"
+		"secret":"1234567890abcdefghi"
 	}
 
 }
