@@ -857,6 +857,7 @@ app.get('/api/csv/hosts', async (req, res) => {
 
   app.get('/api/csv/visits/:date', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+	const date= req.params.date;
 	// const rows = await process.postgresql.query('SELECT * FROM register');
 	const name= new Date().toLocaleDateString();
 	const csvWriter = createCsvWriter({
@@ -874,7 +875,46 @@ app.get('/api/csv/hosts', async (req, res) => {
 		]
 	});
 	 
-	const records = await process.postgresql.query('SELECT * FROM register WHERE date=');
+	const records = await process.postgresql.query('SELECT * FROM register WHERE date=$1',[date]);
+	 
+	csvWriter.writeRecords(records)       // returns a promise
+		.then(() => {
+			console.log('...Done');
+		});
+
+	const src = fs.createReadStream(__dirname+`/public/visits.csv`);
+	
+	res.writeHead(200, {
+		'Content-Type': 'application/csv',
+		'Content-Disposition': `attachment; filename= ${name} report.csv`,
+		'Content-Transfer-Encoding': 'Binary'
+	  });
+	
+	  src.pipe(res); 
+	//   res.send(Buffer.from(records));
+  });
+	
+  app.get('/api/csv/visits/:host', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+	const host= req.params.host;
+	// const rows = await process.postgresql.query('SELECT * FROM register');
+	const name= new Date().toLocaleDateString();
+	const csvWriter = createCsvWriter({
+		path:__dirname+`/public/visits.csv`,
+		header: [
+			{id: 'host_name', title: 'HOST'},
+			{id: 'visitor_name', title: ' VISITOR NAME'},
+			{id: 'visitor_email', title: 'VISITOR EMAIL'},
+			{id: 'visitor_no', title: 'VISITOR MOBILE'},
+			{id: 'date', title: 'DATE'},
+			{id: 'checked_in', title: 'CHECK IN'},
+			{id: 'checked_out', title: 'CHECK OUT'},
+			{id: 'role', title: 'PURPOSE'},
+
+		]
+	});
+	 
+	const records = await process.postgresql.query('SELECT * FROM register WHERE host_id=$1',[host]);
 	 
 	csvWriter.writeRecords(records)       // returns a promise
 		.then(() => {
