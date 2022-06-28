@@ -488,7 +488,7 @@ const user={
 	 WHERE email = '${user.email}' 
 	   AND password = crypt('${user.pass}', password);`).then((err,result) => {
 				if (err) throw err;
-				if (result){};
+				
 
 			});
 			 res.json(newuser)
@@ -522,7 +522,7 @@ const user={
 
 
 
-	
+
   
 
 
