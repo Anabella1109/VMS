@@ -477,47 +477,47 @@ const user={
 		 res.status(200).send(JSON.stringify('User registered'))
 });
 
- //___________________________________ login user ________________________________________________
- app.post('/api/login/admin', async(req,res)=>{
-	const user={
-		email: req.body.email,
-		pass: req.body.password
-	}
-	  const newuser=await process.postgresql.query(`SELECT * 
-	  FROM users
-	 WHERE email = '${user.email}' 
-	   AND password = crypt('${user.pass}', password);`)
-	   if(newuser.length !=0){
-			 res.json(newuser)
-			 console.log(newuser)
-	   };
-	});
+//  //___________________________________ login user ________________________________________________
+//  app.post('/api/login/admin', async(req,res)=>{
+// 	const user={
+// 		email: req.body.email,
+// 		pass: req.body.password
+// 	}
+// 	  const newuser=await process.postgresql.query(`SELECT * 
+// 	  FROM users
+// 	 WHERE email = '${user.email}' 
+// 	   AND password = crypt('${user.pass}', password);`)
+// 	   if(newuser.length !=0){
+// 			 res.json(newuser)
+// 			 console.log(newuser)
+// 	   };
+// 	});
 
-	// app.post('/api/login/admin', async(req,res)=>{
-	// 	const user={
-	// 		email: req.body.email,
-	// 		pass: req.body.password
-	// 	}
-	// 	  const newuser=await process.postgresql.query(`SELECT * 
-	// 	  FROM users
-	// 	 WHERE email = '${user.email}' 
-	// 	   AND password = crypt('${user.pass}', password);`).then((err,result) => {
-	// 				if (err) throw err;
-	// 				if (result){
-	// 					session=req.session;
-    //                     session.userid=user.email;
-    //                     console.log(req.session)
-	// 					res.json(newuser);
-	// 				}
-	// 				else{
+	app.post('/api/login/admin', async(req,res)=>{
+		const user={
+			email: req.body.email,
+			pass: req.body.password
+		}
+		  const newuser=await process.postgresql.query(`SELECT * 
+		  FROM users
+		 WHERE email = '${user.email}' 
+		   AND password = crypt('${user.pass}', password);`).then((err,result) => {
+					if (err) throw err;
+					if (result){
+						session=req.session;
+                        session.userid=user.email;
+                        console.log(req.session)
+						res.json(newuser);
+					}
+					else{
 						
-	// 						res.json('Invalid username or password');
+							res.json('Invalid username or password');
 					
-	// 				};
+					};
 	
-	// 			});
-	// 			 res.json(newuser)
-	// 	});
+				});
+				 
+		});
 
 
 
