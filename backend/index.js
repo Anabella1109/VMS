@@ -894,7 +894,7 @@ app.get('/api/csv/hosts', async (req, res) => {
 	//   res.send(Buffer.from(records));
   });
 	
-  app.get('/api/csv/visits/:host', async (req, res) => {
+  app.get('/api/csv/visits/host/:host', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const host= req.params.host;
 	// const rows = await process.postgresql.query('SELECT * FROM register');
