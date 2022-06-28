@@ -8,7 +8,7 @@
     "pg:start": "pg_ctl -t 1000 -D data start",
     "pg:createdb": "createdb -h 127.0.0.1 app",
     "pg:stop": "pg_ctl -D data stop",
-    "start": "node backend/index.js",
+    "start": "set NODE_ENV=production&&node backend/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
