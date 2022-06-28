@@ -14,6 +14,9 @@
 	"vonage":{
 		"apiKey":"c264a",
 		"apiSecret": "O8JEN8Rm6CQO"
+	},
+	"session":{
+		"secret":"1234567890abcdefghijklmnopqrstuvwxyz"
 	}
 
 }

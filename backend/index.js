@@ -11,7 +11,9 @@ const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const fastcsv= require('fast-csv');
 const Vonage = require('@vonage/server-sdk')
 const PDFDocument = require("pdfkit-table");
-var cors = require('cors')
+const cors = require('cors')
+const cookieParser = require("cookie-parser");
+const sessions = require('express-session');
 
 const vonage = new Vonage({
   apiKey: config.vonage.apiKey,
@@ -23,11 +25,12 @@ const accountSid = config.twilio.accountSid;
 const authToken = config.twilio.authToken;
 const client = require('twilio')(accountSid, authToken);
 
+
 // const { Client } = require('pg');
 
 // const QRCode=qrcode;
 
-
+const oneDay = 1000 * 60 * 60 * 24;
 
 
 
@@ -60,6 +63,17 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/public",express.static(__dirname+'/public'));
 app.use(cors(corsOptions));
+app.use(sessions({
+    secret: config.session.secret,
+    saveUninitialized:true,
+    cookie: { maxAge: oneDay },
+    resave: false
+}));
+app.use(cookieParser());
+
+
+
+let session;
 
 
 
@@ -474,9 +488,37 @@ const user={
 	 WHERE email = '${user.email}' 
 	   AND password = crypt('${user.pass}', password);`).then((err,result) => {
 				if (err) throw err;
+				if (result){};
+
 			});
 			 res.json(newuser)
 	});
+
+	// app.post('/api/login/admin', async(req,res)=>{
+	// 	const user={
+	// 		email: req.body.email,
+	// 		pass: req.body.password
+	// 	}
+	// 	  const newuser=await process.postgresql.query(`SELECT * 
+	// 	  FROM users
+	// 	 WHERE email = '${user.email}' 
+	// 	   AND password = crypt('${user.pass}', password);`).then((err,result) => {
+	// 				if (err) throw err;
+	// 				if (result){
+	// 					session=req.session;
+    //                     session.userid=user.email;
+    //                     console.log(req.session)
+	// 					res.json(newuser);
+	// 				}
+	// 				else{
+						
+	// 						res.json('Invalid username or password');
+					
+	// 				};
+	
+	// 			});
+	// 			 res.json(newuser)
+	// 	});
 
 
   
