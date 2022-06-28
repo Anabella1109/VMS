@@ -11,6 +11,7 @@ const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const fastcsv= require('fast-csv');
 const Vonage = require('@vonage/server-sdk')
 const PDFDocument = require("pdfkit-table");
+var cors = require('cors')
 
 const vonage = new Vonage({
   apiKey: config.vonage.apiKey,
@@ -48,11 +49,17 @@ let transporter = nodemailer.createTransport({
 
 const app = express();
 const path = require('path');
+const corsOptions ={
+    origin:'http://localhost:3000', 
+    credentials:true,            //access-control-allow-credentials:true
+    optionSuccessStatus:200
+}
 // const router = express.Router();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/public",express.static(__dirname+'/public'));
+app.use(cors(corsOptions));
 
 
 
