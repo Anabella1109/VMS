@@ -486,12 +486,10 @@ const user={
 	  const newuser=await process.postgresql.query(`SELECT * 
 	  FROM users
 	 WHERE email = '${user.email}' 
-	   AND password = crypt('${user.pass}', password);`).then((err,result) => {
-				if (err) throw err;
-				
-
-			});
+	   AND password = crypt('${user.pass}', password);`)
+	   if(newuser.length !=0){
 			 res.json(newuser)
+	   };
 	});
 
 	// app.post('/api/login/admin', async(req,res)=>{
