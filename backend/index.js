@@ -300,7 +300,7 @@ app.post('/api/visitors', async (req, res) => {
   });
 
     //___________________________________ sending visits by date ________________________________________________
-	app.get('/api/date/visits/:date', async (req, res) => {
+	app.get('/api/date/visits/date/:date', async (req, res) => {
 		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const date=req.params['date'];
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1', [date]);
@@ -614,6 +614,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
 app.get('/api/pdf/visits', async(req,res)=>{
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const rows = await process.postgresql.query('SELECT * FROM register');
+	const name= new Date().toLocaleDateString();
 	let doc = new PDFDocument({ margin: 30, size: 'A4' });
 	const table = {
 		title: "Visits",
@@ -646,7 +647,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 	//   doc.pipe(res);
 	doc.pipe(fs.createWriteStream(__dirname+'/public/visits.pdf'));
 	const src = fs.createReadStream(__dirname+'/public/visits.pdf');
-	const name= new Date().toLocaleDateString();
+	
 	res.writeHead(200, {
 		'Content-Type': 'application/pdf',
 		'Content-Disposition': `attachment; filename= ${name} report.pdf`,
@@ -657,6 +658,105 @@ app.get('/api/pdf/visits', async(req,res)=>{
 	  doc.end();
 	 
 	});
+
+
+	app.get('/api/pdf/visits/today', async(req,res)=>{
+		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+		const name= new Date().toLocaleDateString();
+		const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1',[name]);
+		let doc = new PDFDocument({ margin: 30, size: 'A4' });
+		const table = {
+			title: "Visits",
+			subtitle: "visitors report",
+			headers: [
+			  { label: "Host", property: 'host_name', width: 60, renderer: null },
+			  { label: "Visitor name", property: 'visitor_name', width:60, renderer: null }, 
+			  { label: "Visitor email", property: 'visitor_email', width: 80, renderer: null }, 
+			  { label: "Visitor mobile", property: 'visitor_no', width: 80, renderer: null }, 
+			  { label: "Date", property: 'date', width: 80, renderer: null },
+			  { label: "Check in time", property: 'checked_in', width: 80, renderer: null }, 
+			  { label: "Check out time", property: 'checked_out', width: 80, renderer: null },
+			  { label: "Role", property: 'role', width: 80, renderer: null },
+			 
+			],
+			// complex data
+			datas:rows,
+			// simeple data
+	
+		  };
+		  // the magic
+		  doc.table(table, {
+			prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
+			prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
+			  doc.font("Helvetica").fontSize(8);
+			  indexColumn === 0 && doc.addBackground(rectRow, 'blue', 0.15);
+			},
+		  });
+		  // done!
+		//   doc.pipe(res);
+		doc.pipe(fs.createWriteStream(__dirname+'/public/visits.pdf'));
+		const src = fs.createReadStream(__dirname+'/public/visits.pdf');
+		
+		res.writeHead(200, {
+			'Content-Type': 'application/pdf',
+			'Content-Disposition': `attachment; filename= ${name} report.pdf`,
+			'Content-Transfer-Encoding': 'Binary'
+		  });
+		
+		  src.pipe(res);
+		  doc.end();
+		 
+		});
+
+		app.get('/api/pdf/visits/date', async(req,res)=>{
+			res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+			const name= new Date().toLocaleDateString();
+			const date= re.query.date;
+			const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1',[date]);
+			let doc = new PDFDocument({ margin: 30, size: 'A4' });
+			const table = {
+				title: "Visits",
+				subtitle: "visitors report",
+				headers: [
+				  { label: "Host", property: 'host_name', width: 60, renderer: null },
+				  { label: "Visitor name", property: 'visitor_name', width:60, renderer: null }, 
+				  { label: "Visitor email", property: 'visitor_email', width: 80, renderer: null }, 
+				  { label: "Visitor mobile", property: 'visitor_no', width: 80, renderer: null }, 
+				  { label: "Date", property: 'date', width: 80, renderer: null },
+				  { label: "Check in time", property: 'checked_in', width: 80, renderer: null }, 
+				  { label: "Check out time", property: 'checked_out', width: 80, renderer: null },
+				  { label: "Role", property: 'role', width: 80, renderer: null },
+				 
+				],
+				// complex data
+				datas:rows,
+				// simeple data
+		
+			  };
+			  // the magic
+			  doc.table(table, {
+				prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
+				prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
+				  doc.font("Helvetica").fontSize(8);
+				  indexColumn === 0 && doc.addBackground(rectRow, 'blue', 0.15);
+				},
+			  });
+			  // done!
+			//   doc.pipe(res);
+			doc.pipe(fs.createWriteStream(__dirname+'/public/visits.pdf'));
+			const src = fs.createReadStream(__dirname+'/public/visits.pdf');
+			
+			res.writeHead(200, {
+				'Content-Type': 'application/pdf',
+				'Content-Disposition': `attachment; filename= ${name} report.pdf`,
+				'Content-Transfer-Encoding': 'Binary'
+			  });
+			
+			  src.pipe(res);
+			  doc.end();
+			 
+			});
+	
 
 
 	app.get('/api/pdf/visitors', async(req,res)=>{
@@ -893,6 +993,7 @@ app.get('/api/csv/hosts', async (req, res) => {
 	const date= req.query.date;
 	// const tdate= date.toLocaleDateString();
 	// const rows = await process.postgresql.query('SELECT * FROM register');
+	// https://vmsapi1.herokuapp.com/api/csv/visits/date?date=6%2F27%2F2022
 	const name= new Date().toLocaleDateString();
 	const csvWriter = createCsvWriter({
 		path:__dirname+`/public/visits.csv`,
