@@ -888,7 +888,7 @@ app.get('/api/csv/hosts', async (req, res) => {
 	//   res.send(Buffer.from(records));
   });
 
-  app.get('/api/csv/visits', async (req, res) => {
+  app.get('/api/csv/visits/date', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const date= req.query.date;
 	const tdate= date.toLocaleDateString();
@@ -909,7 +909,7 @@ app.get('/api/csv/hosts', async (req, res) => {
 		]
 	});
 	 
-	const records = await process.postgresql.query('SELECT * FROM register WHERE date=$1',[name]);
+	const records = await process.postgresql.query('SELECT * FROM register WHERE date=$1',[date]);
 	 
 	csvWriter.writeRecords(records)       // returns a promise
 		.then(() => {
