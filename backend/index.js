@@ -300,9 +300,9 @@ app.post('/api/visitors', async (req, res) => {
   });
 
     //___________________________________ sending visits by date ________________________________________________
-	app.get('/api/date/visits/date/:date', async (req, res) => {
+	app.get('/api/date/visits/date', async (req, res) => {
 		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-		const date=req.params['date'];
+		const date=req.query.date;
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1', [date]);
 	
 		res.status(200).json(rows);
