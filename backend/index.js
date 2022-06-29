@@ -128,7 +128,7 @@ app.get("/", (req, res) => {
 	  FROM hosts
 	 WHERE email = '${user.email}' 
 	   AND password = '${user.pass}'`).then((err,result) => {
-				if (err) throw err;
+				if (err) {console.log(err)};
 			});
 			 res.json(host)
 	});
@@ -200,9 +200,7 @@ app.put('/api/hosts/:id', async (req, res) => {
 		email_id: req.body.email_id,
 		mobile_no: req.body.mobile_no
 	}
-	 await process.postgresql.query('UPDATE "hosts" SET "name" = $1, "email_id" = $2, "mobile_no" = $3 WHERE id=$4', [host.name,host.email_id,host.mobile_no,pk]).then((err,result) => {
-		if (err) throw err;
-	});
+	 await process.postgresql.query('UPDATE "hosts" SET "name" = $1, "email_id" = $2, "mobile_no" = $3 WHERE id=$4', [host.name,host.email_id,host.mobile_no,pk])
 	 res.status(200).send(JSON.stringify('Host edited!'));
 
 	
@@ -215,9 +213,7 @@ app.put('/api/hosts/:id', async (req, res) => {
 	const host = {
 		password:req.body.password
 	}
-	 await process.postgresql.query('UPDATE "hosts" SET "password" = $1 WHERE id=$2', [host.passsword,pk]).then((err,result) => {
-		if (err) throw err;
-	});
+	 await process.postgresql.query('UPDATE "hosts" SET "password" = $1 WHERE id=$2', [host.passsword,pk])
 	 res.status(200).send(JSON.stringify('Password changed'));
 
 	
@@ -257,9 +253,7 @@ app.post('/api/visitors', async (req, res) => {
 		email_id: req.body.email_id,
 		mobile_no: req.body.mobile_no
 	}
-	 await process.postgresql.query(`INSERT INTO visitors (name, email_id, mobile_no) VALUES ('${visitor.name}', '${visitor.email_id}', '${visitor.mobile_no}') ON CONFLICT DO NOTHING;`).then((err,result) => {
-		if (err) throw err;
-	});
+	 await process.postgresql.query(`INSERT INTO visitors (name, email_id, mobile_no) VALUES ('${visitor.name}', '${visitor.email_id}', '${visitor.mobile_no}') ON CONFLICT DO NOTHING;`)
 	 res.status(200).send(JSON.stringify('Visitor registered!'));
 
 	
@@ -275,7 +269,7 @@ app.post('/api/visitors', async (req, res) => {
 			mobile_no: req.body.mobile_no
 		}
 		await process.postgresql.query('UPDATE "visitors" SET "name" = $1, "email_id" = $2,"mobile_no" = $3 WHERE id=$4', [visitor.name,visitor.email_id,visitor.mobile_no,pk]).then((err,result) => {
-			if (err) throw err;
+			if (err) {console.log(err)};
 		});
 		res.status(200).send(JSON.stringify('Visitor updated!'));
 	  });
@@ -425,7 +419,7 @@ app.put('/api/visits/:id', async (req, res) => {
 		
 	}
 	await process.postgresql.query('UPDATE "register" SET "host_id" = $1, "host_name" = $2, "visitor_name" = $3, "visitor_email" = $4, "visitor_no" = $5,"date" = $10, "checked_in"= $6, "checked_out"=$7, "role"=$8  WHERE id=$9', [visit.host_id,visit.host_name,visit.visitor_name, visit.visitor_email,visit.visitor_no, visit.checked_in, visit.checked_out,visit.role,pk,visit.date]).then((err,result) => {
-		if (err) throw err;
+		if (err) {console.log(err)};
 	});
 	 res.status(200).send(JSON.stringify('Visit edited'));
 
@@ -442,7 +436,7 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 		checked_out: checkout_time,
 	}
 	await process.postgresql.query('UPDATE "register" SET "checked_out"=$1  WHERE id=$2', [visit.checked_out,pk]).then((err,result) => {
-		if (err) throw err;
+		if (err)  {console.log(err)};
 	});
 	 res.status(200).send(JSON.stringify('Checked out'));
 
@@ -493,7 +487,7 @@ const user={
 	'${user.email}',
 	crypt('${user.pass}', gen_salt('bf'))
   );`).then((err,result) => {
-			if (err) throw err;
+			if (err) {console.log(err)};
 		});
 		 res.status(200).send(JSON.stringify('User registered'))
 });
@@ -564,7 +558,8 @@ const user={
 		email_id: req.body.email_id,
 		date:req.body.date,
 		time: req.body.time,
-		mobile_no: req.body.mobile_no
+		mobile_no: req.body.mobile_no,
+		host_name: req.body.host_name
 	};
 
 	let stringdata = JSON.stringify(visitor)
