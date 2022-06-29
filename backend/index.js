@@ -300,13 +300,22 @@ app.post('/api/visitors', async (req, res) => {
   });
 
     //___________________________________ sending visits by date ________________________________________________
-	app.get('/api/date/visits/date', async (req, res) => {
+	app.get('/api/date/visits', async (req, res) => {
 		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const date=req.query.date;
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1', [date]);
 	
 		res.status(200).json(rows);
 	  });
+
+ //___________________________________ sending visits for current day ________________________________________________
+ app.get('/api/visits/toya', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+	const date=new Date().toLocaleDateString();
+	const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1', [date]);
+
+	res.status(200).json(rows);
+  });
 
     //___________________________________ sending active visitors ________________________________________________
 	app.get('/api/active/visits', async (req, res) => {

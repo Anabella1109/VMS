@@ -24,12 +24,21 @@
 		<li>DELETE : delete single visit</li>
 	  </ul>
 
-	  <!-- <h1>/api/date/visits/:date </h1>
+	  <h1>/api/date/visits </h1>
 	  <ul>
 	
 		<li> GET: view visits by date</li>
+		<p>query parameters: date</p>
 	
-	  </ul> -->
+	  </ul>
+
+	  <h1>/api/visits/today </h1>
+	  <ul>
+	
+		<li> GET: view visits for current day</li>
+	>
+	
+	  </ul>
 	 
 	  <h1>/api/active/visits </h1>
 	  <ul>
@@ -95,7 +104,7 @@
 
   <h1>/api/admin/logout</h1>
   <ul>
-	<li></li>
+	<li>GET: logout</li>
   </ul>
 	<h1>/api/login/admin</h1>
 	<ul>
@@ -105,7 +114,7 @@
 	<h1>/qrgenerate:</h1>
 	<ul>
 		<li>POST: booking and generate  qrcode</li>
-		<p>parameters: name, email, date, time, mobile_no</p>
+		<p>parameters: name, email, date, time, mobile_no, host_name</p>
 	</ul>
 
 	<b><i><h1>CSV</h1></i></b>
@@ -118,6 +127,10 @@
 <h1>/api/csv/visits/today</h1>
 <ul><li>GET: get visits csv report for current  day</li></ul>
 
+<h1>/api/csv/visits/date</h1>
+<ul><li>GET: get visits pdf report for certain date</li></ul>
+    <p>query parameter: date</p>
+
 <h1>/api/csv/visitors</h1>
 <ul><li>GET: get visitors csv report</li></ul>
 
@@ -129,6 +142,13 @@
 
 <h1>/api/pdf/visits</h1>
 <ul><li>GET: get visits pdf report</li></ul>
+<h1>/api/pdf/visits/today</h1>
+<ul><li>GET: get visits pdf report for current day</li></ul>
+
+<h1>/api/pdf/visits/date</h1>
+<ul><li>GET: get visits pdf report for certain date</li></ul>
+    <p>query parameter: date</p> 
+
 
 <h1>/api/pdf/visitors</h1>
 <ul><li>GET: get visitors pdf report</li></ul>
