@@ -145,7 +145,7 @@ app.post('/api/hosts', async (req, res) => {
 		password: pass
 	}
 	 await process.postgresql.query(`INSERT INTO hosts (name, email_id, mobile_no,password) VALUES ('${host.name}', '${host.email_id}', '${host.mobile_no}','${host.password}') ON CONFLICT DO NOTHING;`).then((err,result) => {
-		if (err) throw err;
+	
 		if (result){let htmlBody = "Your new login information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
 		htmlBody += "Email : " + host.email_id + " \n " + "\n" + 
 		" password : " +host.password ;
