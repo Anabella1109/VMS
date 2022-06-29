@@ -343,7 +343,7 @@ app.post('/api/visits', async (req, res) => {
 		role: req.body.role
 		
 	};
-	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE id=$1' , [visit.host_name]);
+	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE name=$1' , [visit.host_name]);
 	console.log(host);
 	const visitor = await process.postgresql.query('SELECT * FROM visitors WHERE name=$1 AND email_id=$2' , [visit.visitor_name, visit.visitor_email]);
 	if(visitor.length == 0){
