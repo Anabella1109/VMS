@@ -888,9 +888,9 @@ app.get('/api/csv/hosts', async (req, res) => {
 	//   res.send(Buffer.from(records));
   });
 
-  app.get('/api/csv/visits/:date', async (req, res) => {
+  app.get('/api/csv/visits', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	const date= req.params.date;
+	const date= req.query.date;
 	const tdate= date.toLocaleDateString();
 	// const rows = await process.postgresql.query('SELECT * FROM register');
 	const name= new Date().toLocaleDateString();
