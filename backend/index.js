@@ -144,9 +144,9 @@ app.post('/api/hosts', async (req, res) => {
 		mobile_no: req.body.mobile_no,
 		password: pass
 	}
-	 await process.postgresql.query(`INSERT INTO hosts (name, email_id, mobile_no,password) VALUES ('${host.name}', '${host.email_id}', '${host.mobile_no}','${host.password}') ON CONFLICT DO NOTHING;`).then((err,result) => {
-	
-		if (result){let htmlBody = "Your new login information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
+	 await process.postgresql.query(`INSERT INTO hosts (name, email_id, mobile_no,password) VALUES ('${host.name}', '${host.email_id}', '${host.mobile_no}','${host.password}') ON CONFLICT DO NOTHING;`)
+
+	let htmlBody = "Your new login information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
 		htmlBody += "Email : " + host.email_id + " \n " + "\n" + 
 		" password : " +host.password ;
 	  
@@ -185,10 +185,7 @@ app.post('/api/hosts', async (req, res) => {
 				console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
 			}
 		}
-	});};
 	});
-
-	
 	 res.status(200).send('Host registered!');
 
 	
@@ -347,13 +344,14 @@ app.post('/api/visits', async (req, res) => {
 		
 	};
 	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE name=$1' , [visit.host_name]);
+	console.log(host);
 	const visitor = await process.postgresql.query('SELECT * FROM visitors WHERE name=$1 AND email_id=$2' , [visit.visitor_name, visit.visitor_email]);
 	if(visitor.length == 0){
 		await process.postgresql.query(`INSERT INTO visitors (name, email_id, mobile_no) VALUES ('${visit.visitor_name}', '${visit.visitor_email}', '${visit.visitor_no}') ON CONFLICT DO NOTHING;`);
 	}
 	await process.postgresql.query(`INSERT INTO register (host_id,host_name,visitor_name, visitor_email, visitor_no,date,checked_in,checked_out, role) VALUES ('${host[0].id}', '${visit.host_name}','${visit.visitor_name}','${visit.visitor_email}','${visit.visitor_no}','${visit.date}','${visit.checked_in}','${visit.checked_out}', '${visit.role}') ON CONFLICT DO NOTHING;`);
 	
-	console.log(host); 
+	 
 	let htmlBody = "New visitor information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
         htmlBody += "Name : " + visit.visitor_name + " \n " + "\n" + 
         " Email : " + visit.visitor_email + " \n " + "\n" +
