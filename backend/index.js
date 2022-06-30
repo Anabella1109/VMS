@@ -108,7 +108,7 @@ app.get("/", (req, res) => {
 		if (err){
 			console.log(err)
 		} 
-		else if(result){
+		else{
 			res.json(result);
 		};
 	
