@@ -107,12 +107,13 @@ app.get("/", (req, res) => {
 	const rows = await process.postgresql.query('SELECT * FROM hosts').then((err,result)=>{
 		if (err){
 			console.log(err)
-		}
-		
-	
+		} 
+		else if(result){
+			res.json(rows);
+		};
 	
 	});
-	res.json(rows);
+	
   });
 
 
