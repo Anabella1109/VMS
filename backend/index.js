@@ -107,10 +107,10 @@ app.get("/", (req, res) => {
 	 await process.postgresql.query('SELECT * FROM hosts').then((err,result)=>{
 		if (err){
 			console.log(err)
-		} 
-		else{
+		} ;
+		
 			res.json(result);
-		};
+		
 	
 	});
 	
