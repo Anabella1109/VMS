@@ -114,7 +114,7 @@ app.get("/", (req, res) => {
 		if(err){
 		 res.status(404).json("No data");
 		}
-		else{
+		else if(result){
           res.status(200).json(result);
 		}
 	});
