@@ -102,10 +102,23 @@ app.get("/", (req, res) => {
 
 
 
+//   app.get('/api/hosts', async (req, res) => {
+// 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+// 	const rows= await process.postgresql.query('SELECT * FROM hosts');
+// 	res.json(rows);
+//   });
+
   app.get('/api/hosts', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	const rows= await process.postgresql.query('SELECT * FROM hosts');
-	res.json(rows);
+	const rows= await process.postgresql.query('SELECT * FROM hosts').then((err,result)=>{
+		if(err){
+		 res.status(404).json("No data");
+		}
+		else{
+          res.status(200).json(result);
+		}
+	});
+	
   });
 
 
