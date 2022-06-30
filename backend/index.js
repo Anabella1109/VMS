@@ -104,7 +104,7 @@ app.get("/", (req, res) => {
 
   app.get('/api/hosts', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	const rows= await process.postgresql.query('SELECT * FROM hosts');
+	const rows= await process.postgresql.query('SELECT * FROM hosts;');
 	res.json(rows);
   });
 
