@@ -23,7 +23,7 @@ module.exports= (callback = null) => {
     pool,
     query: (...args) => {
       return pool.connect().then((client) => {
-        return client.query(...args).then((err,res) => {
+        return client.query(...args).then((res) => {
           client.release();
           return res.rows;
         });
