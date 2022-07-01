@@ -140,9 +140,7 @@ app.get("/", (req, res) => {
 	  const host=await process.postgresql.query(`SELECT * 
 	  FROM hosts
 	 WHERE email = '${user.email}' 
-	   AND password = '${user.pass}'`).then((err,result) => {
-				if (err) {console.log(err)};
-			});
+	   AND password = '${user.pass}';`);
 			 res.json(host)
 	});
 
@@ -589,8 +587,11 @@ const user={
 		date:req.body.date,
 		time: req.body.time,
 		mobile_no: req.body.mobile_no,
-		host_name: req.body.host_name
+		host_name: req.body.host_name,
+		role: req.body.role
 	};
+
+	await process.postgresql.query(`INSERT INTO booking (host_name,visitor_name, visitor_email, visitor_no,date,checked_in, role) VALUES (' '${visitor.host_name}','${visitor.name}','${visitor.email_id}','${visitor.mobile_no}','${visitor.date}','${visitor.time}', '${visitor.role}') ON CONFLICT DO NOTHING;`);
 
 	let stringdata = JSON.stringify(visitor)
 
