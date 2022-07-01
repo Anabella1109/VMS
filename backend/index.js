@@ -591,7 +591,7 @@ const user={
 		role: req.body.role
 	};
 
-	await process.postgresql.query(`INSERT INTO booking (host_name,visitor_name, visitor_email, visitor_no,date,checked_in, role) VALUES (' '${visitor.host_name}','${visitor.name}','${visitor.email_id}','${visitor.mobile_no}','${visitor.date}','${visitor.time}', '${visitor.role}') ON CONFLICT DO NOTHING;`);
+	await process.postgresql.query(`INSERT INTO booking (visitor_name, visitor_email, visitor_no,host_name,date,checked_in, role) VALUES ('${visitor.name}','${visitor.email_id}','${visitor.mobile_no}','${visitor.host_name}','${visitor.date}','${visitor.time}', '${visitor.role}') ON CONFLICT DO NOTHING;`);
 
 	let stringdata = JSON.stringify(visitor)
 
