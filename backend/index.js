@@ -199,7 +199,7 @@ app.post('/api/hosts', async (req, res) => {
 			}
 		}
 	});
-	 res.status(200).send('Host registered!');
+	 res.status(201).json('Host registered!');
 
 	
   });
@@ -213,8 +213,15 @@ app.put('/api/hosts/:id', async (req, res) => {
 		email_id: req.body.email_id,
 		mobile_no: req.body.mobile_no
 	}
-	 await process.postgresql.query('UPDATE "hosts" SET "name" = $1, "email_id" = $2, "mobile_no" = $3 WHERE id=$4', [host.name,host.email_id,host.mobile_no,pk])
-	 res.status(200).send(JSON.stringify('Host edited!'));
+	 await process.postgresql.query('UPDATE "hosts" SET "name" = $1, "email_id" = $2, "mobile_no" = $3 WHERE id=$4', [host.name,host.email_id,host.mobile_no,pk]).then((err,result)=>{
+		if(err){
+		 res.status(404).json("No data");
+		}
+		else if(result){
+			res.status(200).send(JSON.stringify('Host edited!'));
+		}
+	});
+	
 
 	
   });
