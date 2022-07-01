@@ -22,8 +22,9 @@ module.exports= (callback = null) => {
   const connection = {
     pool,
     query: (...args) => {
-      return pool.connect().then((client) => {
-        return client.query(...args).then((res) => {
+      return pool.connect().then((err,client) => {
+        return client.query(...args).then((err,res) => {
+          if(err){console.error(err)};
           client.release();
           return res.rows;
         });
