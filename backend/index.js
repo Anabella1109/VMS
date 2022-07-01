@@ -126,14 +126,8 @@ app.get("/", (req, res) => {
   app.get('/api/hosts/:id', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params['id'];
-	const rows = await process.postgresql.query('SELECT * FROM hosts WHERE id=$1', [pk]).then((err,result)=>{
-		if(err){
-		 res.status(404).json("No data");
-		}
-		else if(result){
-          res.status(200).json(result);
-		}
-	});
+	const rows = await process.postgresql.query('SELECT * FROM hosts WHERE id=$1', [pk]);
+	res.json(rows);
   });
 
    //___________________________________ login host ________________________________________________
