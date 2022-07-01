@@ -213,9 +213,9 @@ app.put('/api/hosts/:id', async (req, res) => {
 		email_id: req.body.email_id,
 		mobile_no: req.body.mobile_no
 	}
-	 await process.postgresql.query('UPDATE "hosts" SET "name" = $1, "email_id" = $2, "mobile_no" = $3 WHERE id=$4', [host.name,host.email_id,host.mobile_no,pk]).then((err,result)=>{
-		if(err){
-			console.log(err);
+	 await process.postgresql.query('UPDATE "hosts" SET "name" = $1, "email_id" = $2, "mobile_no" = $3 WHERE id=$4', [host.name,host.email_id,host.mobile_no,pk]).then((error,result)=>{
+		if(error){
+			console.log(error);
 		 res.status(404).json("No data");
 		}
 		else if(result){
