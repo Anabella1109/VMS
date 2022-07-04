@@ -169,11 +169,16 @@ app.get("/", (req, res) => {
 		email: req.body.email,
 		pass: req.body.password
 	}
+	try{
 	  const host=await process.postgresql.query(`SELECT * 
 	  FROM hosts
 	 WHERE email = '${user.email}' 
 	   AND password = '${user.pass}';`);
 			 res.json(host)
+	}
+	catch(error){
+    console.error(error);
+	}
 	});
 
 
@@ -187,6 +192,7 @@ app.post('/api/hosts', async (req, res) => {
 		mobile_no: req.body.mobile_no,
 		password: pass
 	}
+	try{
 	 await process.postgresql.query(`INSERT INTO hosts (name, email_id, mobile_no,password) VALUES ('${host.name}', '${host.email_id}', '${host.mobile_no}','${host.password}') ON CONFLICT DO NOTHING;`)
 
 	let htmlBody = "Your new login information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
@@ -231,7 +237,10 @@ app.post('/api/hosts', async (req, res) => {
 	});
 	 res.status(201).json('Host registered!');
 
-	
+}
+catch(error){
+	console.error(error);
+}
   });
 
   //___________________________________ editing a host ________________________________________________
@@ -324,10 +333,13 @@ app.post('/api/visitors', async (req, res) => {
 			email_id: req.body.email_id,
 			mobile_no: req.body.mobile_no
 		}
-		await process.postgresql.query('UPDATE "visitors" SET "name" = $1, "email_id" = $2,"mobile_no" = $3 WHERE id=$4', [visitor.name,visitor.email_id,visitor.mobile_no,pk]).then((err,result) => {
-			if (err) {console.log(err)};
-		});
+		try{
+		await process.postgresql.query('UPDATE "visitors" SET "name" = $1, "email_id" = $2,"mobile_no" = $3 WHERE id=$4', [visitor.name,visitor.email_id,visitor.mobile_no,pk]);
 		res.status(200).send(JSON.stringify('Visitor updated!'));
+		}
+		catch(error){
+			console.error(error);}
+		
 	  });
 	 
 	  //___________________________________ Sending a single visitor ________________________________________________
@@ -338,7 +350,7 @@ app.post('/api/visitors', async (req, res) => {
 		res.json(rows);
 	  });
 	
-	   //___________________________________ Deleting a single visitor ________________________________________________
+	   //___________________________________ Deleting a single visitor _____________________________________________
  app.delete('/api/visitors/:id', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params['id'];
