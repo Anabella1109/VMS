@@ -127,29 +127,14 @@ app.get("/", (req, res) => {
 
   app.get('/api/hosts', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	const rows= await process.postgresql.query('SELECT * FROM hosts;');
-	// const rows= execute('SELECT * FROM hosts;').then(result => {
-	// 	if (result) {
-	// 		console.log('Table created');
-	// 		console.log(result);
-	// 		// res.json(result);
-	// 	}
-	// });
+	try {
+		const rows= await process.postgresql.query('SELECT * FROM hosts;');
 	res.json(rows);
-  });
-
-//   app.get('/api/hosts', async (req, res) => {
-// 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	//  await process.postgresql.query('SELECT * FROM hosts;').then((err,result)=>{
-	// 	if(err){
-	// 	 res.status(404).json("No data");
-	// 	}
-	// 	else if(result){
-    //       res.status(200).json(result);
-	// 	}
-	// });
+	} catch (error) {
+		console.error(error);
+	}
 	
-//   });
+  });
 
 
   //___________________________________ Sending single host ________________________________________________
@@ -158,8 +143,13 @@ app.get("/", (req, res) => {
 	res.setHeader( "Access-Control-Allow-Origin", "*" );
 
 	const pk=req.params['id'];
-	const rows = await process.postgresql.query('SELECT * FROM hosts WHERE id=$1', [pk]);
+	try {
+		const rows = await process.postgresql.query('SELECT * FROM hosts WHERE id=$1', [pk]);
 	res.json(rows);
+	} catch (error) {
+		console.error(error);
+	}
+	
   });
 
    //___________________________________ login host ________________________________________________
@@ -282,8 +272,13 @@ app.put('/api/hosts/:id', async (req, res) => {
  app.delete('/api/hosts/:id', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params['id'];
-	await process.postgresql.query('DELETE FROM "hosts" WHERE "id" = $1', [pk]);
+	try {
+		await process.postgresql.query('DELETE FROM "hosts" WHERE "id" = $1', [pk]);
 	res.json('Host deleted');
+	} catch (error) {
+		console.error(error);
+	}
+	
   });
 
 
@@ -346,16 +341,26 @@ app.post('/api/visitors', async (req, res) => {
 	  app.get('/api/visitors/:id', async (req, res) => {
 		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const pk=req.params['id'];
-		const rows = await process.postgresql.query('SELECT * FROM visitors WHERE id=$1', [pk]);
+		try {
+			const rows = await process.postgresql.query('SELECT * FROM visitors WHERE id=$1', [pk]);
 		res.json(rows);
+		} catch (error) {
+			console.error(error);
+		}
+		
 	  });
 	
 	   //___________________________________ Deleting a single visitor _____________________________________________
  app.delete('/api/visitors/:id', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params['id'];
-	await process.postgresql.query('DELETE FROM "visitors" WHERE "id" = $1', [pk]);
+	try {
+		await process.postgresql.query('DELETE FROM "visitors" WHERE "id" = $1', [pk]);
 	res.json('Visitor deleted');
+	} catch (error) {
+		console.error(error);
+	}
+	
   });
 
    //___________________________________VISITS ________________________________________________
@@ -422,22 +427,15 @@ app.post('/api/visits', async (req, res) => {
 	try{
 	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE name=$1' , [visit.host_name]);
 	console.log(host);
-	}
-	catch(error){
-		console.error(error);
-	};
-	try{
+	
+	
+
 	const visitor = await process.postgresql.query('SELECT * FROM visitors WHERE name=$1 AND email_id=$2' , [visit.visitor_name, visit.visitor_email]);
 	if(visitor.length == 0){
 		await process.postgresql.query(`INSERT INTO visitors (name, email_id, mobile_no) VALUES ('${visit.visitor_name}', '${visit.visitor_email}', '${visit.visitor_no}') ON CONFLICT DO NOTHING;`);
 	}	
-}
-	catch(error){
-		console.error(error);
-	}
 
 	
-try{
 	await process.postgresql.query(`INSERT INTO register (host_id,host_name,visitor_name, visitor_email, visitor_no,date,checked_in,checked_out, role) VALUES ('${host[0].id}', '${visit.host_name}','${visit.visitor_name}','${visit.visitor_email}','${visit.visitor_no}','${visit.date}','${visit.checked_in}','${visit.checked_out}', '${visit.role}') ON CONFLICT DO NOTHING;`);
 	
 	 
@@ -828,7 +826,8 @@ app.get('/api/pdf/visits', async(req,res)=>{
 	app.get('/api/pdf/visits/today', async(req,res)=>{
 		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const name= new Date().toLocaleDateString();
-		const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1',[name]);
+		try {
+			const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1',[name]);
 		let doc = new PDFDocument({ margin: 30, size: 'A4' });
 		const table = {
 			title: "Visits",
@@ -870,6 +869,10 @@ app.get('/api/pdf/visits', async(req,res)=>{
 		
 		  src.pipe(res);
 		  doc.end();
+		} catch (error) {
+			console.error(error);
+		}
+		
 		 
 		});
 
@@ -877,7 +880,8 @@ app.get('/api/pdf/visits', async(req,res)=>{
 			res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 			const name= new Date().toLocaleDateString();
 			const date= req.query.date;
-			const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1',[date]);
+			try {
+				const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1',[date]);
 			let doc = new PDFDocument({ margin: 30, size: 'A4' });
 			const table = {
 				title: "Visits",
@@ -919,6 +923,10 @@ app.get('/api/pdf/visits', async(req,res)=>{
 			
 			  src.pipe(res);
 			  doc.end();
+			} catch (error) {
+				console.error(error);
+			}
+			
 			 
 			});
 	
@@ -1118,7 +1126,8 @@ app.get('/api/csv/hosts', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const date= req.params.date;
 	// const rows = await process.postgresql.query('SELECT * FROM register');
-	const name= new Date().toLocaleDateString();
+	try {
+		const name= new Date().toLocaleDateString();
 	const csvWriter = createCsvWriter({
 		path:__dirname+`/public/visits.csv`,
 		header: [
@@ -1150,6 +1159,10 @@ app.get('/api/csv/hosts', async (req, res) => {
 	  });
 	
 	  src.pipe(res); 
+	} catch (error) {
+		console.error(error);
+	}
+	
 	//   res.send(Buffer.from(records));
   });
 
@@ -1159,7 +1172,8 @@ app.get('/api/csv/hosts', async (req, res) => {
 	// const tdate= date.toLocaleDateString();
 	// const rows = await process.postgresql.query('SELECT * FROM register');
 	// https://vmsapi1.herokuapp.com/api/csv/visits/date?date=6%2F27%2F2022
-	const name= new Date().toLocaleDateString();
+	try {
+		const name= new Date().toLocaleDateString();
 	const csvWriter = createCsvWriter({
 		path:__dirname+`/public/visits.csv`,
 		header: [
@@ -1191,6 +1205,10 @@ app.get('/api/csv/hosts', async (req, res) => {
 	  });
 	
 	  src.pipe(res); 
+	} catch (error) {
+		console.error(error);
+	}
+	
 	//   res.send(Buffer.from(records));
   });
 	
@@ -1199,7 +1217,8 @@ app.get('/api/csv/hosts', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const host= req.params.host;
 	// const rows = await process.postgresql.query('SELECT * FROM register');
-	const name= new Date().toLocaleDateString();
+	try {
+		const name= new Date().toLocaleDateString();
 	const csvWriter = createCsvWriter({
 		path:__dirname+`/public/visits.csv`,
 		header: [
@@ -1231,6 +1250,10 @@ app.get('/api/csv/hosts', async (req, res) => {
 	  });
 	
 	  src.pipe(res); 
+	} catch (error) {
+		console.error(error);
+	}
+	
 	//   res.send(Buffer.from(records));
   });
 	
