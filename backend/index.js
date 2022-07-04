@@ -128,14 +128,14 @@ app.get("/", (req, res) => {
   app.get('/api/hosts', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	// const rows= await process.postgresql.query('SELECT * FROM hosts;');
-	execute('SELECT * FROM hosts;').then(result => {
+	const rows= execute('SELECT * FROM hosts;').then(result => {
 		if (result) {
 			console.log('Table created');
 			console.log(result);
-			res.json(result);
+			// res.json(result);
 		}
 	});
-	// res.json(rows);
+	res.json(rows);
   });
 
 //   app.get('/api/hosts', async (req, res) => {
