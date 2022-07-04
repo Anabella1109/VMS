@@ -202,7 +202,7 @@ app.post('/api/hosts', async (req, res) => {
 		
 		var mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
 		{
-		  from: config.email_setting.email,
+		  from: process.env.EMAIL,
 		  to: host.email_id,
 		  subject: "Login information.",
 		  html: htmlBody,
