@@ -304,8 +304,13 @@ app.post('/api/visitors', async (req, res) => {
 		email_id: req.body.email_id,
 		mobile_no: req.body.mobile_no
 	}
+	try{
 	 await process.postgresql.query(`INSERT INTO visitors (name, email_id, mobile_no) VALUES ('${visitor.name}', '${visitor.email_id}', '${visitor.mobile_no}') ON CONFLICT DO NOTHING;`)
 	 res.status(200).send(JSON.stringify('Visitor registered!'));
+	}
+	 catch(error){
+		console.error(error);}
+	//   res.status(200).send(JSON.stringify('Visitor registered!'));
 
 	
   });
@@ -793,7 +798,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 		app.get('/api/pdf/visits/date', async(req,res)=>{
 			res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 			const name= new Date().toLocaleDateString();
-			const date= re.query.date;
+			const date= req.query.date;
 			const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1',[date]);
 			let doc = new PDFDocument({ margin: 30, size: 'A4' });
 			const table = {
