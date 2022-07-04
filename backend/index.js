@@ -53,7 +53,7 @@ let transporter = nodemailer.createTransport({
 const app = express();
 const path = require('path');
 const corsOptions ={
-    origin:'http://localhost:3000', 
+    origin:'*', 
     credentials:true,            //access-control-allow-credentials:true
     optionSuccessStatus:200
 }
@@ -62,7 +62,7 @@ const corsOptions ={
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/public",express.static(__dirname+'/public'));
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(sessions({
     secret: process.env.SECRET,
     saveUninitialized:true,
