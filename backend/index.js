@@ -252,17 +252,13 @@ app.put('/api/hosts/:id', async (req, res) => {
 		email_id: req.body.email_id,
 		mobile_no: req.body.mobile_no
 	}
-	 await process.postgresql.query('UPDATE "hosts" SET "name" = $1, "email_id" = $2, "mobile_no" = $3 WHERE id=$4', [host.name,host.email_id,host.mobile_no,pk]).then((error,result)=>{
-		if(error){
-			console.log(result);
-		 res.status(404).json("No data");
-		}
-		else if(result){
-			res.status(200).send(JSON.stringify('Host edited!'));
-		}
-	});
-	
-
+	try{
+	 await process.postgresql.query('UPDATE "hosts" SET "name" = $1, "email_id" = $2, "mobile_no" = $3 WHERE id=$4', [host.name,host.email_id,host.mobile_no,pk])
+		res.status(200).send(JSON.stringify('Host edited!'));
+	}
+	catch(error){
+		console.error(error);
+	}	
 	
   });
 
@@ -273,9 +269,13 @@ app.put('/api/hosts/:id', async (req, res) => {
 	const host = {
 		password:req.body.password
 	}
+	try{
 	 await process.postgresql.query('UPDATE "hosts" SET "password" = $1 WHERE id=$2', [host.passsword,pk])
 	 res.status(200).send(JSON.stringify('Password changed'));
-
+	}
+	catch(error){
+		console.error(error);
+	}
 	
   });
    //___________________________________ Deleting a single host ________________________________________________
@@ -355,7 +355,7 @@ app.post('/api/visitors', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params['id'];
 	await process.postgresql.query('DELETE FROM "visitors" WHERE "id" = $1', [pk]);
-	res.send('Visitor deleted');
+	res.json('Visitor deleted');
   });
 
    //___________________________________VISITS ________________________________________________
@@ -371,13 +371,18 @@ app.post('/api/visitors', async (req, res) => {
 	app.get('/api/date/visits', async (req, res) => {
 		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const date=req.query.date;
+		try{
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1', [date]);
 	
 		res.status(200).json(rows);
+		}
+		catch(error){
+			console.error(error);
+		}
 	  });
 
  //___________________________________ sending visits for current day ________________________________________________
- app.get('/api/visits/toya', async (req, res) => {
+ app.get('/api/visits/today', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const date=new Date().toLocaleDateString();
 	const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1', [date]);
@@ -414,12 +419,25 @@ app.post('/api/visits', async (req, res) => {
 		role: req.body.role
 		
 	};
+	try{
 	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE name=$1' , [visit.host_name]);
 	console.log(host);
+	}
+	catch(error){
+		console.error(error);
+	};
+	try{
 	const visitor = await process.postgresql.query('SELECT * FROM visitors WHERE name=$1 AND email_id=$2' , [visit.visitor_name, visit.visitor_email]);
 	if(visitor.length == 0){
 		await process.postgresql.query(`INSERT INTO visitors (name, email_id, mobile_no) VALUES ('${visit.visitor_name}', '${visit.visitor_email}', '${visit.visitor_no}') ON CONFLICT DO NOTHING;`);
+	}	
+}
+	catch(error){
+		console.error(error);
 	}
+
+	
+try{
 	await process.postgresql.query(`INSERT INTO register (host_id,host_name,visitor_name, visitor_email, visitor_no,date,checked_in,checked_out, role) VALUES ('${host[0].id}', '${visit.host_name}','${visit.visitor_name}','${visit.visitor_email}','${visit.visitor_no}','${visit.date}','${visit.checked_in}','${visit.checked_out}', '${visit.role}') ON CONFLICT DO NOTHING;`);
 	
 	 
@@ -474,7 +492,10 @@ vonage.message.sendSms(from, to, text, (err, responseData) => {
 // })
 	 res.status(200).send('Visit registered!');
 
-	 
+}
+catch(error){
+	console.error(error);
+} 
 
 	
   });
@@ -495,11 +516,13 @@ app.put('/api/visits/:id', async (req, res) => {
 		role: req.body.role
 		
 	}
-	await process.postgresql.query('UPDATE "register" SET "host_id" = $1, "host_name" = $2, "visitor_name" = $3, "visitor_email" = $4, "visitor_no" = $5,"date" = $10, "checked_in"= $6, "checked_out"=$7, "role"=$8  WHERE id=$9', [visit.host_id,visit.host_name,visit.visitor_name, visit.visitor_email,visit.visitor_no, visit.checked_in, visit.checked_out,visit.role,pk,visit.date]).then((err,result) => {
-		if (err) {console.log(err)};
-	});
+	try{
+	await process.postgresql.query('UPDATE "register" SET "host_id" = $1, "host_name" = $2, "visitor_name" = $3, "visitor_email" = $4, "visitor_no" = $5,"date" = $10, "checked_in"= $6, "checked_out"=$7, "role"=$8  WHERE id=$9', [visit.host_id,visit.host_name,visit.visitor_name, visit.visitor_email,visit.visitor_no, visit.checked_in, visit.checked_out,visit.role,pk,visit.date]);
 	 res.status(200).send(JSON.stringify('Visit edited'));
-
+	}
+	catch(error){
+		console.error(error);
+	}
 	
   });
 
@@ -512,11 +535,14 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 	const visit = {
 		checked_out: checkout_time,
 	}
-	await process.postgresql.query('UPDATE "register" SET "checked_out"=$1  WHERE id=$2', [visit.checked_out,pk]).then((err,result) => {
-		if (err)  {console.log(err)};
-	});
+	try{
+	await process.postgresql.query('UPDATE "register" SET "checked_out"=$1  WHERE id=$2', [visit.checked_out,pk]);
 	 res.status(200).send(JSON.stringify('Checked out'));
-
+	}
+	catch(error){
+		console.error(error);
+		res.status(404).json('Visit not found');
+	}
 	
   });
 
@@ -524,18 +550,29 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 	 app.get('/api/visits/:id', async (req, res) => {
 		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const pk=req.params['id'];
+		try{
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE id=$1', [pk]);
 		res.json(rows);
+		}
+		catch(error){
+			console.error(error);
+			res.status(404).json('Visit not found');
+		}
 	  });
 	
 		 //___________________________________ Sending a visit by date and time ________________________________________________
-		 app.get('/api/visits/:date/:time', async (req, res) => {
+		 app.get('/api/visits/date/time', async (req, res) => {
 			res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-			const date=req.params['date'];
-			const time= req.params['time'];
-	
+			const date=req.query.date;
+			const time= req.query.time;
+	        try{
 			const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1 AND checked_in=$2', [date, time]);
 			res.json(rows);
+			}
+			catch(error){
+				console.error(error);
+				res.status(404).json("Recordnot found");
+			}
 		  });
 	
 	
@@ -545,8 +582,13 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 	 app.delete('/api/visits/:id', async (req, res) => {
 		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const pk=req.params['id'];
-		await process.postgresql.query('DELETE FROM "register" WHERE "id" = $1', [pk]);
+		try {
+			await process.postgresql.query('DELETE FROM "register" WHERE "id" = $1', [pk]);
 		res.send('Record deleted');
+		} catch (error) {
+			console.error(error);
+		}
+		
 	  });
 
 
@@ -560,13 +602,16 @@ const user={
 	email: req.body.email,
 	pass: req.body.password
 }
-  await process.postgresql.query(`INSERT INTO users (email, password) VALUES (
-	'${user.email}',
-	crypt('${user.pass}', gen_salt('bf'))
-  );`).then((err,result) => {
-			if (err) {console.log(err)};
-		});
-		 res.status(200).send(JSON.stringify('User registered'))
+try {
+	await process.postgresql.query(`INSERT INTO users (email, password) VALUES (
+		'${user.email}',
+		crypt('${user.pass}', gen_salt('bf'))
+	  );`)
+			 res.status(200).send(JSON.stringify('User registered'));
+} catch (error) {
+	console.error(error);
+}
+ 
 });
 
 //  //___________________________________ login user ________________________________________________
@@ -591,30 +636,41 @@ const user={
 			email: req.body.email,
 			pass: req.body.password
 		}
-		  const newuser=await process.postgresql.query(`SELECT * 
-		  FROM users
-		 WHERE email = '${user.email}' 
-		   AND password = crypt('${user.pass}', password);`).then((err,result) => {
-					
-					if (result){
-						session=req.session;
-                        session.userid=user.email;
-                        console.log(req.session)
-						res.json(newuser);
-					}
-					else{
-						
-							res.json('Invalid username or password');
-					
-					};
+		try {
+			const newuser=await process.postgresql.query(`SELECT * 
+			FROM users
+		   WHERE email = '${user.email}' 
+			 AND password = crypt('${user.pass}', password);`)
+					  
+					  if (newuser.length != 0){
+						  session=req.session;
+						  session.userid=user.email;
+						  console.log(req.session)
+						  res.json('User logged in');
+					  }
+					  else{
+						  
+							  res.json('Invalid username or password');
+					  
+					  };
+			
+		} catch (error) {
+			console.error(error);
+		}
+		 
 	
-				});
+				
 				 
 		});
 
 		app.get('/api/admin/logout',(req,res) => {
-			req.session.destroy();
-			res.json('user logged out');
+			try {
+				req.session.destroy();
+			res.json('User logged out');
+			} catch (error) {
+				console.error(error);
+			}
+			
 		});
 
 
@@ -644,9 +700,14 @@ res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, O
 		host_name: req.body.host_name,
 		role: req.body.role
 	};
+	try {
+		await process.postgresql.query(`INSERT INTO booking (visitor_name, visitor_email, visitor_no,host_name,date,checked_in, role) VALUES ('${visitor.name}','${visitor.email_id}','${visitor.mobile_no}','${visitor.host_name}','${visitor.date}','${visitor.time}', '${visitor.role}') ON CONFLICT DO NOTHING;`);
+     console.log('Booking registered')
+	} catch (error) {
+		console.error(error);
+	}
 
-	await process.postgresql.query(`INSERT INTO booking (visitor_name, visitor_email, visitor_no,host_name,date,checked_in, role) VALUES ('${visitor.name}','${visitor.email_id}','${visitor.mobile_no}','${visitor.host_name}','${visitor.date}','${visitor.time}', '${visitor.role}') ON CONFLICT DO NOTHING;`);
-
+	
 	let stringdata = JSON.stringify(visitor)
 
 // 	QRCode.toString(stringdata,{type:'terminal'},
@@ -701,12 +762,17 @@ QRCode.toDataURL(stringdata, function (err, code) {
 	res.json(rows);
   });
 
-//___________________________________ Sending a single visitor ________________________________________________
+//___________________________________ Sending a single booking ________________________________________________
 app.get('/api/bookings/:id', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params['id'];
-	const rows = await process.postgresql.query('SELECT * FROM booking WHERE id=$1', [pk]);
+	try {
+		const rows = await process.postgresql.query('SELECT * FROM booking WHERE id=$1', [pk]);
 	res.json(rows);
+	} catch (error) {
+		console.error(error);
+	}
+	
   });
 
 // ___________________________________________pdf________________________________________________________________
