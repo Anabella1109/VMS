@@ -619,8 +619,8 @@ res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, O
 
 	// openssl('openssl req -config csr.cnf -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout key.key -out certificate.crt');
 	const visitor = {
-		name: req.body.name,
-		email_id: req.body.email_id,
+		name: req.body.visitor_name,
+		email_id: req.body.visitor_email,
 		date:req.body.date,
 		time: req.body.time,
 		mobile_no: req.body.visitor_no,
