@@ -62,7 +62,7 @@ const corsOptions ={
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/public",express.static(__dirname+'/public'));
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(sessions({
     secret: process.env.SECRET,
     saveUninitialized:true,
@@ -155,6 +155,8 @@ app.get("/", (req, res) => {
   //___________________________________ Sending single host ________________________________________________
   app.get('/api/hosts/:id', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+	res.setHeader( "Access-Control-Allow-Origin", "*" );
+
 	const pk=req.params['id'];
 	const rows = await process.postgresql.query('SELECT * FROM hosts WHERE id=$1', [pk]);
 	res.json(rows);
@@ -610,6 +612,8 @@ const user={
 //___________________________________ generating qrcode ________________________________________________
   app.post('/qrgenerate', async(req,res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+	res.setHeader( "Access-Control-Allow-Origin", "*" );
+
 	// openssl('openssl req -config csr.cnf -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout key.key -out certificate.crt');
 	const visitor = {
 		name: req.body.name,
