@@ -86,9 +86,9 @@ let session;
 	// res.send('hey')
 //   });
 //___________________________________ Connection to database ________________________________________________
-// postgresql(async (connection) => {
+postgresql(async (connection) => {
 	
-//  });
+ });
 
 // const client = new Client({
 //     user: process.env.DATABASE_USER,
