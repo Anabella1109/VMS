@@ -26,7 +26,7 @@ const authToken = config.twilio.authToken;
 // const client = require('twilio')(accountSid, authToken);
 
 
-const { Client } = require('pg');
+// const { Client } = require('pg');
 
 // const QRCode=qrcode;
 
@@ -90,28 +90,28 @@ let session;
 	
 //  });
 
-const client = new Client({
-    user: process.env.DATABASE_USER,
-    database: process.env.DATABASE ,
-    password:process.env.DATABASE_PASSWORD,
-    host:process.env.DATABASE_HOST,
-    port:  5432,
-    ssl: {
-      rejectUnauthorized: false
-	}
-});
- const execute = async (query) => {
-    try {
-        await client.connect();     // gets connection
-        await client.query(query);  // sends queries
-        return true;
-    } catch (error) {
-        console.error(error.stack);
-        return false;
-    } finally {
-        await client.end();         // closes connection
-    }
-};
+// const client = new Client({
+//     user: process.env.DATABASE_USER,
+//     database: process.env.DATABASE ,
+//     password:process.env.DATABASE_PASSWORD,
+//     host:process.env.DATABASE_HOST,
+//     port:  5432,
+//     ssl: {
+//       rejectUnauthorized: false
+// 	}
+// });
+//  const execute = async (query) => {
+//     try {
+//         await client.connect();     // gets connection
+//         await client.query(query);  // sends queries
+//         return true;
+//     } catch (error) {
+//         console.error(error.stack);
+//         return false;
+//     } finally {
+//         await client.end();         // closes connection
+//     }
+// };
 
 app.get("/", (req, res) => {
 	res.sendFile(__dirname+'/index.html');
@@ -127,14 +127,14 @@ app.get("/", (req, res) => {
 
   app.get('/api/hosts', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	// const rows= await process.postgresql.query('SELECT * FROM hosts;');
-	const rows= execute('SELECT * FROM hosts;').then(result => {
-		if (result) {
-			console.log('Table created');
-			console.log(result);
-			// res.json(result);
-		}
-	});
+	const rows= await process.postgresql.query('SELECT * FROM hosts;');
+	// const rows= execute('SELECT * FROM hosts;').then(result => {
+	// 	if (result) {
+	// 		console.log('Table created');
+	// 		console.log(result);
+	// 		// res.json(result);
+	// 	}
+	// });
 	res.json(rows);
   });
 
