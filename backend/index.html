@@ -130,8 +130,10 @@
 <h1>/api/csv/visits</h1>
 <ul><li>GET: get visits csv report</li></ul>
 
-<h1>/api/csv/visits/host/:id</h1>
+<h1>/api/csv/visits/host/:host</h1>
 <ul><li>GET: get visits csv report by host</li></ul>
+<p>host: host id</p>
+
 
 <h1>/api/csv/visits/today</h1>
 <ul><li>GET: get visits csv report for current  day</li></ul>
@@ -159,6 +161,14 @@
 <ul><li>GET: get visits pdf report for certain date</li></ul>
     <p>query parameter: date</p> 
 <p>Example: https://vmsapi1.herokuapp.com/api/pdf/visits/date?date=6%2F27%2F2022</p>
+
+<h1>/api/pdf/visits/today</h1>
+<ul><li>GET: get visits pdf report for current day</li></ul>
+
+
+<h1>/api/pdf/visits/host/:host</h1>
+<ul><li>GET: get visits pdf report for specific host</li></ul>
+
 
 <h1>/api/pdf/visitors</h1>
 <ul><li>GET: get visitors pdf report</li></ul>

@@ -781,7 +781,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 	let doc = new PDFDocument({ margin: 30, size: 'A4' });
 	const table = {
 		title: "Visits",
-		subtitle: "visitors report",
+		subtitle: "General visits report",
 		headers: [
 		  { label: "Host", property: 'host_name', width: 60, renderer: null },
 		  { label: "Visitor name", property: 'visitor_name', width:60, renderer: null }, 
@@ -822,6 +822,56 @@ app.get('/api/pdf/visits', async(req,res)=>{
 	 
 	});
 
+	app.get('/api/pdf/visits/host/:host', async(req,res)=>{
+		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+		const host= req.params.host;
+		const rows = await process.postgresql.query('SELECT * FROM register WHERE host_id=$1',[host]);
+		const name= new Date().toLocaleDateString();
+		let doc = new PDFDocument({ margin: 30, size: 'A4' });
+		const table = {
+			title: "Visits",
+			subtitle: "Guest report by host",
+			headers: [
+			  { label: "Host", property: 'host_name', width: 60, renderer: null },
+			  { label: "Visitor name", property: 'visitor_name', width:60, renderer: null }, 
+			  { label: "Visitor email", property: 'visitor_email', width: 80, renderer: null }, 
+			  { label: "Visitor mobile", property: 'visitor_no', width: 80, renderer: null }, 
+			  { label: "Date", property: 'date', width: 80, renderer: null },
+			  { label: "Check in time", property: 'checked_in', width: 80, renderer: null }, 
+			  { label: "Check out time", property: 'checked_out', width: 80, renderer: null },
+			  { label: "Role", property: 'role', width: 80, renderer: null },
+			 
+			],
+			// complex data
+			datas:rows,
+			// simeple data
+	
+		  };
+		  // the magic
+		  doc.table(table, {
+			prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
+			prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
+			  doc.font("Helvetica").fontSize(8);
+			  indexColumn === 0 && doc.addBackground(rectRow, 'blue', 0.15);
+			},
+		  });
+		  // done!
+		//   doc.pipe(res);
+		doc.pipe(fs.createWriteStream(__dirname+'/public/visits.pdf'));
+		const src = fs.createReadStream(__dirname+'/public/visits.pdf');
+		
+		res.writeHead(200, {
+			'Content-Type': 'application/pdf',
+			'Content-Disposition': `attachment; filename= ${name} report.pdf`,
+			'Content-Transfer-Encoding': 'Binary'
+		  });
+		
+		  src.pipe(res);
+		  doc.end();
+		 
+		});
+	
+
 
 	app.get('/api/pdf/visits/today', async(req,res)=>{
 		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
@@ -831,7 +881,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 		let doc = new PDFDocument({ margin: 30, size: 'A4' });
 		const table = {
 			title: "Visits",
-			subtitle: "visitors report",
+			subtitle: "Today's visits report",
 			headers: [
 			  { label: "Host", property: 'host_name', width: 60, renderer: null },
 			  { label: "Visitor name", property: 'visitor_name', width:60, renderer: null }, 
@@ -885,7 +935,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 			let doc = new PDFDocument({ margin: 30, size: 'A4' });
 			const table = {
 				title: "Visits",
-				subtitle: "visitors report",
+				subtitle: "Visits report by date",
 				headers: [
 				  { label: "Host", property: 'host_name', width: 60, renderer: null },
 				  { label: "Visitor name", property: 'visitor_name', width:60, renderer: null }, 
@@ -1022,7 +1072,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 // _____________________________________________csv______________________________________________________________________
 app.get('/api/csv/hosts', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	const rows = await process.postgresql.query('SELECT * FROM hosts');
+	// const rows = await process.postgresql.query('SELECT * FROM hosts');
 	const csvWriter = createCsvWriter({
 		path:__dirname+'/public/hosts.csv',
 		header: [
@@ -1051,7 +1101,9 @@ app.get('/api/csv/hosts', async (req, res) => {
 	  src.pipe(res); 
   });
 
-  app.get('/api/csv/visitors', async (req, res) => {
+//   +++++++++++++++++++++++++++++++++++++++++++++===csv visitors++++++++++++++++++++++++++++++++++++++
+  
+app.get('/api/csv/visitors', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	// const rows = await process.postgresql.query('SELECT * FROM visitors');
 	const name= new Date().toLocaleDateString();
@@ -1083,6 +1135,7 @@ app.get('/api/csv/hosts', async (req, res) => {
 	  src.pipe(res); 
   });
 
+// ++++++++++++++++++++++++++++++++++++++++++++++csv visits++++++++++++++++++++++++++++++++++++++++
 
   app.get('/api/csv/visits', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
@@ -1121,6 +1174,8 @@ app.get('/api/csv/hosts', async (req, res) => {
 	  src.pipe(res); 
 	//   res.send(Buffer.from(records));
   });
+
+//   ++++++++++++++++++++++++++++++++++++++++++++++++++csv visits for current day++++++++++++++++++++++++++++++++++++++++++++++
 
   app.get('/api/csv/visits/today', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
@@ -1165,6 +1220,8 @@ app.get('/api/csv/hosts', async (req, res) => {
 	
 	//   res.send(Buffer.from(records));
   });
+
+//   +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++csv visits by date++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   app.get('/api/csv/visits/date', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
@@ -1212,7 +1269,9 @@ app.get('/api/csv/hosts', async (req, res) => {
 	//   res.send(Buffer.from(records));
   });
 	
-	
+
+//   +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++csv visits by host+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
   app.get('/api/csv/visits/host/:host', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const host= req.params.host;
