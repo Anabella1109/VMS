@@ -208,7 +208,7 @@ app.post('/api/hosts', async (req, res) => {
 	
 	
 	const from = "250787380054";
-	const to =`250${host.mobile_no}`;
+	const to =`25${host.mobile_no}`;
 	const text =` Your new login information
 	Email: ${host.email_id} 
 	   Password: ${host.password}
