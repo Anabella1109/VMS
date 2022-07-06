@@ -210,7 +210,7 @@ app.post('/api/hosts', async (req, res) => {
 	const from = "250787380054";
 	const to =`25${host.mobile_no}`;
 	const text =` Your new login information
-	Email: ${host.email_id} 
+	   Email: ${host.email_id} 
 	   Password: ${host.password}
 	  `;
 	
@@ -287,11 +287,6 @@ app.put('/api/hosts/:id', async (req, res) => {
  //___________________________________ VISITORS ________________________________________________
 
   //___________________________________ sending visitors ________________________________________________
-  app.get('/visitors', async (req, res) => {
-	const rows = await process.postgresql.query('SELECT * FROM visitors');
-	res.status(200).send(JSON.stringify(rows));
-  });
-
   app.get('/api/visitors', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const rows = await process.postgresql.query('SELECT * FROM visitors');
@@ -466,7 +461,7 @@ app.post('/api/visits', async (req, res) => {
 
 const from = "250787380054";
 const to =`250${host[0].mobile_no}`;
-const text =` A new  guest has arrived
+const text =` A new  guest for you has arrived
 Name: ${visit.visitor_name} 
    Number: ${visit.visitor_no}
    email: ${visit.visitor_email}`;
@@ -527,7 +522,7 @@ app.put('/api/visits/:id', async (req, res) => {
   //___________________________________ Editing a visit checkout ________________________________________________
 app.patch('/api/visits/checkout/:id', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	const pk=req.params['id'];
+	const pk=req.params.id;
 	const checkout= new Date();
 	const checkout_time= checkout.toLocaleTimeString();
 	const visit = {
@@ -535,7 +530,7 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 	}
 	try{
 	await process.postgresql.query('UPDATE "register" SET "checked_out"=$1  WHERE id=$2', [visit.checked_out,pk]);
-	 res.status(200).send(JSON.stringify('Checked out'));
+	 res.status(200).json('Checked out');
 	}
 	catch(error){
 		console.error(error);
