@@ -438,6 +438,7 @@ app.post('/api/visits', async (req, res) => {
         htmlBody += "Name : " + visit.visitor_name + " \n " + "\n" + 
         " Email : " + visit.visitor_email + " \n " + "\n" +
         "Mobile Number : " +visit.visitor_no + " \n " + "\n" +
+		"Purpose of visit:" + visit.role+  " \n " + "\n" +
         " Check In Time :" +visit.checked_in;
       
         
