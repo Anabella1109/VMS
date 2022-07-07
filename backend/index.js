@@ -693,6 +693,7 @@ res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, O
 		host_name: req.body.host_name,
 		role: req.body.role
 	};
+	console.log(visitor);
 	try {
 		await process.postgresql.query(`INSERT INTO booking (visitor_name, visitor_email, visitor_no,host_name,date,checked_in, role) VALUES ('${visitor.name}','${visitor.email_id}','${visitor.mobile_no}','${visitor.host_name}','${visitor.date}','${visitor.time}', '${visitor.role}') ON CONFLICT DO NOTHING;`);
      console.log('Booking registered')
