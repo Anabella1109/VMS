@@ -419,6 +419,7 @@ app.post('/api/visits', async (req, res) => {
 		role: req.body.role
 		
 	};
+	console.log(visit);
 	try{
 	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE name=$1' , [visit.host_name]);
 	console.log(host);
