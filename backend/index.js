@@ -720,7 +720,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
         let mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
         {
           from: process.env.EMAIL,
-          to: visitor.email_id,
+          to: visitor.visitor_email,
           subject: "Qr Code.",
 		  text: 'Dear guest, find attached the qr code for your visit to AmaliTech',
 		  attachDataUrls: true,
