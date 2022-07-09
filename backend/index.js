@@ -14,6 +14,7 @@ const PDFDocument = require("pdfkit-table");
 const cors = require('cors')
 const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
+const { DateTime } = require("luxon");    
 
 const vonage = new Vonage({
   apiKey: process.env.API_KEY,
@@ -760,7 +761,8 @@ QRCode.toDataURL(stringdata, function (err, code) {
 
 app.get('/api/bookings/today', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	const today=new Date().toLocaleDateString();
+	const today=DateTime.now();
+	console.log(today);
 	const rando= "2022-06-23";
 	const randomly=new Date(rando).toLocaleDateString();
 	// console.log(new Date(rando).toLocaleDateString());
@@ -770,10 +772,10 @@ app.get('/api/bookings/today', async (req, res) => {
 
 	for (let index = 0; index < rows.length; index++) {
 		const element = rows[index];
-		console.log(element);
+		// console.log(element);
 		if( today > new Date(element.date).toLocaleDateString()){
 			data.push(element);
-			console.log(element);
+			// console.log(element);
 			console.log(element.date);
 			console.log(new Date(element.date).toLocaleDateString())
 
