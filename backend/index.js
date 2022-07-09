@@ -769,7 +769,7 @@ app.get('/api/bookings/today', async (req, res) => {
 	const rows= await process.postgresql.query('SELECT * FROM booking;');
 
 	for (let index = 0; index < rows.length; index++) {
-		const element = array[index];
+		const element = rows[index];
 		if( today> new Date(element.date).toLocaleDateString()){
 			data.push(element);
 		}
