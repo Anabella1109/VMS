@@ -761,9 +761,9 @@ QRCode.toDataURL(stringdata, function (err, code) {
 
 app.get('/api/bookings/today', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	const today=DateTime.now();
+	const today=DateTime.now().toFormat("yyyy-MM-dd");
 	console.log(today);
-	console.log(today.toFormat("yyyy-MM-dd"));
+	// console.log(today.toFormat("yyyy-MM-dd"));
 	const rando= "2022-06-23";
 	const randomly=new Date(rando).toLocaleDateString();
 	// console.log(new Date(rando).toLocaleDateString());
@@ -774,7 +774,7 @@ app.get('/api/bookings/today', async (req, res) => {
 	for (let index = 0; index < rows.length; index++) {
 		const element = rows[index];
 		// console.log(element);
-		if( today > new Date(element.date).toLocaleDateString()){
+		if( today > element.date ){
 			data.push(element);
 			// console.log(element);
 			console.log(element.date);
