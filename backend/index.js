@@ -754,13 +754,27 @@ QRCode.toDataURL(stringdata, function (err, code) {
 // _________________________________________sending bookings______________________________
   app.get('/api/bookings', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+	const rows= await process.postgresql.query('SELECT * FROM booking;');
+	res.json(rows);
+  });
+
+app.get('/api/bookings/today', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const today=new Date().toLocaleDateString();
 	const rando= "2022-06-23";
 	const randomly=new Date(rando).toLocaleDateString();
 	// console.log(new Date(rando).toLocaleDateString());
 	console.log(today > randomly);
+	let data=[];
 	const rows= await process.postgresql.query('SELECT * FROM booking;');
-	res.json(rows);
+
+	for (let index = 0; index < rows.length; index++) {
+		const element = array[index];
+		if( today> new Date(element.date).toLocaleDateString()){
+			data.push(element);
+		}
+	}
+	res.json(data);
   });
 
 //___________________________________ Sending a single booking ________________________________________________
