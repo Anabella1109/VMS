@@ -695,7 +695,7 @@ try {
 	};
 	console.log(visitor);
 	try {
-		await process.postgresql.query(`INSERT INTO booking (visitor_name, visitor_email, visitor_no,host_name,date,checked_in, role) VALUES ('${visitor.name}','${visitor.email_id}','${visitor.mobile_no}','${visitor.host_name}','${visitor.date}','${visitor.time}', '${visitor.role}') ON CONFLICT DO NOTHING;`);
+		await process.postgresql.query(`INSERT INTO booking (visitor_name, visitor_email, visitor_no,host_name,date,checked_in, role) VALUES ('${visitor.visitor_name}','${visitor.visitor_email}','${visitor.visitor_no}','${visitor.host_name}','${visitor.date}','${visitor.checked_in}', '${visitor.role}') ON CONFLICT DO NOTHING;`);
      console.log('Booking registered')
 	} catch (error) {
 		console.error(error);
