@@ -752,8 +752,8 @@ QRCode.toDataURL(stringdata, function (err, code) {
 			}
 		  });
 		  const dateAndTime= visitor.date +'T'+ visitor.checked_in; 
-		  const scheduledTime=new DateTime(dateAndTime).plus({minutes: -30});
-		  const scheduledTime1=new DateTime(dateAndTime).plus({minutes: -10});
+		  const scheduledTime=new DateTime(dateAndTime).minus({minutes: 30});
+		  const scheduledTime1=new DateTime(dateAndTime).minus({minutes: 10});
 		//   console.log(dateAndTime);
 		//   console.log(new Date(dateAndTime));
 		//   console.log(new DateTime(dateAndTime));
@@ -775,7 +775,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
 		  const second1= scheduledTime1.second;
 
 		 
-		  const mailOptions30=  {
+		  const let=  {
 			from: process.env.EMAIL,
 			to: host[0].email_id,
 			subject: "Reminder",
@@ -783,7 +783,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
 			
 		  };
 
-		  const mailOptions10=  {
+		  let mailOptions10=  {
 			from: process.env.EMAIL,
 			to: host[0].email_id,
 			subject: "Reminder",
@@ -794,7 +794,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
 
 	
 
-		  cron.schedule(`${second} ${minute} ${hour} ${day} ${month} ${dayOfTheweek}`,	()=>{
+		  cron.schedule(`* ${minute} ${hour} ${day} ${month} *`,	()=>{
 			transporter.sendMail(mailOptions30, function(error, info){             // SEnding Mail
 				if (error) {
 				  console.log(error);
@@ -804,7 +804,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
 			  });
 		  } )
 
-		  cron.schedule(`${second1} ${minute1} ${hour1} ${day1} ${month1} ${dayOfTheweek1}`,	()=>{
+		  cron.schedule(`* ${minute1} ${hour1} ${day1} ${month1} *`,	()=>{
 			transporter.sendMail(mailOptions10, function(error, info){             // SEnding Mail
 				if (error) {
 				  console.log(error);
