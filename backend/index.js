@@ -754,8 +754,9 @@ QRCode.toDataURL(stringdata, function (err, code) {
 // _________________________________________sending bookings______________________________
   app.get('/api/bookings', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	const today=new Date().toDateString();
-	console.log(today);
+	const today=new Date().toLocaleDateString();
+	const rando= "2022-06-23";
+	console.log(new Date(rando));
 	const rows= await process.postgresql.query('SELECT * FROM booking;');
 	res.json(rows);
   });
