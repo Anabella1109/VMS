@@ -775,7 +775,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
 		  const second1= scheduledTime1.second;
 
 		 
-		  const let=  {
+		   let=  {
 			from: process.env.EMAIL,
 			to: host[0].email_id,
 			subject: "Reminder",
