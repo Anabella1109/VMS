@@ -120,8 +120,8 @@ app.get("/", (req, res) => {
 	const time= "19:00";
 	const combined=  date+'T'+time;
 	const dateAndTime= new DateTime(combined);
-	console.log(dateAndTime.weekDay());
-	console.log(dateAndTime.year());
+	console.log(dateAndTime.weekDay);
+	console.log(dateAndTime.year);
 	console.log(dateAndTime);
 	console.log(dateAndTime);
 	res.sendFile(__dirname+'/index.html');
