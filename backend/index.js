@@ -15,6 +15,7 @@ const cors = require('cors')
 const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
 const { DateTime } = require("luxon");    
+const cron = require('node-cron');
 
 const vonage = new Vonage({
   apiKey: process.env.API_KEY,
@@ -675,24 +676,20 @@ try {
   
 
 
-//___________________________________ QRCODE ________________________________________________
+//___________________________________ Booking ________________________________________________
 
 
 //___________________________________ generating qrcode ________________________________________________
   app.post('/qrgenerate', async(req,res) => {
-res.setHeader("Access-Control-Allow-Origin", "*")
-res.setHeader("Access-Control-Allow-Credentials", "true");
-res.setHeader("Access-Control-Max-Age", "1800");
-res.setHeader("Access-Control-Allow-Headers", "content-type");
-res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS");
+
 
 	// openssl('openssl req -config csr.cnf -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout key.key -out certificate.crt');
 	const visitor = {
-		name: req.body.visitor_name,
-		email_id: req.body.visitor_email,
+		visitor_name: req.body.visitor_name,
+		visitor_email: req.body.visitor_email,
 		date:req.body.date,
-		time: req.body.time,
-		mobile_no: req.body.visitor_no,
+		checked_in: req.body.checked_in,
+		visitor_no: req.body.visitor_no,
 		host_name: req.body.host_name,
 		role: req.body.role
 	};
@@ -744,6 +741,11 @@ QRCode.toDataURL(stringdata, function (err, code) {
 			  console.log('Email sent: ' + info.response);
 			}
 		  });
+		  const dateAndTime= visitor.date + visitor.checked_in; 
+		  const scheduledTime= new Date(dateAndTime);
+		  console.log(scheduledTime);
+
+		  cron.schedule()
 
 
 	res.status(200).json('Qr code sent')
