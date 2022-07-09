@@ -701,7 +701,8 @@ try {
 		host_name: req.body.host_name,
 		role: req.body.role
 	};
-	console.log(visitor);
+	// console.log(visitor);
+	const host = await process.postgresql.query('SELECT * FROM hosts WHERE name=$1', [visitor.host_name]);
 	try {
 		await process.postgresql.query(`INSERT INTO booking (visitor_name, visitor_email, visitor_no,host_name,date,checked_in, role) VALUES ('${visitor.visitor_name}','${visitor.visitor_email}','${visitor.visitor_no}','${visitor.host_name}','${visitor.date}','${visitor.checked_in}', '${visitor.role}') ON CONFLICT DO NOTHING;`);
      console.log('Booking registered')
@@ -772,7 +773,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
 		  const minute1= scheduledTime1.minute;
 		  const second1= scheduledTime1.second;
 
-		  const host = await process.postgresql.query('SELECT * FROM hosts WHERE name=$1', [visitor.host_name]);
+		 
 		  const mailOptions30=  {
 			from: process.env.EMAIL,
 			to: host[0].email_id,
