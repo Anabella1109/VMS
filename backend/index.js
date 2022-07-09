@@ -745,7 +745,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
 		  const scheduledTime= new Date(dateAndTime);
 		  console.log(dateAndTime);
 		  console.log(new Date(dateAndTime));
-		  console.log(DateTime(dateAndTime));
+		  console.log(new DateTime(dateAndTime));
 
 		//   cron.schedule()
 
