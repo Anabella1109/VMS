@@ -741,10 +741,11 @@ QRCode.toDataURL(stringdata, function (err, code) {
 			  console.log('Email sent: ' + info.response);
 			}
 		  });
-		  const dateAndTime= visitor.date + visitor.checked_in; 
+		  const dateAndTime= visitor.date +'T'+ visitor.checked_in; 
 		  const scheduledTime= new Date(dateAndTime);
 		  console.log(dateAndTime);
-		  console.log(scheduledTime);
+		  console.log(new Date(dateAndTime));
+		  console.log(DateTime(dateAndTime));
 
 		//   cron.schedule()
 
