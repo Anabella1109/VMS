@@ -774,7 +774,7 @@ app.get('/api/bookings/today', async (req, res) => {
 	for (let index = 0; index < rows.length; index++) {
 		const element = rows[index];
 		// console.log(element);
-		if( today > element.date ){
+		if( today < element.date ){
 			data.push(element);
 			// console.log(element);
 			console.log(element.date);
