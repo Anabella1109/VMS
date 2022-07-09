@@ -120,7 +120,7 @@ app.get("/", (req, res) => {
 	const time= "19:00";
 	const combined=  date+'T'+time;
 	const dateAndTime= new DateTime(combined);
-	console.log(dateAndTime.weekDay);
+	console.log(dateAndTime.weekday);
 	console.log(dateAndTime.year);
 	console.log(dateAndTime);
 	console.log(dateAndTime);
@@ -750,14 +750,67 @@ QRCode.toDataURL(stringdata, function (err, code) {
 			}
 		  });
 		  const dateAndTime= visitor.date +'T'+ visitor.checked_in; 
-		  const scheduledTime=new DateTime(dateAndTime);
+		  const scheduledTime=new DateTime(dateAndTime).plus({minutes: -30});
+		  const scheduledTime1=new DateTime(dateAndTime).plus({minutes: -10});
 		//   console.log(dateAndTime);
 		//   console.log(new Date(dateAndTime));
 		//   console.log(new DateTime(dateAndTime));
-		  const dayOfTheweek= scheduledTime.weekDay;
-		  console.log(dayOfTheweek);
+		  const dayOfTheweek= scheduledTime.weekday;
+		  const year= scheduledTime.year;
+		  const month= scheduledTime.month;
+		  const day= scheduledTime.day;
+		  const hour= scheduledTime.hour;
+		  const minute= scheduledTime.minute;
+		  const second= scheduledTime.second;
+	
 
-		//   cron.schedule()
+		  const dayOfTheweek1= scheduledTime1.weekday;
+		  const year1= scheduledTime1.year;
+		  const month1= scheduledTime1.month;
+		  const day1= scheduledTime1.day;
+		  const hour1= scheduledTime1.hour;
+		  const minute1= scheduledTime1.minute;
+		  const second1= scheduledTime1.second;
+
+		  const host = await process.postgresql.query('SELECT * FROM hosts WHERE name=$1', [visitor.host_name]);
+		  const mailOptions30=  {
+			from: process.env.EMAIL,
+			to: host[0].email_id,
+			subject: "Reminder",
+			text: `You have a scheduled visit from ${visitor.visitor_name}  in 30 minutes`,
+			
+		  };
+
+		  const mailOptions10=  {
+			from: process.env.EMAIL,
+			to: host[0].email_id,
+			subject: "Reminder",
+			text: `You have a scheduled visit from ${visitor.visitor_name}  in 10 minutes`,
+			
+		  };
+
+
+	
+
+		  cron.schedule(`${second} ${minute} ${hour} ${day} ${month} ${dayOfTheweek}`,	()=>{
+			transporter.sendMail(mailOptions30, function(error, info){             // SEnding Mail
+				if (error) {
+				  console.log(error);
+				} else {
+				  console.log('Email sent: ' + info.response);
+				}
+			  });
+		  } )
+
+		  cron.schedule(`${second1} ${minute1} ${hour1} ${day1} ${month1} ${dayOfTheweek1}`,	()=>{
+			transporter.sendMail(mailOptions10, function(error, info){             // SEnding Mail
+				if (error) {
+				  console.log(error);
+				} else {
+				  console.log('Email sent: ' + info.response);
+				}
+			  });
+		  } )
 
 
 	res.status(200).json('Qr code sent')
@@ -791,8 +844,8 @@ app.get('/api/bookings/today', async (req, res) => {
 		if( today < element.date ){
 			data.push(element);
 			// console.log(element);
-			console.log(element.date);
-			console.log(new Date(element.date).toLocaleDateString())
+			// console.log(element.date);
+			// console.log(new Date(element.date).toLocaleDateString())
 
 		}
 	}
