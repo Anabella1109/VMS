@@ -793,26 +793,34 @@ QRCode.toDataURL(stringdata, function (err, code) {
 
 
 	
-
-		  cron.schedule(`* ${minute} ${hour} ${day} ${month} *`,()=>{
-			transporter.sendMail(mailOptions30, function(error, info){             // SEnding Mail
-				if (error) {
-				  console.log(error);
-				} else {
-				  console.log('Email sent: ' + info.response);
-				}
-			  });
-		  } );
-
-		  cron.schedule(`* ${minute1} ${hour1} ${day1} ${month1} *`,()=>{
-			transporter.sendMail(mailOptions10, function(error, info){             // SEnding Mail
-				if (error) {
-				  console.log(error);
-				} else {
-				  console.log('Email sent: ' + info.response);
-				}
-			  });
-		  } )
+try {
+	cron.schedule(`* ${minute} ${hour} ${day} ${month} *`,()=>{
+		transporter.sendMail(mailOptions30, function(error, info){             // SEnding Mail
+			if (error) {
+			  console.log(error);
+			} else {
+			  console.log('Email sent: ' + info.response);
+			}
+		  });
+	  } );
+} catch (error) {
+	console.error(error);
+}
+		 
+try {
+	cron.schedule(`* ${minute1} ${hour1} ${day1} ${month1} *`,()=>{
+		transporter.sendMail(mailOptions10, function(error, info){             // SEnding Mail
+			if (error) {
+			  console.log(error);
+			} else {
+			  console.log('Email sent: ' + info.response);
+			}
+		  });
+	  } )
+} catch (error) {
+	console.error(error);
+}
+		  
 
 
 	res.status(200).json('Qr code sent')
