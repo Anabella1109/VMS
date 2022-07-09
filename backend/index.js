@@ -743,9 +743,10 @@ QRCode.toDataURL(stringdata, function (err, code) {
 		  });
 		  const dateAndTime= visitor.date + visitor.checked_in; 
 		  const scheduledTime= new Date(dateAndTime);
+		  console.log(dateAndTime);
 		  console.log(scheduledTime);
 
-		  cron.schedule()
+		//   cron.schedule()
 
 
 	res.status(200).json('Qr code sent')
