@@ -116,6 +116,14 @@ postgresql(async (connection) => {
 // };
 
 app.get("/", (req, res) => {
+	const date= "2022-07-10";
+	const time= "19:00";
+	const combined=  date+'T'+time;
+	const dateAndTime= new DateTime(combined);
+	console.log(dateAndTime.weekDay());
+	console.log(dateAndTime.year());
+	console.log(dateAndTime);
+	console.log(dateAndTime);
 	res.sendFile(__dirname+'/index.html');
   });
 
@@ -742,10 +750,12 @@ QRCode.toDataURL(stringdata, function (err, code) {
 			}
 		  });
 		  const dateAndTime= visitor.date +'T'+ visitor.checked_in; 
-		  const scheduledTime= new Date(dateAndTime);
-		  console.log(dateAndTime);
-		  console.log(new Date(dateAndTime));
-		  console.log(new DateTime(dateAndTime));
+		  const scheduledTime=new DateTime(dateAndTime);
+		//   console.log(dateAndTime);
+		//   console.log(new Date(dateAndTime));
+		//   console.log(new DateTime(dateAndTime));
+		  const dayOfTheweek= scheduledTime.weekDay;
+		  console.log(dayOfTheweek);
 
 		//   cron.schedule()
 
