@@ -756,7 +756,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const today=new Date().toLocaleDateString();
 	const rando= "2022-06-23";
-	console.log(new Date(rando));
+	console.log(new Date(rando).toLocaleDateString());
 	const rows= await process.postgresql.query('SELECT * FROM booking;');
 	res.json(rows);
   });
