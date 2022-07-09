@@ -770,6 +770,7 @@ app.get('/api/bookings/today', async (req, res) => {
 
 	for (let index = 0; index < rows.length; index++) {
 		const element = rows[index];
+		console.log(element);
 		if( today < new Date(element.date).toLocaleDateString()){
 			data.push(element);
 			console.log(element);
