@@ -775,7 +775,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
 		  const second1= scheduledTime1.second;
 
 		 
-		   let=  {
+		   let mailOptions30=  {
 			from: process.env.EMAIL,
 			to: host[0].email_id,
 			subject: "Reminder",
@@ -794,7 +794,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
 
 	
 
-		  cron.schedule(`* ${minute} ${hour} ${day} ${month} *`,	()=>{
+		  cron.schedule(`* ${minute} ${hour} ${day} ${month} *`,()=>{
 			transporter.sendMail(mailOptions30, function(error, info){             // SEnding Mail
 				if (error) {
 				  console.log(error);
@@ -802,9 +802,9 @@ QRCode.toDataURL(stringdata, function (err, code) {
 				  console.log('Email sent: ' + info.response);
 				}
 			  });
-		  } )
+		  } );
 
-		  cron.schedule(`* ${minute1} ${hour1} ${day1} ${month1} *`,	()=>{
+		  cron.schedule(`* ${minute1} ${hour1} ${day1} ${month1} *`,()=>{
 			transporter.sendMail(mailOptions10, function(error, info){             // SEnding Mail
 				if (error) {
 				  console.log(error);
