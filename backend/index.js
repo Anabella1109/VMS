@@ -190,10 +190,11 @@ app.post('/api/hosts', async (req, res) => {
 		name: req.body.name,
 		email_id: req.body.email_id,
 		mobile_no: req.body.mobile_no,
+		department: req.body.department,
 		password: pass
 	}
 	try{
-	 await process.postgresql.query(`INSERT INTO hosts (name, email_id, mobile_no,password) VALUES ('${host.name}', '${host.email_id}', '${host.mobile_no}','${host.password}') ON CONFLICT DO NOTHING;`)
+	 await process.postgresql.query(`INSERT INTO hosts (name, email_id, mobile_no,department,password) VALUES ('${host.name}', '${host.email_id}', '${host.mobile_no}','${host.department}','${host.password}') ON CONFLICT DO NOTHING;`)
 
 	let htmlBody = "Your new login information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
 		htmlBody += "Email : " + host.email_id + " \n " + "\n" + 
@@ -224,17 +225,17 @@ app.post('/api/hosts', async (req, res) => {
 	   Password: ${host.password}
 	  `;
 	
-	vonage.message.sendSms(from, to, text, (err, responseData) => {
-		if (err) {
-			console.log(err);
-		} else {
-			if(responseData.messages[0]['status'] === "0") {
-				console.log("Message sent successfully.");
-			} else {
-				console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
-			}
-		}
-	});
+	// vonage.message.sendSms(from, to, text, (err, responseData) => {
+	// 	if (err) {
+	// 		console.log(err);
+	// 	} else {
+	// 		if(responseData.messages[0]['status'] === "0") {
+	// 			console.log("Message sent successfully.");
+	// 		} else {
+	// 			console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
+	// 		}
+	// 	}
+	// });
 	 res.status(201).json('Host registered!');
 
 }
