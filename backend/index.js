@@ -850,7 +850,8 @@ app.get('/api/bookings/today', async (req, res) => {
 	// console.log(new Date(rando).toLocaleDateString());
 	console.log(today > randomly);
 	let data=[];
-	const rows= await process.postgresql.query('SELECT * FROM booking;');
+	try {
+		const rows= await process.postgresql.query('SELECT * FROM booking;');
 
 	for (let index = 0; index < rows.length; index++) {
 		const element = rows[index];
@@ -859,12 +860,16 @@ app.get('/api/bookings/today', async (req, res) => {
 			data.push(element);
 			console.log(new DateTime(element.date).toISO());
 			// console.log(element);
-			// console.log(element.date);
+			console.log(element.date);
 			// console.log(new Date(element.date).toLocaleDateString())
 
 		}
 	}
 	res.json(data);
+	} catch (error) {
+		console.error(error);
+	}
+	
   });
 
 //___________________________________ Sending a single booking ________________________________________________
