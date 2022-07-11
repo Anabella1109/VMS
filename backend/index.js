@@ -703,7 +703,7 @@ try {
 		host_name: req.body.host_name,
 		role: req.body.role
 	};
-	console.log(visitor);
+	// console.log(visitor);
 	const host = await process.postgresql.query('SELECT * FROM hosts WHERE name=$1', [visitor.host_name]);
 	console.log(host);
 	try {
@@ -840,7 +840,7 @@ try {
 
 app.get('/api/bookings/today', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	const today=DateTime.now().toFormat("yyyy-MM-dd");
+	const today= DateTime.now().toString();
 	console.log(today);
 	// console.log(today.toFormat("yyyy-MM-dd"));
 	const rando= "2022-06-23";
@@ -853,7 +853,7 @@ app.get('/api/bookings/today', async (req, res) => {
 	for (let index = 0; index < rows.length; index++) {
 		const element = rows[index];
 		// console.log(element);
-		if( today < element.date ){
+		if( today < new DateTime(element.date).toString()){
 			data.push(element);
 			// console.log(element);
 			// console.log(element.date);
