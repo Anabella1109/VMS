@@ -857,7 +857,7 @@ app.get('/api/bookings/today', async (req, res) => {
 		// console.log(element);
 		if( today < element.date && time < element.checked_in){
 			data.push(element);
-			console.log(DateTime(element.date).toISO());
+			console.log(new DateTime(element.date).toISO());
 			// console.log(element);
 			// console.log(element.date);
 			// console.log(new Date(element.date).toLocaleDateString())
