@@ -856,7 +856,7 @@ app.get('/api/bookings/today', async (req, res) => {
 	for (let index = 0; index < rows.length; index++) {
 		const element = rows[index];
 		// console.log(element);
-		if( today < element.date && time < element.checked_in){
+		if( today < element.date && time > element.checked_in){
 			data.push(element);
 			console.log(new DateTime(element.date).toISO());
 			// console.log(element);
