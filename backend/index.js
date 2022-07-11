@@ -840,7 +840,7 @@ try {
 
 app.get('/api/bookings/today', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	const today= DateTime.now().toString();
+	const today= DateTime.now();
 	console.log(today);
 	// console.log(today.toFormat("yyyy-MM-dd"));
 	const rando= "2022-06-23";
@@ -853,7 +853,7 @@ app.get('/api/bookings/today', async (req, res) => {
 	for (let index = 0; index < rows.length; index++) {
 		const element = rows[index];
 		// console.log(element);
-		if( today < new DateTime(element.date).toString()){
+		if( today < new DateTime(element.date)){
 			data.push(element);
 			// console.log(element);
 			// console.log(element.date);
