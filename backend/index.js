@@ -705,7 +705,7 @@ try {
 	};
 	// console.log(visitor);
 	const host = await process.postgresql.query('SELECT * FROM hosts WHERE name=$1', [visitor.host_name]);
-	console.log(host);
+	console.log(host[0].email_id);
 	try {
 		await process.postgresql.query(`INSERT INTO booking (visitor_name, visitor_email, visitor_no,host_name,date,checked_in, role) VALUES ('${visitor.visitor_name}','${visitor.visitor_email}','${visitor.visitor_no}','${visitor.host_name}','${visitor.date}','${visitor.checked_in}', '${visitor.role}') ON CONFLICT DO NOTHING;`);
      console.log('Booking registered')
@@ -802,7 +802,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
 
 	
 try {
-	cron.schedule(`* ${minute} ${hour} ${day} ${month} *`,()=>{
+	cron.schedule(`${second} ${minute} ${hour} ${day} ${month} ${dayOfTheweek}`,()=>{
 		transporter.sendMail(mailOptions30, function(error, info){             // SEnding Mail
 			if (error) {
 			  console.log(error);
@@ -816,7 +816,7 @@ try {
 }
 		 
 try {
-	cron.schedule(`* ${minute1} ${hour1} ${day1} ${month1} *`,()=>{
+	cron.schedule(`${second1} ${minute1} ${hour1} ${day1} ${month1} ${dayOfTheweek1}`,()=>{
 		transporter.sendMail(mailOptions10, function(error, info){             // SEnding Mail
 			if (error) {
 			  console.log(error);
