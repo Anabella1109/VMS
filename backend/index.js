@@ -756,6 +756,8 @@ QRCode.toDataURL(stringdata, function (err, code) {
 		  const dateAndTime= visitor.date +'T'+ visitor.checked_in; 
 		  const scheduledTime=new DateTime(dateAndTime).minus({minutes: 30});
 		  const scheduledTime1=new DateTime(dateAndTime).minus({minutes: 10});
+		  console.log(scheduledTime);
+		  console.log(scheduledTime1);
 		//   console.log(dateAndTime);
 		//   console.log(new Date(dateAndTime));
 		//   console.log(new DateTime(dateAndTime));
@@ -766,6 +768,10 @@ QRCode.toDataURL(stringdata, function (err, code) {
 		  const hour= scheduledTime.hour;
 		  const minute= scheduledTime.minute;
 		  const second= scheduledTime.second;
+
+		  console.log(dayOfTheweek);
+		  console.log(year);
+		  console.log(month);
 	
 
 		  const dayOfTheweek1= scheduledTime1.weekday;
@@ -856,7 +862,7 @@ app.get('/api/bookings/today', async (req, res) => {
 	for (let index = 0; index < rows.length; index++) {
 		const element = rows[index];
 		// console.log(element);
-		if( today < element.date && time > element.checked_in){
+		if( today < element.date && time < element.checked_in){
 			data.push(element);
 			console.log(new DateTime(element.date).toISO());
 			// console.log(element);
