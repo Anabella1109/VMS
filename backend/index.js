@@ -16,6 +16,7 @@ const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
 const { DateTime } = require("luxon");    
 const cron = require('node-cron');
+const multer = require('multer');
 
 const vonage = new Vonage({
   apiKey: process.env.API_KEY,
@@ -702,7 +703,7 @@ try {
 		host_name: req.body.host_name,
 		role: req.body.role
 	};
-	// console.log(visitor);
+	console.log(visitor);
 	const host = await process.postgresql.query('SELECT * FROM hosts WHERE name=$1', [visitor.host_name]);
 	console.log(host);
 	try {
@@ -1418,12 +1419,61 @@ app.get('/api/csv/visitors', async (req, res) => {
 	
 	//   res.send(Buffer.from(records));
   });
-	
 
+//   ______________________________________________upload csv______________________________________________
 
+var storage = multer.diskStorage({
+    destination: (req, file, callBack) => {
+        callBack(null, './public/uploads/')    
+    },
+    filename: (req, file, callBack) => {
+        callBack(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+    }
+})
  
+var upload = multer({
+    storage: storage
+});
 
-
+app.post('/uploadfile', upload.single("uploadfile"), (req, res) =>{
+    UploadCsvDataToMyDatabase(__dirname + '/public/uploads/' + req.file.filename);
+    console.log('CSV file data has been uploaded in database ');
+});
+	
+let UploadCsvDataToMyDatabase= (filePath)=>{
+	let stream = fs.createReadStream(filePath);
+    let csvData = [];
+    let csvStream = fastcsv
+        .parse()
+        .on("data", function (data) {
+            csvData.push(data);
+        })
+        .on("end", function () {
+            // Remove Header ROW
+            csvData.shift();
+  
+            // Open the MySQL connection
+            
+               
+			let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department) VALUES ($1, $2, $3, $4)";
+			try {
+				csvData.forEach(row => {
+					process.postgresql.query(query, row);
+				});
+			  }
+			  catch(error){
+				console.error(error);
+			  };
+               
+      
+             
+            // delete file after saving to MySQL database
+            // -> you can comment the statement to see the uploaded CSV file.
+            fs.unlinkSync(filePath)
+        });
+  
+    stream.pipe(csvStream);
+};
 
 
 //   app.get("/", (req, res) => {
