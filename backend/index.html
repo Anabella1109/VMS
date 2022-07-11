@@ -46,6 +46,10 @@
 		<li> GET: view all active visits{haven't checked out)</li>
 	
 	  </ul>
+	  <h1>/api/checkedout/visits</h1>
+	  <ul>
+		<li>GET: view all checkedout visits</li>
+	  </ul>
 	  <h1>/api/visits/checkout/:id</h1>
 	  <ul>
 		<li>PATCH: checkout</li>
@@ -179,6 +183,13 @@
 
 <h1>/api/pdf/hosts</h1>
 <ul><li>GET: get hosts pdf report</li></ul>
+
+<b><i>UPLOAD CSV</i></b>
+<h1>/uploadfile</h1>
+ <ul><li>
+	POST: upload hosts using csv
+ </li></ul>
+ <p>csv headers: name, email_id, mobile_no, department</p>
 	
 </body>
 </html>
