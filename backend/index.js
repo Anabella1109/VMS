@@ -412,6 +412,16 @@ app.post('/api/visitors', async (req, res) => {
 		res.status(200).json(rows);
 	  });
 
+    //___________________________________ sending active visitors ________________________________________________
+	app.get('/api/checkedout/visits', async (req, res) => {
+		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+		// const date=req.params['date'];
+		const checked_out="null";
+		const rows = await process.postgresql.query('SELECT * FROM register WHERE checked_out!=$1', [checked_out]);
+	
+		res.status(200).json(rows);
+	  });
+
 //___________________________________ registering a visit ________________________________________________
 app.post('/api/visits', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
