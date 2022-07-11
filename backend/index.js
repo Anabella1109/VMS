@@ -754,8 +754,8 @@ QRCode.toDataURL(stringdata, function (err, code) {
 			}
 		  });
 		  const dateAndTime= visitor.date +'T'+ visitor.checked_in; 
-		  const scheduledTime=new DateTime(dateAndTime).minus({minutes: 30});
-		  const scheduledTime1=new DateTime(dateAndTime).minus({minutes: 10});
+		  const scheduledTime=new DateTime(dateAndTime).setZone('CAT').minus({minutes: 30});
+		  const scheduledTime1=new DateTime(dateAndTime).setZone('CAT').minus({minutes: 10});
 		  console.log(scheduledTime);
 		  console.log(scheduledTime1);
 		//   console.log(dateAndTime);
