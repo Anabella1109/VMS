@@ -43,7 +43,7 @@ const oneDay = 1000 * 60 * 60 * 24;
 let transporter = nodemailer.createTransport({
 	host: config.email_setting.host,
 	port: 587,
-	secure: false,
+	secure: true,
 	requireTLS: true,
 	auth: {
 	  user: process.env.EMAIL,
