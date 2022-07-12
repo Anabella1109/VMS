@@ -4,7 +4,7 @@
     "email_setting":{
     	"email":"amali@outlook.com",
 		  "password":"xxxxxxxx",
-		  "host":"smtp.outlook.com"
+		  "host":"smtp.gmail.com"
     },
 	"twilio":{
     	"accountSid":"AC00484d8fc366187b0ce200813b2e6a10",
