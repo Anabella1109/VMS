@@ -791,6 +791,8 @@ QRCode.toDataURL(stringdata, function (err, code) {
 		  const hour1= scheduledTime1.hour;
 		  const minute1= scheduledTime1.minute;
 		  const second1= scheduledTime1.second;
+   console.log(`${second} ${minute} ${hour} ${day} ${month} ${dayOfTheweek}`);
+   console.log(`${second1} ${minute1} ${hour1} ${day1} ${month1} ${dayOfTheweek1}`);
 
 		 
 		   let mailOptions30=  {
@@ -820,6 +822,9 @@ try {
 			  console.log('Email sent: ' + info.response);
 			}
 		  });
+	  }, {
+		scheduled: true,
+		timezone: "CAT"
 	  } );
 } catch (error) {
 	console.error(error);
@@ -834,7 +839,10 @@ try {
 			  console.log('Email sent: ' + info.response);
 			}
 		  });
-	  } )
+	  } , {
+		scheduled: true,
+		timezone: "CAT"
+	  })
 } catch (error) {
 	console.error(error);
 }
