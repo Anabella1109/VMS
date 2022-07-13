@@ -1369,7 +1369,7 @@ var storage = multer.diskStorage({
     },
     filename: (req, file, callBack) => {
 		// callBack(null, file.fieldname )
-        callBack(null, file.fieldname + '-' + Date.now().replace(/:/g, '-') + path.extname(file.originalname))
+        callBack(null, file.fieldname + '-' + new Date().toISOString().replace(/:/g, '-')+ path.extname(file.originalname))
     }
 })
  
