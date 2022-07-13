@@ -1423,6 +1423,8 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
 app.post('/uploadfile', (res, req)=>{
 	console.log(req.body);
 	let csvData= req.body;
+	csvData.forEach(function(x){ delete x.id });
+	csvData.shift();
 
 	let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department) VALUES ($1, $2, $3, $4)";
 	try {
