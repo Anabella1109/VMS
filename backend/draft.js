@@ -276,4 +276,54 @@ execute(createregister).then(result => {
     // Printing the code
     // console.log(`250${visitor.mobile_no}`)
 
+	// const client = new Client({
+//     user: process.env.DATABASE_USER,
+//     database: process.env.DATABASE ,
+//     password:process.env.DATABASE_PASSWORD,
+//     host:process.env.DATABASE_HOST,
+//     port:  5432,
+//     ssl: {
+//       rejectUnauthorized: false
+// 	}
+// });
+//  const execute = async (query) => {
+//     try {
+//         await client.connect();     // gets connection
+//         await client.query(query);  // sends queries
+//         return true;
+//     } catch (error) {
+//         console.error(error.stack);
+//         return false;
+//     } finally {
+//         await client.end();         // closes connection
+//     }
+// };
+
+//  app.post('/api/login/admin', async(req,res)=>{
+// 	const user={
+// 		email: req.body.email,
+// 		pass: req.body.password
+// 	}
+// 	  const newuser=await process.postgresql.query(`SELECT * 
+// 	  FROM users
+// 	 WHERE email = '${user.email}' 
+// 	   AND password = crypt('${user.pass}', password);`)
+// 	   if(newuser.length !=0){
+// 			 res.json(newuser)
+// 			 console.log(newuser)
+// 	   };
+// 	});
+
+
+
+// 	QRCode.toString(stringdata,{type:'terminal'},
+//                     function (err, QRcode) {
+ 
+//     if(err) return console.log("error occurred")
+ 
+//     // Printing the generated code
+//     console.log(QRcode)
+// })
+   
+// Converting the data into base64
 

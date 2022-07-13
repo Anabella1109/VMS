@@ -80,51 +80,14 @@ let session;
 
 
 
-// app.get('/',function(req,res){
-	// const checked_in= new Date();
-	// const checkin_date= checked_in.toLocaleDateString();
-	// const checkin_time= checked_in.toLocaleTimeString();
-	// console.log(checkin_date);
-	// console.log(checkin_time);
-	// res.send('hey')
-//   });
 //___________________________________ Connection to database ________________________________________________
 postgresql(async (connection) => {
 	
  });
 
-// const client = new Client({
-//     user: process.env.DATABASE_USER,
-//     database: process.env.DATABASE ,
-//     password:process.env.DATABASE_PASSWORD,
-//     host:process.env.DATABASE_HOST,
-//     port:  5432,
-//     ssl: {
-//       rejectUnauthorized: false
-// 	}
-// });
-//  const execute = async (query) => {
-//     try {
-//         await client.connect();     // gets connection
-//         await client.query(query);  // sends queries
-//         return true;
-//     } catch (error) {
-//         console.error(error.stack);
-//         return false;
-//     } finally {
-//         await client.end();         // closes connection
-//     }
-// };
+
 
 app.get("/", (req, res) => {
-	const date= "2022-07-10";
-	const time= "19:00";
-	const combined=  date+'T'+time;
-	const dateAndTime= new DateTime(combined);
-	console.log(dateAndTime.weekday);
-	console.log(dateAndTime.year);
-	console.log(dateAndTime);
-	console.log(dateAndTime);
 	res.sendFile(__dirname+'/index.html');
   });
 
@@ -133,7 +96,6 @@ app.get("/", (req, res) => {
 
 
 //___________________________________ Send hosts ________________________________________________
-
 
 
   app.get('/api/hosts', async (req, res) => {
@@ -164,8 +126,7 @@ app.get("/", (req, res) => {
   });
 
    //___________________________________ login host ________________________________________________
- app.post('/api/login/host', async(req,res)=>{
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+ app.post('/api/login/host', async(req,res)=>{;
 	const user={
 		email: req.body.email,
 		pass: req.body.password
@@ -175,7 +136,17 @@ app.get("/", (req, res) => {
 	  FROM hosts
 	 WHERE email = '${user.email}' 
 	   AND password = '${user.pass}';`);
-			 res.json(host)
+	   if (host.length != 0){
+		session=req.session;
+		session.userid=user.email;
+		console.log(req.session)
+		res.json('User logged in');
+	}
+	else{
+		
+			res.json('Invalid username or password');
+	
+	};
 	}
 	catch(error){
     console.error(error);
@@ -226,22 +197,23 @@ app.post('/api/hosts', async (req, res) => {
 	   Password: ${host.password}
 	  `;
 	
-	// vonage.message.sendSms(from, to, text, (err, responseData) => {
-	// 	if (err) {
-	// 		console.log(err);
-	// 	} else {
-	// 		if(responseData.messages[0]['status'] === "0") {
-	// 			console.log("Message sent successfully.");
-	// 		} else {
-	// 			console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
-	// 		}
-	// 	}
-	// });
+	vonage.message.sendSms(from, to, text, (err, responseData) => {
+		if (err) {
+			console.log(err);
+		} else {
+			if(responseData.messages[0]['status'] === "0") {
+				console.log("Message sent successfully.");
+			} else {
+				console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
+			}
+		}
+	});
 	 res.status(201).json('Host registered!');
 
 }
 catch(error){
 	console.error(error);
+	res.send(error);
 }
   });
 
@@ -252,10 +224,11 @@ app.put('/api/hosts/:id', async (req, res) => {
 	const host = {
 		name: req.body.name,
 		email_id: req.body.email_id,
-		mobile_no: req.body.mobile_no
+		mobile_no: req.body.mobile_no,
+		department: req.body.department
 	}
 	try{
-	 await process.postgresql.query('UPDATE "hosts" SET "name" = $1, "email_id" = $2, "mobile_no" = $3 WHERE id=$4', [host.name,host.email_id,host.mobile_no,pk])
+	 await process.postgresql.query('UPDATE "hosts" SET "name" = $1, "email_id" = $2, "mobile_no" = $3, "department"= $4 WHERE id=$5', [host.name,host.email_id,host.mobile_no,host.department,pk])
 		res.status(200).send(JSON.stringify('Host edited!'));
 	}
 	catch(error){
@@ -266,7 +239,6 @@ app.put('/api/hosts/:id', async (req, res) => {
 
   //___________________________________ editing a host password ________________________________________________
   app.patch('/api/hosts/:id', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params['id'];
 	const host = {
 		password:req.body.password
@@ -300,9 +272,14 @@ app.put('/api/hosts/:id', async (req, res) => {
 
   //___________________________________ sending visitors ________________________________________________
   app.get('/api/visitors', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+try {
 	const rows = await process.postgresql.query('SELECT * FROM visitors');
 	res.json(rows);
+} catch (error) {
+	console.error(error);
+	res.status(400).json('Resource not found')
+}
+	
 
 	
   });
@@ -321,13 +298,11 @@ app.post('/api/visitors', async (req, res) => {
 	}
 	 catch(error){
 		console.error(error);}
-	//   res.status(200).send(JSON.stringify('Visitor registered!'));
 
-	
   });
 
     //___________________________________ editing a visitor ________________________________________________
-	app.put('/api/visitors/:id', async (req, res) => {
+app.put('/api/visitors/:id', async (req, res) => {
 		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const pk=req.params['id'];
 		const visitor = {
@@ -374,14 +349,12 @@ app.post('/api/visitors', async (req, res) => {
 
   //___________________________________ sending visits ________________________________________________
   app.get('/api/visits', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const rows = await process.postgresql.query('SELECT * FROM register');
 	res.status(200).json(rows);
   });
 
     //___________________________________ sending visits by date ________________________________________________
 	app.get('/api/date/visits', async (req, res) => {
-		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const date=req.query.date;
 		try{
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1', [date]);
@@ -395,7 +368,6 @@ app.post('/api/visitors', async (req, res) => {
 
  //___________________________________ sending visits for current day ________________________________________________
  app.get('/api/visits/today', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const date=new Date().toLocaleDateString();
 	const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1', [date]);
 
@@ -404,30 +376,26 @@ app.post('/api/visitors', async (req, res) => {
 
     //___________________________________ sending active visitors ________________________________________________
 	app.get('/api/active/visits', async (req, res) => {
-		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-		// const date=req.params['date'];
 		const checked_out="null";
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE checked_out=$1', [checked_out]);
 	
 		res.status(200).json(rows);
 	  });
 
-    //___________________________________ sending active visitors ________________________________________________
+    //___________________________________ sending checkedout visitors ________________________________________________
 	app.get('/api/checkedout/visits', async (req, res) => {
 		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-		// const date=req.params['date'];
 		const checked_out="null";
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE checked_out!=$1', [checked_out]);
-	
 		res.status(200).json(rows);
 	  });
 
 //___________________________________ registering a visit ________________________________________________
 app.post('/api/visits', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	const checked_in= new Date();
-	const checkin_date= checked_in.toLocaleDateString();
-	const checkin_time= checked_in.toLocaleTimeString();
+	const checked_in= DateTime.now().setZone('CAT');
+	const checkin_date= checked_in.toFormat("yyyy-MM--dd");
+	const checkin_time= checked_in.toFormat(DateTime.TIME_24_SIMPLE);
 	
 	const visit = {
 		
@@ -488,7 +456,8 @@ const to =`250${host[0].mobile_no}`;
 const text =` A new  guest for you has arrived
 Name: ${visit.visitor_name} 
    Number: ${visit.visitor_no}
-   email: ${visit.visitor_email}`;
+   email: ${visit.visitor_email}
+   Checkin Time:${visit.checked_in}`;
 
 vonage.message.sendSms(from, to, text, (err, responseData) => {
     if (err) {
@@ -547,8 +516,8 @@ app.put('/api/visits/:id', async (req, res) => {
 app.patch('/api/visits/checkout/:id', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params.id;
-	const checkout= new Date();
-	const checkout_time= checkout.toLocaleTimeString();
+	const checkout= DateTime.now().setZone('CAT');
+	const checkout_time= checkout.toFormat(DateTime.TIME_24_SIMPLE);
 	const visit = {
 		checked_out: checkout_time,
 	}
@@ -577,7 +546,7 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 		}
 	  });
 	
-		 //___________________________________ Sending a visit by date and time ________________________________________________
+		 //___________________________________ Sending a visits by date and time ________________________________________________
 		 app.get('/api/visits/date/time', async (req, res) => {
 			res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 			const date=req.query.date;
@@ -588,7 +557,7 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 			}
 			catch(error){
 				console.error(error);
-				res.status(404).json("Recordnot found");
+				res.status(404).json("Record not found");
 			}
 		  });
 	
@@ -631,21 +600,7 @@ try {
  
 });
 
-//  //___________________________________ login user ________________________________________________
-//  app.post('/api/login/admin', async(req,res)=>{
-// 	const user={
-// 		email: req.body.email,
-// 		pass: req.body.password
-// 	}
-// 	  const newuser=await process.postgresql.query(`SELECT * 
-// 	  FROM users
-// 	 WHERE email = '${user.email}' 
-// 	   AND password = crypt('${user.pass}', password);`)
-// 	   if(newuser.length !=0){
-// 			 res.json(newuser)
-// 			 console.log(newuser)
-// 	   };
-// 	});
+ //___________________________________ login user ________________________________________________
 
 	app.post('/api/login/admin', async(req,res)=>{
 		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
@@ -674,13 +629,11 @@ try {
 		} catch (error) {
 			console.error(error);
 		}
-		 
-	
-				
 				 
 		});
 
-		app.get('/api/admin/logout',(req,res) => {
+// ______________________________________________logout user________________________________________
+app.get('/api/admin/logout',(req,res) => {
 			try {
 				req.session.destroy();
 			res.json('User logged out');
@@ -690,20 +643,11 @@ try {
 			
 		});
 
-
-
-
-  
-
-
 //___________________________________ Booking ________________________________________________
 
 
 //___________________________________ generating qrcode ________________________________________________
   app.post('/qrgenerate', async(req,res) => {
-
-
-	// openssl('openssl req -config csr.cnf -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout key.key -out certificate.crt');
 	const visitor = {
 		visitor_name: req.body.visitor_name,
 		visitor_email: req.body.visitor_email,
@@ -713,7 +657,6 @@ try {
 		host_name: req.body.host_name,
 		role: req.body.role
 	};
-	// console.log(visitor);
 	const host = await process.postgresql.query('SELECT * FROM hosts WHERE name=$1', [visitor.host_name]);
 	console.log(host[0].email_id);
 	try {
@@ -724,18 +667,8 @@ try {
 	}
 
 	
-	let stringdata = JSON.stringify(visitor)
+	let stringdata = JSON.stringify(visitor);
 
-// 	QRCode.toString(stringdata,{type:'terminal'},
-//                     function (err, QRcode) {
- 
-//     if(err) return console.log("error occurred")
- 
-//     // Printing the generated code
-//     console.log(QRcode)
-// })
-   
-// Converting the data into base64
 QRCode.toDataURL(stringdata, function (err, code) {
     if(err) return console.log("error occurred")
 
@@ -766,11 +699,8 @@ QRCode.toDataURL(stringdata, function (err, code) {
 		  const dateAndTime= visitor.date +' '+ visitor.checked_in; 
 		  const scheduledTime=DateTime.fromSQL(dateAndTime,{zone: 'CAT'}).minus({minutes: 30});
 		  const scheduledTime1=DateTime.fromSQL(dateAndTime,{zone: 'CAT'}).minus({minutes: 10});
-		  console.log(scheduledTime);
-		  console.log(scheduledTime1);
-		//   console.log(dateAndTime);
-		//   console.log(new Date(dateAndTime));
-		//   console.log(new DateTime(dateAndTime));
+
+
 		  const dayOfTheweek= scheduledTime.weekday;
 		  const year= scheduledTime.year;
 		  const month= scheduledTime.month;
@@ -778,10 +708,6 @@ QRCode.toDataURL(stringdata, function (err, code) {
 		  const hour= scheduledTime.hour;
 		  const minute= scheduledTime.minute;
 		  const second= scheduledTime.second;
-
-		  console.log(dayOfTheweek);
-		  console.log(year);
-		  console.log(month);
 	
 
 		  const dayOfTheweek1= scheduledTime1.weekday;
@@ -791,11 +717,11 @@ QRCode.toDataURL(stringdata, function (err, code) {
 		  const hour1= scheduledTime1.hour;
 		  const minute1= scheduledTime1.minute;
 		  const second1= scheduledTime1.second;
-   console.log(`${second} ${minute} ${hour} ${day} ${month} ${dayOfTheweek}`);
-   console.log(`${second1} ${minute1} ${hour1} ${day1} ${month1} ${dayOfTheweek1}`);
+//    console.log(`${second} ${minute} ${hour} ${day} ${month} ${dayOfTheweek}`);
+//    console.log(`${second1} ${minute1} ${hour1} ${day1} ${month1} ${dayOfTheweek1}`);
 
 		 
-		   let mailOptions30=  {
+		let mailOptions30=  {
 			from: process.env.EMAIL,
 			to: host[0].email_id,
 			subject: "Reminder",
@@ -856,8 +782,7 @@ try {
 
   });
 // _________________________________________sending bookings______________________________
-  app.get('/api/bookings', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+app.get('/api/bookings', async (req, res) => {
 	const rows= await process.postgresql.query('SELECT * FROM booking;');
 	res.json(rows);
   });
@@ -866,13 +791,6 @@ app.get('/api/bookings/today', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const today=DateTime.now().toFormat("yyyy-MM-dd");
 	const time= DateTime.now().toLocaleString(DateTime.TIME_24_SIMPLE);
-	console.log(today);
-	console.log(time);
-	// console.log(today.toFormat("yyyy-MM-dd"));
-	const rando= "2022-06-23";
-	const randomly=new Date(rando).toLocaleDateString();
-	// console.log(new Date(rando).toLocaleDateString());
-	console.log(today > randomly);
 	let data=[];
 	try {
 		const rows= await process.postgresql.query('SELECT * FROM booking;');
@@ -882,10 +800,6 @@ app.get('/api/bookings/today', async (req, res) => {
 		// console.log(element);
 		if( today < element.date && time < element.checked_in){
 			data.push(element);
-			console.log(new DateTime(element.date).toISO());
-			// console.log(element);
-			console.log(element.date);
-			// console.log(new Date(element.date).toLocaleDateString())
 
 		}
 	}
@@ -898,7 +812,6 @@ app.get('/api/bookings/today', async (req, res) => {
 
 //___________________________________ Sending a single booking ________________________________________________
 app.get('/api/bookings/:id', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params['id'];
 	try {
 		const rows = await process.postgresql.query('SELECT * FROM booking WHERE id=$1', [pk]);
@@ -911,7 +824,6 @@ app.get('/api/bookings/:id', async (req, res) => {
 
 // ___________________________________________pdf________________________________________________________________
 app.get('/api/pdf/visits', async(req,res)=>{
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const rows = await process.postgresql.query('SELECT * FROM register');
 	const name= new Date().toLocaleDateString();
 	let doc = new PDFDocument({ margin: 30, size: 'A4' });
@@ -929,12 +841,9 @@ app.get('/api/pdf/visits', async(req,res)=>{
 		  { label: "Role", property: 'role', width: 80, renderer: null },
 		 
 		],
-		// complex data
 		datas:rows,
-		// simeple data
-
 	  };
-	  // the magic
+
 	  doc.table(table, {
 		prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
 		prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
@@ -942,7 +851,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 		  indexColumn === 0 && doc.addBackground(rectRow, 'blue', 0.15);
 		},
 	  });
-	  // done!
+
 	//   doc.pipe(res);
 	doc.pipe(fs.createWriteStream(__dirname+'/public/visits.pdf'));
 	const src = fs.createReadStream(__dirname+'/public/visits.pdf');
@@ -1469,6 +1378,8 @@ var upload = multer({
 
 app.post('/uploadfile', upload.single("uploadfile"), (req, res) =>{
     UploadCsvDataToMyDatabase(__dirname + '/public/uploads/' + req.file.filename);
+	console.log(req.file.filename);
+	console.log(req.body);
     console.log('CSV file data has been uploaded in database ');
 });
 	
