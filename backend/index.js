@@ -1368,7 +1368,7 @@ var storage = multer.diskStorage({
         callBack(null, './public/uploads/')    
     },
     filename: (req, file, callBack) => {
-		callBack(null, file.fieldname )
+		callBack(null, "file" )
         // callBack(null, file.fieldname + '-' + new Date().toISOString().replace(/:/g, '-')+ path.extname(file.originalname))
     }
 })
@@ -1378,12 +1378,12 @@ var upload = multer({
 	dest: 'public/uploads/'
 });
 // { dest: 'public/images/servers' }
-app.post('/uploadfile', upload.single("file"), (req, res) =>{
-    UploadCsvDataToMyDatabase(__dirname + '/public/uploads/' + req.file.filename);
-	console.log(req.file.filename);
-	console.log(req.body);
-    console.log('CSV file data has been uploaded in database ');
-});
+// app.post('/uploadfile', upload.single("file"), (req, res) =>{
+//     UploadCsvDataToMyDatabase(__dirname + '/public/uploads/' + req.file.filename);
+// 	console.log(req.file.filename);
+// 	console.log(req.body);
+//     console.log('CSV file data has been uploaded in database ');
+// });
 	
 let UploadCsvDataToMyDatabase= (filePath)=>{
 	let stream = fs.createReadStream(filePath);
@@ -1419,6 +1419,22 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
   
     stream.pipe(csvStream);
 };
+
+app.post('/uploadfile', (res, req)=>{
+	console.log(req.body);
+	let csvData= req.body;
+
+	let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department) VALUES ($1, $2, $3, $4)";
+	try {
+		csvData.forEach(row => {
+			process.postgresql.query(query, row);
+		});
+	  }
+	  catch(error){
+		console.error(error);
+	  };
+
+})
 
 
 //   app.get("/", (req, res) => {
