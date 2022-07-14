@@ -1378,12 +1378,12 @@ var upload = multer({
 	dest: 'public/uploads/'
 });
 // { dest: 'public/images/servers' }
-// app.post('/uploadfile', upload.single("file"), (req, res) =>{
-//     UploadCsvDataToMyDatabase(__dirname + '/public/uploads/' + req.file.filename);
-// 	console.log(req.file.filename);
-// 	console.log(req.body);
-//     console.log('CSV file data has been uploaded in database ');
-// });
+app.post('/uploadfiles', upload.single("file"), (req, res) =>{
+    UploadCsvDataToMyDatabase(__dirname + '/public/uploads/' + req.file.filename);
+	console.log(req.file.filename);
+	console.log(req.body);
+    console.log('CSV file data has been uploaded in database ');
+});
 	
 let UploadCsvDataToMyDatabase= (filePath)=>{
 	let stream = fs.createReadStream(filePath);
@@ -1420,25 +1420,45 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
     stream.pipe(csvStream);
 };
 
-app.post('/uploadfile', (res, req)=>{
+app.post('/uploadfile', async (res, req)=>{
 	console.log(req.body);
 	let csvData= req.body;
 	csvData.shift();
-	csvData.forEach(function(x){ delete x[0] });
+	// csvData.forEach(function(x){ delete x[0] });
 	
 
 	let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department) VALUES ($1, $2, $3, $4)";
 	try {
 		csvData.forEach(row => {
-			process.postgresql.query(query, row);
+			await process.postgresql.query(query, row);
 		});
 	  }
 	  catch(error){
 		console.error(error);
+		res.send(error);
 	  };
 
 })
 
+app.post('/uploadfile/data',async (res, req)=>{
+	console.log(req.body);
+	let csvData= req.body;
+	csvData.shift();
+	// csvData.forEach(function(x){ delete x[0] });
+	
+
+	let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department) VALUES ($1, $2, $3, $4)";
+	try {
+		csvData.forEach(row => {
+			await process.postgresql.query(query, [row.name, row.email_id,row.mobile_no,row.department]);
+		});
+	  }
+	  catch(error){
+		console.error(error);
+		res.send(error);
+	  };
+
+})
 
 //   app.get("/", (req, res) => {
 // 	res.sendFile('../views/index.html')
