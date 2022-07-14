@@ -1430,7 +1430,7 @@ app.post('/uploadfile', async (res, req)=>{
 	let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department) VALUES ($1, $2, $3, $4)";
 	try {
 		csvData.forEach(row => {
-			await process.postgresql.query(query, row);
+			 process.postgresql.query(query, row);
 		});
 	  }
 	  catch(error){
@@ -1450,7 +1450,7 @@ app.post('/uploadfile/data',async (res, req)=>{
 	let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department) VALUES ($1, $2, $3, $4)";
 	try {
 		csvData.forEach(row => {
-			await process.postgresql.query(query, [row.name, row.email_id,row.mobile_no,row.department]);
+			 process.postgresql.query(query, [row.name, row.email_id,row.mobile_no,row.department]);
 		});
 	  }
 	  catch(error){
