@@ -1378,7 +1378,7 @@ var upload = multer({
 	dest: 'public/uploads/'
 });
 // { dest: 'public/images/servers' }
-app.post('/uploadfiles', upload.single("file"), (req, res) =>{
+app.post('/uploadfiles', upload.single("file"), async (req, res) =>{
     UploadCsvDataToMyDatabase(__dirname + '/public/uploads/' + req.file.filename);
 	console.log(req.file.filename);
 	console.log(req.body);
