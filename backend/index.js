@@ -485,7 +485,7 @@ catch(error){
   //___________________________________ registering a visit ________________________________________________
 app.post('/api/checkin', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	req.setHeader( "Content-Type", "application/json" );
+	
 	const checked_in= DateTime.now().setZone('CAT');
 	const checkin_date= checked_in.toFormat("yyyy-MM--dd");
 	const checkin_time= checked_in.toFormat(DateTime.TIME_24_SIMPLE);
