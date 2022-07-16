@@ -61,12 +61,12 @@ const corsOptions ={
     optionSuccessStatus:200
 }
 // const router = express.Router();
-app.use("/public",express.static(__dirname+'/public'));
-app.use(cors());
+;
 app.use(bodyParser.json());
 // app.use(require('connect').bodyParser.json({type: '*/*'}));
 app.use(bodyParser.urlencoded({ extended: false }));
-
+app.use("/public",express.static(__dirname+'/public'));
+app.use(cors())
 
 app.use(sessions({
     secret: process.env.SECRET,
