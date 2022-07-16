@@ -516,8 +516,9 @@ app.post('/api/checkin', async (req, res) => {
 		// 	role: req.body.role
 			
 		// };
-		console.log(visit.visitor_no);
+		
 		if(visit != "No Result"){
+			console.log(visit.visitor_no);
 	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE name=$1' , [visit.host_name]);
 	console.log(host);
 	
