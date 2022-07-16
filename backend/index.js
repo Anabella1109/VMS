@@ -1436,6 +1436,11 @@ app.post('/uploadfile', async (res, req)=>{
 	req.setHeader('Accept','application/json');
 	req.setHeader('Content-Type','application/json');
 	req.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+
+	req.writeHead(200, {
+		'Content-Type': 'application/json',
+		'Accept':'application/json'
+	  });
 	console.log(req.body);
 	let csvData= req.body;
 	
@@ -1460,6 +1465,9 @@ app.post('/uploadfile/data',async (res, req)=>{
 	res.setHeader('Content-Type', 'application/json');
 	console.log(req.body);
 	let csvData= req.body;
+	req.writeHead(200, {
+		'Content-Type': 'application/csv'
+	  });
 	
 	try {
 		csvData.shift();
