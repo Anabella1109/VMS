@@ -63,7 +63,7 @@ const corsOptions ={
 ;
 app.use(bodyParser.json());
 // app.use(require('connect').bodyParser.json({type: '*/*'}));
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/public",express.static(__dirname+'/public'));
 app.use(cors())
 
@@ -490,10 +490,12 @@ app.post('/api/checkin', async (req, res) => {
 	const checkin_time= checked_in.toFormat(DateTime.TIME_24_SIMPLE);
 	
 	try{
-		console.log(req.body);
-		req.body.forEach(function(entry, index) {
-			console.log(index, entry)
-		});
+		const obj = JSON.parse(JSON.stringify(req.body)); // req.body = [Object: null prototype] { title: 'product' }
+
+		console.log(obj);
+		// req.body.forEach(function(entry, index) {
+		// 	console.log(index, entry)
+		// });
 		const visit=req.body;
 		// const visit = {
 			
