@@ -490,7 +490,8 @@ app.post('/api/checkin', async (req, res) => {
 	const checkin_time= checked_in.toFormat(DateTime.TIME_24_SIMPLE);
 	
 	try{
-		const obj = JSON.parse(JSON.stringify(req.body)); // req.body = [Object: null prototype] { title: 'product' }
+		const obj = Object.assign({},req.body)
+		// const obj = JSON.parse(JSON.stringify(req.body)); // req.body = [Object: null prototype] { title: 'product' }
 
 		console.log(obj);
 		// req.body.forEach(function(entry, index) {
