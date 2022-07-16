@@ -497,6 +497,7 @@ app.post('/api/checkin', async (req, res) => {
 		// 	console.log(index, entry)
 		// });
 		const visit=obj;
+		const checked_out=null;
 		// const visit = {
 			
 		// 	host_name: req.body.host_name,
@@ -521,7 +522,7 @@ app.post('/api/checkin', async (req, res) => {
 	}	
 
 	
-	await process.postgresql.query(`INSERT INTO register (host_id,host_name,visitor_name, visitor_email, visitor_no,date,checked_in,checked_out, role) VALUES ('${host[0].id}', '${visit.host_name}','${visit.visitor_name}','${visit.visitor_email}','${visit.visitor_no}','${visit.date}','${visit.checked_in}','${visit.checked_out}', '${visit.role}') ON CONFLICT DO NOTHING;`);
+	await process.postgresql.query(`INSERT INTO register (host_id,host_name,visitor_name, visitor_email, visitor_no,date,checked_in,checked_out, role) VALUES ('${host[0].id}', '${visit.host_name}','${visit.visitor_name}','${visit.visitor_email}','${visit.visitor_no}','${checkin_date}','${checkin_time}','${checked_out}', '${visit.role}') ON CONFLICT DO NOTHING;`);
 	
 	 
 	let htmlBody = "New visitor information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
