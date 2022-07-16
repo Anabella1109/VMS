@@ -534,7 +534,6 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 
      //___________________________________ Sending a single visit ________________________________________________
 	 app.get('/api/visits/:id', async (req, res) => {
-		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const pk=req.params['id'];
 		try{
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE id=$1', [pk]);
@@ -548,7 +547,6 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 	
 		 //___________________________________ Sending a visits by date and time ________________________________________________
 		 app.get('/api/visits/date/time', async (req, res) => {
-			res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 			const date=req.query.date;
 			const time= req.query.time;
 	        try{
@@ -566,7 +564,6 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 	  
 	   //___________________________________ Deleting a single visit ________________________________________________
 	 app.delete('/api/visits/:id', async (req, res) => {
-		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const pk=req.params['id'];
 		try {
 			await process.postgresql.query('DELETE FROM "register" WHERE "id" = $1', [pk]);
@@ -821,6 +818,19 @@ app.get('/api/bookings/:id', async (req, res) => {
 	}
 	
   });
+
+    
+	   //___________________________________ Deleting a single visit ________________________________________________
+	   app.delete('/api/bookings/:id', async (req, res) => {
+		const pk=req.params['id'];
+		try {
+			await process.postgresql.query('DELETE FROM "booking" WHERE "id" = $1', [pk]);
+		res.send('Record deleted');
+		} catch (error) {
+			console.error(error);
+		}
+		
+	  });
 
 // ___________________________________________pdf________________________________________________________________
 app.get('/api/pdf/visits', async(req,res)=>{
@@ -1423,12 +1433,13 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
 app.post('/uploadfile', async (res, req)=>{
 	console.log(req.body);
 	let csvData= req.body;
-	csvData.shift();
+	
+	try {
+		csvData.shift();
 	// csvData.forEach(function(x){ delete x[0] });
 	
 
 	let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department) VALUES ($1, $2, $3, $4)";
-	try {
 		csvData.forEach(row => {
 			 process.postgresql.query(query, row);
 		});
@@ -1443,12 +1454,13 @@ app.post('/uploadfile', async (res, req)=>{
 app.post('/uploadfile/data',async (res, req)=>{
 	console.log(req.body);
 	let csvData= req.body;
-	csvData.shift();
+	
+	try {
+		csvData.shift();
 	// csvData.forEach(function(x){ delete x[0] });
 	
 
 	let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department) VALUES ($1, $2, $3, $4)";
-	try {
 		csvData.forEach(row => {
 			 process.postgresql.query(query, [row.name, row.email_id,row.mobile_no,row.department]);
 		});
