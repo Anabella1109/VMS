@@ -825,7 +825,7 @@ app.get('/api/bookings/:id', async (req, res) => {
 		const pk=req.params['id'];
 		try {
 			await process.postgresql.query('DELETE FROM "booking" WHERE "id" = $1', [pk]);
-		res.send('Record deleted');
+		   res.json('Record deleted');
 		} catch (error) {
 			console.error(error);
 		}
