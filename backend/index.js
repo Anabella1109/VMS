@@ -496,7 +496,7 @@ app.post('/api/checkin', async (req, res) => {
 
 		// console.log(obj);
 		// console.log(req.body);
-		const getvisit= ()=>{for(entry in obj){
+		const getvisit= ()=>{for(entry in req.body){
 			// console.log(entry);
 		
 			return entry;
