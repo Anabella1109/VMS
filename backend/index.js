@@ -488,8 +488,11 @@ app.post('/api/checkin', async (req, res) => {
 	const checked_in= DateTime.now().setZone('CAT');
 	const checkin_date= checked_in.toFormat("yyyy-MM--dd");
 	const checkin_time= checked_in.toFormat(DateTime.TIME_24_SIMPLE);
-	console.log(req.body[0][0]);
-	const visit=req.body[0][0];
+	console.log(req.body);
+	req.body.forEach(function(entry, index) {
+        console.log(index, entry)
+    });
+	const visit=req.body;
 	// const visit = {
 		
 	// 	host_name: req.body.host_name,
