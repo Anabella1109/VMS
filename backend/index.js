@@ -1376,6 +1376,7 @@ var storage = multer.diskStorage({
     },
     filename: (req, file, callBack) => {
 		callBack(null, "file" )
+		// callBack(null, file.fieldname )
         // callBack(null, file.fieldname + '-' + new Date().toISOString().replace(/:/g, '-')+ path.extname(file.originalname))
     }
 })
@@ -1388,7 +1389,7 @@ var upload = multer({
 app.post('/uploadfiles', upload.single("file"), async (req, res) =>{
 	console.log(req);
 	try {
-	UploadCsvDataToMyDatabase(__dirname + '/public/uploads/' + req.body.filename);
+	UploadCsvDataToMyDatabase(__dirname + '/public/uploads/file');
 	console.log(req.file.filename);
 	console.log(req.body);
     console.log('CSV file data has been uploaded in database ');
