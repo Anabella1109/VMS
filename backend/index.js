@@ -1412,7 +1412,7 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
             // Remove Header ROW
             csvData.shift();
   
-            // Open the MySQL connection
+          
             
                
 			let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department) VALUES ($1, $2, $3, $4)";
@@ -1451,7 +1451,7 @@ app.post('/uploadfile', async (res, req)=>{
 	  }
 	  catch(error){
 		console.error(error);
-		res.send(error);
+		res.json(error);
 	  };
 
 })
