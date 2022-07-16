@@ -63,8 +63,8 @@ const corsOptions ={
 // const router = express.Router();
 app.use("/public",express.static(__dirname+'/public'));
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json({type: '*/*'}));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 
 app.use(sessions({
