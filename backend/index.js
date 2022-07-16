@@ -482,6 +482,103 @@ catch(error){
 	
   });
 
+  //___________________________________ registering a visit ________________________________________________
+app.post('/api/checkin', async (req, res) => {
+	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+	const checked_in= DateTime.now().setZone('CAT');
+	const checkin_date= checked_in.toFormat("yyyy-MM--dd");
+	const checkin_time= checked_in.toFormat(DateTime.TIME_24_SIMPLE);
+	console.log(req.body);
+	const visit=req.body;
+	// const visit = {
+		
+	// 	host_name: req.body.host_name,
+	// 	visitor_name: req.body.visitor_name,
+	// 	visitor_email: req.body.visitor_email,
+	// 	visitor_no: req.body.visitor_no,
+	// 	date:checkin_date,
+	// 	checked_in: checkin_time,
+	// 	checked_out:null,
+	// 	role: req.body.role
+		
+	// };
+	console.log(visit);
+	try{
+	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE name=$1' , [visit.host_name]);
+	console.log(host);
+	
+	
+
+	const visitor = await process.postgresql.query('SELECT * FROM visitors WHERE name=$1 AND email_id=$2' , [visit.visitor_name, visit.visitor_email]);
+	if(visitor.length == 0){
+		await process.postgresql.query(`INSERT INTO visitors (name, email_id, mobile_no) VALUES ('${visit.visitor_name}', '${visit.visitor_email}', '${visit.visitor_no}') ON CONFLICT DO NOTHING;`);
+	}	
+
+	
+	await process.postgresql.query(`INSERT INTO register (host_id,host_name,visitor_name, visitor_email, visitor_no,date,checked_in,checked_out, role) VALUES ('${host[0].id}', '${visit.host_name}','${visit.visitor_name}','${visit.visitor_email}','${visit.visitor_no}','${visit.date}','${visit.checked_in}','${visit.checked_out}', '${visit.role}') ON CONFLICT DO NOTHING;`);
+	
+	 
+	let htmlBody = "New visitor information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
+        htmlBody += "Name : " + visit.visitor_name + " \n " + "\n" + 
+        " Email : " + visit.visitor_email + " \n " + "\n" +
+        "Mobile Number : " +visit.visitor_no + " \n " + "\n" +
+		"Purpose of visit:" + visit.role+  " \n " + "\n" +
+        " Check In Time :" +visit.checked_in;
+      
+        
+        var mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
+        {
+          from: process.env.EMAIL,
+          to: host[0].email_id,
+          subject: "New guest for you has arrived.",
+          html: htmlBody,
+        };
+
+		transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
+			if (error) {
+			  console.log(error);
+			} else {
+			  console.log('Email sent: ' + info.response);
+			}
+		  });
+
+
+
+const from = "250787380054";
+const to =`250${host[0].mobile_no}`;
+const text =` A new  guest for you has arrived
+Name: ${visit.visitor_name} 
+   Number: ${visit.visitor_no}
+   email: ${visit.visitor_email}
+   Checkin Time:${visit.checked_in}`;
+
+vonage.message.sendSms(from, to, text, (err, responseData) => {
+    if (err) {
+        console.log(err);
+    } else {
+        if(responseData.messages[0]['status'] === "0") {
+            console.log("Message sent successfully.");
+        } else {
+            console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
+        }
+    }
+});
+
+
+
+
+
+// })
+	 res.status(200).send('Visit registered!');
+
+}
+catch(error){
+	console.error(error);
+} 
+
+	
+  });
+
 //___________________________________ Editing a visit ________________________________________________
 app.put('/api/visits/:id', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
