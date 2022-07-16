@@ -1451,7 +1451,7 @@ app.post('/uploadfile', async (res, req)=>{
 	  }
 	  catch(error){
 		console.error(error);
-		res.json(error);
+		// res.json(error);
 	  };
 
 })
@@ -1472,7 +1472,7 @@ app.post('/uploadfile/data',async (res, req)=>{
 	  }
 	  catch(error){
 		console.error(error);
-		res.send(error);
+		// res.send(error);
 	  };
 
 })
