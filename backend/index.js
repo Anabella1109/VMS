@@ -494,7 +494,7 @@ app.post('/api/checkin', async (req, res) => {
 		// const obj = JSON.parse(JSON.stringify(req.body)); // req.body = [Object: null prototype] { title: 'product' }
 
 		console.log(obj);
-		console.log(req.body.toString());
+		console.log(req.body);
 		// req.body.forEach(function(entry, index) {
 		// 	console.log(index, entry)
 		// });
