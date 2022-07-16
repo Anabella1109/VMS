@@ -1382,8 +1382,8 @@ var storage = multer.diskStorage({
 })
  
 var upload = multer({
-    // storage: storage
-	dest: '/public/uploads/'
+    storage: storage
+	// dest: '/public/uploads/'
 });
 // { dest: 'public/images/servers' }
 app.post('/uploadfiles', upload.single("file"), async (req, res) =>{
