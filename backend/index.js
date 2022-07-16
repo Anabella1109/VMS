@@ -1372,7 +1372,7 @@ app.get('/api/csv/visitors', async (req, res) => {
 
 var storage = multer.diskStorage({
     destination: (req, file, callBack) => {
-        callBack(null, '/public/uploads/')    
+        callBack(null, '/uploads/')    
     },
     filename: (req, file, callBack) => {
 		callBack(null, "file" )
@@ -1389,7 +1389,7 @@ var upload = multer({
 app.post('/uploadfiles', upload.single("file"), async (req, res) =>{
 	console.log(req);
 	try {
-	UploadCsvDataToMyDatabase(__dirname + '/public/uploads/file');
+	UploadCsvDataToMyDatabase(__dirname + '/uploads/file');
 	console.log(req.file.filename);
 	console.log(req.body);
     console.log('CSV file data has been uploaded in database ');
