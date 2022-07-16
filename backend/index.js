@@ -1427,7 +1427,7 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
 			let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department) VALUES ($1, $2, $3, $4)";
 			try {
 				csvData.forEach(row => {
-					process.postgresql.query(query, row);
+					process.postgresql.query(query, [row[1],row[2], row[3],row[4]]);
 				});
 			  }
 			  catch(error){
