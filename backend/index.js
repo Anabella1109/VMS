@@ -1389,10 +1389,15 @@ var upload = multer({
 });
 // { dest: 'public/images/servers' }
 app.post('/uploadfiles', upload.single("file"), async (req, res) =>{
-    UploadCsvDataToMyDatabase(__dirname + '/public/uploads/' + req.file.filename);
+	try {
+		UploadCsvDataToMyDatabase(__dirname + '/public/uploads/' + req.file.filename);
 	console.log(req.file.filename);
 	console.log(req.body);
     console.log('CSV file data has been uploaded in database ');
+	} catch (error) {
+		console.error(error);
+	}
+    
 });
 	
 let UploadCsvDataToMyDatabase= (filePath)=>{
