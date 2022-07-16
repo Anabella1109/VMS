@@ -499,7 +499,7 @@ app.post('/api/checkin', async (req, res) => {
 		const getvisit= ()=>{for(entry in obj){
 			// console.log(entry);
 		
-			return entry;
+			return JSON.parse(entry);
 		}
 	};
 		const visit=getvisit();
