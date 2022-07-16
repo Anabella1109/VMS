@@ -502,7 +502,7 @@ app.post('/api/checkin', async (req, res) => {
 			return entry;
 		}
 	};
-		// const visit=obj;
+		const visit=getvisit();
 		const checked_out=null;
 		// const visit = {
 			
