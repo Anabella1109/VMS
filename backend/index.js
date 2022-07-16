@@ -17,7 +17,6 @@ const sessions = require('express-session');
 const { DateTime } = require("luxon");    
 const cron = require('node-cron');
 const multer = require('multer');
-
 const vonage = new Vonage({
   apiKey: process.env.API_KEY,
   apiSecret:process.env.API_SECRET
@@ -597,7 +596,6 @@ try {
  //___________________________________ login user ________________________________________________
 
 	app.post('/api/login/admin', async(req,res)=>{
-		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const user={
 			email: req.body.email,
 			pass: req.body.password
@@ -1418,16 +1416,38 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
             // Remove Header ROW
             csvData.shift();
 			console.log(csvData);
-			csvData.forEach(function(x){ delete x[0] });
+			// csvData.forEach(function(x){ delete x[0] });
 			console.log(csvData);
   
           
             
                
-			let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department) VALUES ($1, $2, $3, $4)";
+			let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department,password) VALUES ($1, $2, $3, $4,$5)";
 			try {
 				csvData.forEach(row => {
-					process.postgresql.query(query, [row[1],row[2], row[3],row[4]]);
+					let pass=crypto.randomBytes(8).toString('hex');
+					process.postgresql.query(query, [row[1],row[2], row[3],row[4],pass]);
+
+					let htmlBody = "Your new login information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
+		htmlBody += "Email : " + row[2] + " \n " + "\n" + 
+		" password : " +pass ;
+	  
+		
+		var mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
+		{
+		  from: process.env.EMAIL,
+		  to: row[2],
+		  subject: "Login information.",
+		  html: htmlBody,
+		};
+	
+		transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
+			if (error) {
+			  console.log(error);
+			} else {
+			  console.log('Email sent: ' + info.response);
+			}
+		  });
 				});
 			  }
 			  catch(error){
@@ -1442,6 +1462,7 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
         });
   
     stream.pipe(csvStream);
+	res.status(200).json('Hosts added');
 };
 
 app.post('/uploadfile', async (res, req)=>{
@@ -1486,9 +1507,10 @@ app.post('/uploadfile/data',async (res, req)=>{
 	// csvData.forEach(function(x){ delete x[0] });
 	
 
-	let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department) VALUES ($1, $2, $3, $4)";
+	let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department,password) VALUES ($1, $2, $3, $4,$5)";
 		csvData.forEach(row => {
-			 process.postgresql.query(query, [row[1] , row[2],row[3],row[4]]);
+			let pass=crypto.randomBytes(8).toString('hex');
+			 process.postgresql.query(query, [row[1] , row[2],row[3],row[4],pass]);
 		});
 	  }
 	  catch(error){
