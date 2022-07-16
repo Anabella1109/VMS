@@ -498,8 +498,10 @@ app.post('/api/checkin', async (req, res) => {
 		console.log(req.body);
 		for(entry in obj){
 			console.log(entry);
+			const visit=entry;
+			return visit;
 		}
-		const visit=obj;
+		// const visit=obj;
 		const checked_out=null;
 		// const visit = {
 			
