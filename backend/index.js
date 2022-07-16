@@ -1388,7 +1388,7 @@ var upload = multer({
 app.post('/uploadfiles', upload.single("file"), async (req, res) =>{
 	console.log(req);
 	try {
-		UploadCsvDataToMyDatabase(__dirname + '/public/uploads/' + req.file.filename);
+	UploadCsvDataToMyDatabase(__dirname + '/public/uploads/' + req.body.filename);
 	console.log(req.file.filename);
 	console.log(req.body);
     console.log('CSV file data has been uploaded in database ');
