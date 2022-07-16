@@ -1457,6 +1457,7 @@ app.post('/uploadfile', async (res, req)=>{
 })
 
 app.post('/uploadfile/data',async (res, req)=>{
+	res.setHeader('Content-Type', 'application/json');
 	console.log(req.body);
 	let csvData= req.body;
 	
