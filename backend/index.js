@@ -488,25 +488,26 @@ app.post('/api/checkin', async (req, res) => {
 	const checked_in= DateTime.now().setZone('CAT');
 	const checkin_date= checked_in.toFormat("yyyy-MM--dd");
 	const checkin_time= checked_in.toFormat(DateTime.TIME_24_SIMPLE);
-	console.log(req.body);
-	req.body.forEach(function(entry, index) {
-        console.log(index, entry)
-    });
-	const visit=req.body;
-	// const visit = {
-		
-	// 	host_name: req.body.host_name,
-	// 	visitor_name: req.body.visitor_name,
-	// 	visitor_email: req.body.visitor_email,
-	// 	visitor_no: req.body.visitor_no,
-	// 	date:checkin_date,
-	// 	checked_in: checkin_time,
-	// 	checked_out:null,
-	// 	role: req.body.role
-		
-	// };
-	console.log(visit);
+	
 	try{
+		console.log(req.body);
+		req.body.forEach(function(entry, index) {
+			console.log(index, entry)
+		});
+		const visit=req.body;
+		// const visit = {
+			
+		// 	host_name: req.body.host_name,
+		// 	visitor_name: req.body.visitor_name,
+		// 	visitor_email: req.body.visitor_email,
+		// 	visitor_no: req.body.visitor_no,
+		// 	date:checkin_date,
+		// 	checked_in: checkin_time,
+		// 	checked_out:null,
+		// 	role: req.body.role
+			
+		// };
+		console.log(visit);
 	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE name=$1' , [visit.host_name]);
 	console.log(host);
 	
