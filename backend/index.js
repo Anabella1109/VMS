@@ -1386,6 +1386,7 @@ var upload = multer({
 });
 // { dest: 'public/images/servers' }
 app.post('/uploadfiles', upload.single("file"), async (req, res) =>{
+	console.log(req);
 	try {
 		UploadCsvDataToMyDatabase(__dirname + '/public/uploads/' + req.file.filename);
 	console.log(req.file.filename);
@@ -1408,6 +1409,7 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
         .on("end", function () {
             // Remove Header ROW
             csvData.shift();
+			console.log(csvData);
   
           
             
