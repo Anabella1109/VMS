@@ -1418,6 +1418,8 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
             // Remove Header ROW
             csvData.shift();
 			console.log(csvData);
+			csvData.forEach(function(x){ delete x[0] });
+			console.log(csvData);
   
           
             
