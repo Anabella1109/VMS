@@ -517,6 +517,7 @@ app.post('/api/checkin', async (req, res) => {
 			
 		// };
 		console.log(visit);
+		if(visit != "No Result"){
 	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE name=$1' , [visit.host_name]);
 	console.log(host);
 	
@@ -585,6 +586,7 @@ vonage.message.sendSms(from, to, text, (err, responseData) => {
 	 res.status(200).send('Visit registered!');
 
 }
+	}
 catch(error){
 	console.error(error);
 } 
