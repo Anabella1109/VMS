@@ -1372,7 +1372,7 @@ app.get('/api/csv/visitors', async (req, res) => {
 
 var storage = multer.diskStorage({
     destination: (req, file, callBack) => {
-        callBack(null, './public/uploads/')    
+        callBack(null, '/public/uploads/')    
     },
     filename: (req, file, callBack) => {
 		callBack(null, "file" )
@@ -1382,7 +1382,7 @@ var storage = multer.diskStorage({
  
 var upload = multer({
     // storage: storage
-	dest: 'public/uploads/'
+	dest: '/public/uploads/'
 });
 // { dest: 'public/images/servers' }
 app.post('/uploadfiles', upload.single("file"), async (req, res) =>{
