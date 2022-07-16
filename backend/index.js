@@ -1385,7 +1385,7 @@ var storage = multer.diskStorage({
 var upload = multer({
 
     // storage: storage
-	dest: '/uploads/',
+	dest: __dirname +'/uploads/',
     rename: function (fieldname, filename) {
 		filename= 'file';
             return filename;
