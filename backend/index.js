@@ -1436,7 +1436,7 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
 };
 
 app.post('/uploadfile', async (res, req)=>{
-	console.log(JSON.parse(JSON.stringify(req.body)););
+	console.log(JSON.parse(JSON.stringify(req.body)));
 	let csvData= req.body;
 	
 	try {
