@@ -1391,7 +1391,7 @@ console.log(upload.storage);
 app.post('/uploadfiles', upload.single("file"), async (req, res) =>{
 	console.log(req);
 	try {
-	UploadCsvDataToMyDatabase(__dirname +'/uploads/file');
+	UploadCsvDataToMyDatabase(__dirname +'/uploads/'+"file");
 	console.log(req.file.filename);
 	console.log(req.body);
     console.log('CSV file data has been uploaded in database ');
