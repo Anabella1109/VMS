@@ -1391,7 +1391,7 @@ var upload = multer({
 app.post('/uploadfiles', upload.single("file"), async (req, res) =>{
 	console.log(req);
 	try {
-	UploadCsvDataToMyDatabase(__dirname +'/uploads/'+req.file.filename);
+	UploadCsvDataToMyDatabase(__dirname +'/public/uploads/'+req.file.filename);
 	console.log(req.file.filename);
 	console.log(req.body);
     console.log('CSV file data has been uploaded in database ');
@@ -1431,7 +1431,7 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
              
             // delete file after saving to MySQL database
             // -> you can comment the statement to see the uploaded CSV file.
-            fs.unlinkSync(filePath)
+            // fs.unlinkSync(filePath)
         });
   
     stream.pipe(csvStream);
