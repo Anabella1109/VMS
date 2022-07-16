@@ -821,7 +821,7 @@ app.get('/api/bookings/:id', async (req, res) => {
 
     
 	   //___________________________________ Deleting a single visit ________________________________________________
-	   app.delete('/api/bookings/:id/delete', async (req, res) => {
+	   app.delete('/api/bookings/delete/:id', async (req, res) => {
 		const pk=req.params['id'];
 		try {
 			await process.postgresql.query('DELETE FROM "booking" WHERE "id" = $1', [pk]);
