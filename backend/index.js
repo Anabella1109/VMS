@@ -494,10 +494,10 @@ app.post('/api/checkin', async (req, res) => {
 		// const obj = Object.assign({},req.body)
 		const obj = JSON.parse(JSON.stringify(req.body)); // req.body = [Object: null prototype] { title: 'product' }
 
-		console.log(obj);
-		console.log(req.body);
+		// console.log(obj);
+		// console.log(req.body);
 		for(entry in obj){
-			console.log(entry);
+			// console.log(entry);
 			const visit=entry;
 			return visit;
 		}
