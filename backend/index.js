@@ -65,7 +65,7 @@ const corsOptions ={
 app.use(bodyParser.json());
 // app.use(require('connect').bodyParser.json({type: '*/*'}));
 app.use(bodyParser.urlencoded({ extended: false }));
-// app.use("/public",express.static(__dirname+'/public'));
+app.use("/public",express.static(__dirname+'/public'));
 app.use(cors())
 
 app.use(sessions({
@@ -1383,15 +1383,20 @@ var storage = multer.diskStorage({
 })
  
 var upload = multer({
+
     // storage: storage
-	dest: '/public/uploads/'
+	dest: '/uploads/',
+    rename: function (fieldname, filename) {
+		filename= 'file';
+            return filename;
+	}
 });
 // console.log(upload.storage.getFilename());
 // { dest: 'public/images/servers' }
 app.post('/uploadfiles', upload.single("file"), async (req, res) =>{
 	console.log(req);
 	try {
-	UploadCsvDataToMyDatabase(__dirname +'/public/uploads/'+req.file.filename);
+	UploadCsvDataToMyDatabase(__dirname +'/uploads/'+req.file.filename);
 	console.log(req.file.filename);
 	console.log(req.body);
     console.log('CSV file data has been uploaded in database ');
