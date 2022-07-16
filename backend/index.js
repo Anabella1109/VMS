@@ -63,8 +63,8 @@ const corsOptions ={
 // const router = express.Router();
 app.use("/public",express.static(__dirname+'/public'));
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 
 app.use(sessions({
@@ -100,7 +100,6 @@ app.get("/", (req, res) => {
 
 
   app.get('/api/hosts', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	try {
 		const rows= await process.postgresql.query('SELECT * FROM hosts;');
 	res.json(rows);
@@ -113,8 +112,6 @@ app.get("/", (req, res) => {
 
   //___________________________________ Sending single host ________________________________________________
   app.get('/api/hosts/:id', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	res.setHeader( "Access-Control-Allow-Origin", "*" );
 
 	const pk=req.params['id'];
 	try {
