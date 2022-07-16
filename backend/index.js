@@ -1467,7 +1467,7 @@ app.post('/uploadfile/data',async (res, req)=>{
 
 	let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department) VALUES ($1, $2, $3, $4)";
 		csvData.forEach(row => {
-			 process.postgresql.query(query, [row.name, row.email_id,row.mobile_no,row.department]);
+			 process.postgresql.query(query, [row[1] , row[2],row[3],row[4]]);
 		});
 	  }
 	  catch(error){
