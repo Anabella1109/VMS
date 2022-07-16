@@ -1386,7 +1386,7 @@ var upload = multer({
     storage: storage
 	// dest: '/public/uploads/'
 });
-console.log(upload.storage);
+console.log(upload.storage.getFilename());
 // { dest: 'public/images/servers' }
 app.post('/uploadfiles', upload.single("file"), async (req, res) =>{
 	console.log(req);
