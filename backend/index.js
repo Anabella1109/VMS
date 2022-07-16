@@ -1383,15 +1383,15 @@ var storage = multer.diskStorage({
 })
  
 var upload = multer({
-    storage: storage
-	// dest: '/public/uploads/'
+    // storage: storage
+	dest: '/public/uploads/'
 });
-console.log(upload.storage.getFilename());
+// console.log(upload.storage.getFilename());
 // { dest: 'public/images/servers' }
 app.post('/uploadfiles', upload.single("file"), async (req, res) =>{
 	console.log(req);
 	try {
-	UploadCsvDataToMyDatabase(__dirname +'/uploads/'+"file");
+	UploadCsvDataToMyDatabase(__dirname +'/uploads/'+req.file.filename);
 	console.log(req.file.filename);
 	console.log(req.body);
     console.log('CSV file data has been uploaded in database ');
