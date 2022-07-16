@@ -1375,8 +1375,8 @@ var storage = multer.diskStorage({
         callBack(null, '/uploads/')    
     },
     filename: (req, file, callBack) => {
-		callBack(null, "file" )
-		console.log("test1")
+		callBack(null, "file" );
+		// console.log("test1")
 		// callBack(null, file.fieldname )
         // callBack(null, file.fieldname + '-' + new Date().toISOString().replace(/:/g, '-')+ path.extname(file.originalname))
     }
