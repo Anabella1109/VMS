@@ -519,6 +519,7 @@ app.post('/api/checkin', async (req, res) => {
 		
 		if(visit != "No Result"){
 			console.log(visit);
+			console.log(typeof(visit));
 	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE name=$1' , [visit.host_name]);
 	console.log(host);
 	
