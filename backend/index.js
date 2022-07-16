@@ -79,8 +79,6 @@ app.use(cookieParser());
 
 let session;
 
-
-
 //___________________________________ Connection to database ________________________________________________
 postgresql(async (connection) => {
 	
