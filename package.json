@@ -17,6 +17,7 @@
   "dependencies": {
     "@vonage/server-sdk": "^2.11.1",
     "body-parser": "^1.20.0",
+    "connect": "^3.7.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "csv": "^6.1.2",
