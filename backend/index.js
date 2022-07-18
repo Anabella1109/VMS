@@ -120,6 +120,7 @@ app.get("/", (req, res) => {
 		}
 		else{
 			console.log('Data undefined');
+			res.redirect('/api/hosts');
 		}
 	} catch (error) {
 		console.error(error);
