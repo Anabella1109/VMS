@@ -1638,6 +1638,16 @@ app.post('/uploadfile/data',async (res, req)=>{
 //   app.get("/", (req, res) => {
 // 	res.sendFile('../views/index.html')
 //   });
+app.use('*', (req, res) => {
+	res.status(503).json({
+	  success: 'false',
+	  message: 'Request Timeout',
+	  error: {
+		statusCode: 503,
+		message: 'Request timeout, check sent data',
+	  },
+	});
+  });
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
