@@ -425,6 +425,7 @@ app.post('/api/visits', async (req, res) => {
 	};
 	console.log(visit);
 	try{
+		if( visit.visitor_no != "undefined"){
 	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE name=$1' , [visit.host_name]);
 	console.log(host);
 	
@@ -487,12 +488,17 @@ vonage.message.sendSms(from, to, text, (err, responseData) => {
 
 
 
-
+		
 
 // })
 	 res.status(200).send('Visit registered!');
 
 }
+else{
+	res.status(404).json("Data undefined");
+	}
+	
+	}
 catch(error){
 	console.error(error);
 } 
@@ -500,7 +506,7 @@ catch(error){
 	
   });
 
-  //___________________________________ registering a visit ________________________________________________
+  //___________________________________ qr checkin________________________________________________
 app.post('/api/checkin', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	
@@ -631,8 +637,12 @@ app.put('/api/visits/:id', async (req, res) => {
 		
 	}
 	try{
+		if(pk!= "undefined" && visit.visitor_no != "undefined"){
 	await process.postgresql.query('UPDATE "register" SET "host_id" = $1, "host_name" = $2, "visitor_name" = $3, "visitor_email" = $4, "visitor_no" = $5,"date" = $10, "checked_in"= $6, "checked_out"=$7, "role"=$8  WHERE id=$9', [visit.host_id,visit.host_name,visit.visitor_name, visit.visitor_email,visit.visitor_no, visit.checked_in, visit.checked_out,visit.role,pk,visit.date]);
 	 res.status(200).send(JSON.stringify('Visit edited'));
+		}else{
+			res.status(404).json("Data undefined");
+		}
 	}
 	catch(error){
 		console.error(error);
@@ -650,9 +660,14 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 		checked_out: checkout_time,
 	}
 	try{
+		if( pk !="undefined"){
 	await process.postgresql.query('UPDATE "register" SET "checked_out"=$1  WHERE id=$2', [visit.checked_out,pk]);
 	 res.status(200).json('Checked out');
 	}
+	else{
+		res.status(404).json("Data undefined")
+	}
+}
 	catch(error){
 		console.error(error);
 		res.status(404).json('Visit not found');
@@ -664,8 +679,13 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 	 app.get('/api/visits/:id', async (req, res) => {
 		const pk=req.params['id'];
 		try{
+			if(pk!="undefined"){
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE id=$1', [pk]);
 		res.json(rows);
+			}
+			else{
+				res.status(404).json("data undefined")
+			}
 		}
 		catch(error){
 			console.error(error);
@@ -694,8 +714,13 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 	 app.delete('/api/visits/:id', async (req, res) => {
 		const pk=req.params['id'];
 		try {
+			if( pk!= "undefined"){
 			await process.postgresql.query('DELETE FROM "register" WHERE "id" = $1', [pk]);
 		res.send('Record deleted');
+			}
+			else{
+				res.status(404).json("Data undefined");
+			}
 		} catch (error) {
 			console.error(error);
 		}
@@ -772,6 +797,7 @@ app.get('/api/admin/logout',(req,res) => {
 
 //___________________________________ generating qrcode ________________________________________________
   app.post('/qrgenerate', async(req,res) => {
+	if( req.body.visitor_no !="undefined"){
 	const visitor = {
 		visitor_name: req.body.visitor_name,
 		visitor_email: req.body.visitor_email,
@@ -781,6 +807,7 @@ app.get('/api/admin/logout',(req,res) => {
 		host_name: req.body.host_name,
 		role: req.body.role
 	};
+
 	const host = await process.postgresql.query('SELECT * FROM hosts WHERE name=$1', [visitor.host_name]);
 	console.log(host[0].email_id);
 	try {
@@ -903,6 +930,10 @@ try {
 
 	
 })
+}
+else{
+	res.status(404).json("Data undefined");
+}
 
   });
 // _________________________________________sending bookings______________________________
@@ -938,8 +969,13 @@ app.get('/api/bookings/today', async (req, res) => {
 app.get('/api/bookings/:id', async (req, res) => {
 	const pk=req.params['id'];
 	try {
+		if(pk != "undefined"){
 		const rows = await process.postgresql.query('SELECT * FROM booking WHERE id=$1', [pk]);
 	res.json(rows);
+		}
+		else{
+			res.status(404).json("Data undefined");
+		}
 	} catch (error) {
 		console.error(error);
 	}
@@ -947,12 +983,17 @@ app.get('/api/bookings/:id', async (req, res) => {
   });
 
     
-	   //___________________________________ Deleting a single visit ________________________________________________
+	   //___________________________________ Deleting a single booking ________________________________________________
 	   app.delete('/api/bookings/delete/:id', async (req, res) => {
 		const pk=req.params['id'];
 		try {
+			if(pk != "undefined"){
 			await process.postgresql.query('DELETE FROM "booking" WHERE "id" = $1', [pk]);
 		   res.json('Record deleted');
+			}
+			else{
+				res.status(404).json("data undefined");
+			}
 		} catch (error) {
 			console.error(error);
 		}
