@@ -692,6 +692,24 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 			res.status(404).json('Visit not found');
 		}
 	  });
+
+	     //___________________________________ Sending a single visit ________________________________________________
+		 app.get('/api/visits/:host_id', async (req, res) => {
+			const pk=req.params['host_id'];
+			try{
+				if(pk!="undefined"){
+			const rows = await process.postgresql.query('SELECT * FROM register WHERE host_id=$1', [pk]);
+			res.json(rows);
+				}
+				else{
+					res.status(404).json("data undefined")
+				}
+			}
+			catch(error){
+				console.error(error);
+				res.status(404).json('Visit not found');
+			}
+		  });
 	
 		 //___________________________________ Sending a visits by date and time ________________________________________________
 		 app.get('/api/visits/date/time', async (req, res) => {
