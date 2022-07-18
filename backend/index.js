@@ -694,7 +694,7 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 	  });
 
 	     //___________________________________ Sending a single visit ________________________________________________
-		 app.get('/api/visits/:host_id', async (req, res) => {
+		 app.get('/api/visits/host/:host_id', async (req, res) => {
 			const pk=req.params['host_id'];
 			try{
 				if(pk!="undefined"){
