@@ -112,6 +112,7 @@ app.get("/", (req, res) => {
   app.get('/api/hosts/:id', async (req, res) => {
 
 	const pk=req.params['id'];
+	console.log(typeof(pk));
 	try {
 		const rows = await process.postgresql.query('SELECT * FROM hosts WHERE id=$1', [pk]);
 	res.json(rows);
