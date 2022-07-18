@@ -230,8 +230,13 @@ app.put('/api/hosts/:id', async (req, res) => {
 		department: req.body.department
 	}
 	try{
+		if(host.mobile_no != "undefined"){
 	 await process.postgresql.query('UPDATE "hosts" SET "name" = $1, "email_id" = $2, "mobile_no" = $3, "department"= $4 WHERE id=$5', [host.name,host.email_id,host.mobile_no,host.department,pk])
 		res.status(200).send(JSON.stringify('Host edited!'));
+		}else{
+			console.log("Data undefined");
+			res.redirect('/api/hosts');
+		}
 	}
 	catch(error){
 		console.error(error);
