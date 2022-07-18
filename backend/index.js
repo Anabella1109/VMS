@@ -120,7 +120,7 @@ app.get("/", (req, res) => {
 		}
 		else{
 			console.log('Data undefined');
-			res.redirect('/api/hosts');
+			res.status(404).json("Data undefined");
 		}
 	} catch (error) {
 		console.error(error);
@@ -236,7 +236,7 @@ app.put('/api/hosts/:id', async (req, res) => {
 		res.status(200).send(JSON.stringify('Host edited!'));
 		}else{
 			console.log("Data undefined");
-			res.redirect('/api/hosts');
+			res.status(404).json("data undefined");
 		}
 	}
 	catch(error){
@@ -264,8 +264,14 @@ app.put('/api/hosts/:id', async (req, res) => {
  app.delete('/api/hosts/:id', async (req, res) => {
 	const pk=req.params['id'];
 	try {
-		await process.postgresql.query('DELETE FROM "hosts" WHERE "id" = $1', [pk]);
+		if(pk !="undefined"){
+			await process.postgresql.query('DELETE FROM "hosts" WHERE "id" = $1', [pk]);
 	res.json('Host deleted');
+			}
+			else{
+				console.log('Data undefined');
+				res.status(404).json("Data undefined");
+			}
 	} catch (error) {
 		console.error(error);
 		res.status(400).json(error);
