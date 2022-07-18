@@ -186,24 +186,24 @@ app.post('/api/hosts', async (req, res) => {
 		  });
 	
 	
-	const from = "250787380054";
-	const to =`25${host.mobile_no}`;
-	const text =` Your new login information
-	   Email: ${host.email_id} 
-	   Password: ${host.password}
-	  `;
+	// const from = "250787380054";
+	// const to =`25${host.mobile_no}`;
+	// const text =` Your new login information
+	//    Email: ${host.email_id} 
+	//    Password: ${host.password}
+	//   `;
 	
-	vonage.message.sendSms(from, to, text, (err, responseData) => {
-		if (err) {
-			console.log(err);
-		} else {
-			if(responseData.messages[0]['status'] === "0") {
-				console.log("Message sent successfully.");
-			} else {
-				console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
-			}
-		}
-	});
+	// vonage.message.sendSms(from, to, text, (err, responseData) => {
+	// 	if (err) {
+	// 		console.log(err);
+	// 	} else {
+	// 		if(responseData.messages[0]['status'] === "0") {
+	// 			console.log("Message sent successfully.");
+	// 		} else {
+	// 			console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
+	// 		}
+	// 	}
+	// });
 	 res.status(201).json('Host registered!');
 
 }
