@@ -250,13 +250,13 @@ app.put('/api/hosts/:id', async (req, res) => {
   });
    //___________________________________ Deleting a single host ________________________________________________
  app.delete('/api/hosts/:id', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params['id'];
 	try {
 		await process.postgresql.query('DELETE FROM "hosts" WHERE "id" = $1', [pk]);
 	res.json('Host deleted');
 	} catch (error) {
 		console.error(error);
+		res.status(400).json(error);
 	}
 	
   });
@@ -1512,6 +1512,7 @@ app.post('/uploadfiles', upload.single("file"), async (req, res) =>{
 	console.log(req.file.filename);
 	console.log(req.body);
     console.log('CSV file data has been uploaded in database ');
+	res.status(200).json('Hosts added');
 	} catch (error) {
 		console.error(error);
 	}
@@ -1576,7 +1577,7 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
         });
   
     stream.pipe(csvStream);
-	res.status(200).json('Hosts added');
+	
 };
 
 app.post('/uploadfile', async (res, req)=>{
