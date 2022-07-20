@@ -627,7 +627,7 @@ app.put('/api/visits/:id', async (req, res) => {
 		host_id: req.body.host_id,
 		host_name: req.body.host_name,
 		visitor_name: req.body.visitor_name,
-		visitor_email: req.body.email,
+		visitor_email: req.body.visitor_email,
 		visitor_no: req.body.visitor_no,
 		date: req.body.date,
 		checked_in: req.body.checked_in,
@@ -637,7 +637,7 @@ app.put('/api/visits/:id', async (req, res) => {
 	}
 	try{
 		if(pk!= "undefined" && visit.visitor_no != "undefined"){
-	await process.postgresql.query('UPDATE "register" SET "host_name" = $2, "visitor_name" = $3, "visitor_email" = $4, "visitor_no" = $5,"date" = $10, "checked_in"= $6, "checked_out"=$7, "role"=$8  WHERE id=$9', [visit.host_id,visit.host_name,visit.visitor_name, visit.visitor_email,visit.visitor_no, visit.checked_in, visit.checked_out,visit.role,pk,visit.date]);
+	await process.postgresql.query('UPDATE "register" SET "host_name" = $2, "visitor_name" = $3, "visitor_email" = $4, "visitor_no" = $5, "role"=$8  WHERE id=$9', [visit.host_id,visit.host_name,visit.visitor_name, visit.visitor_email,visit.visitor_no, visit.checked_in, visit.checked_out,visit.role,pk,visit.date]);
 	 res.status(200).send(JSON.stringify('Visit edited'));
 		}else{
 			res.status(404).json("Data undefined");
