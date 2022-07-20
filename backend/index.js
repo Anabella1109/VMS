@@ -87,6 +87,9 @@ postgresql(async (connection) => {
 
 
 app.get("/", (req, res) => {
+	session=req.session;
+		session.userid=user.email;
+		console.log(req.session)
 	res.sendFile(__dirname+'/index.html');
   });
 
