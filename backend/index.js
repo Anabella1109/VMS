@@ -657,9 +657,11 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 	const pk=req.params.id;
 	const checkout= DateTime.now().setZone('CAT');
 	const checkout_time= checkout.toFormat(DateTime.TIME_24_SIMPLE);
+
 	const visit = {
 		checked_out: checkout_time,
 	}
+	console.log(visit);
 	try{
 		if( pk !="undefined"){
 	await process.postgresql.query('UPDATE "register" SET "checked_out"=$1  WHERE id=$2', [visit.checked_out,pk]);
