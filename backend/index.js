@@ -1029,6 +1029,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 	const rows = await process.postgresql.query('SELECT * FROM register');
 	const name= new Date().toLocaleDateString();
 	let doc = new PDFDocument({ margin: 30, size: 'A4' });
+
 	const table = {
 		title: "Visits",
 		subtitle: "General visits report",
@@ -1046,26 +1047,32 @@ app.get('/api/pdf/visits', async(req,res)=>{
 		datas:rows,
 	  };
 
-	  doc.table(table, {
-		prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
-		prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
-		  doc.font("Helvetica").fontSize(8);
-		  indexColumn === 0 && doc.addBackground(rectRow, 'blue', 0.15);
-		},
-	  });
+	  try {
+		doc.table(table, {
+			prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
+			prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
+			  doc.font("Helvetica").fontSize(8);
+			  indexColumn === 0 && doc.addBackground(rectRow, 'blue', 0.15);
+			},
+		  });
+	
+		//   doc.pipe(res);
+		doc.pipe(fs.createWriteStream(__dirname+'/public/visits.pdf'));
+		const src = fs.createReadStream(__dirname+'/public/visits.pdf');
+		
+		res.writeHead(200, {
+			'Content-Type': 'application/pdf',
+			'Content-Disposition': `attachment; filename= ${name} report.pdf`,
+			'Content-Transfer-Encoding': 'Binary'
+		  });
+		
+		  src.pipe(res);
+		  doc.end();
+	  } catch (error) {
+		console.error(error);
+	  }
 
-	//   doc.pipe(res);
-	doc.pipe(fs.createWriteStream(__dirname+'/public/visits.pdf'));
-	const src = fs.createReadStream(__dirname+'/public/visits.pdf');
-	
-	res.writeHead(200, {
-		'Content-Type': 'application/pdf',
-		'Content-Disposition': `attachment; filename= ${name} report.pdf`,
-		'Content-Transfer-Encoding': 'Binary'
-	  });
-	
-	  src.pipe(res);
-	  doc.end();
+	  
 	 
 	});
 
