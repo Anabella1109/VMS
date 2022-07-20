@@ -656,7 +656,9 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params.id;
 	const checkout= DateTime.now().setZone('CAT');
+	console.log(checkout);
 	const checkout_time= checkout.toFormat(DateTime.TIME_24_SIMPLE);
+	console.log(checkout_time);
 
 	const visit = {
 		checked_out: checkout_time,
