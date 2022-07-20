@@ -635,6 +635,7 @@ app.put('/api/visits/:id', async (req, res) => {
 		role: req.body.role
 		
 	}
+	console.log(visit);
 	try{
 		if(pk!= "undefined" && visit.visitor_no != "undefined"){
 	await process.postgresql.query('UPDATE "register" SET "host_name" = $1, "visitor_name" = $2, "visitor_email" = $3, "visitor_no" = $4, "role"=$5  WHERE id=$6', [visit.host_name,visit.visitor_name, visit.visitor_email,visit.visitor_no, visit.role,pk]);
