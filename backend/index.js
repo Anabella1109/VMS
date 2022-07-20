@@ -147,7 +147,7 @@ app.get("/", (req, res) => {
 		session.userid=user.email;
 		session.isAdmin=false;
 		console.log(req.session)
-		res.json('User logged in');
+		res.json(session);
 	}
 	else{
 		
@@ -796,7 +796,7 @@ try {
 						  session.userid=user.email;
 						  session.isAdmin= true;
 						  console.log(req.session)
-						  res.json('User logged in');
+						  res.json(session);
 					  }
 					  else{
 						  
