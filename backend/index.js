@@ -623,6 +623,7 @@ catch(error){
 //___________________________________ Editing a visit ________________________________________________
 app.put('/api/visits/:id', async (req, res) => {
 	const pk=req.params['id'];
+	console.log(req.body);
 	const visit = {
 		host_id: req.body.host_id,
 		host_name: req.body.host_name,
