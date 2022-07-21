@@ -1615,9 +1615,10 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
 			
   
             let rows= process.postgresql.query(`SELECT * FROM hosts`); 
+			console.log(rows);
 			for(item in rows){
 				emails.push(item.email_id);
-				console.log(item.email_id)
+				console.log(item[0])
 			};
 			console.log(emails);
 
