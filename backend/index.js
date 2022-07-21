@@ -1616,10 +1616,10 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
   
             let rows= await process.postgresql.query(`SELECT * FROM hosts;`); 
 			console.log(rows);
-			for(item in rows){
-				emails.push(item[2]);
-				console.log(item[2])
-			};
+			rows.forEach(item =>{
+				emails.push(item.email_id);
+				console.log(item)
+			});
 			console.log(emails);
 
 			let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department,password) VALUES ($1, $2, $3, $4,$5)";
