@@ -198,24 +198,24 @@ app.post('/api/hosts', async (req, res) => {
 		  });
 	
 	
-	// const from = "250787380054";
-	// const to =`25${host.mobile_no}`;
-	// const text =` Your new login information
-	//    Email: ${host.email_id} 
-	//    Password: ${host.password}
-	//   `;
+	const from = "250787380054";
+	const to =`25${host.mobile_no}`;
+	const text =` Your new login information
+	   Email: ${host.email_id} 
+	   Password: ${host.password}
+	  `;
 	
-	// vonage.message.sendSms(from, to, text, (err, responseData) => {
-	// 	if (err) {
-	// 		console.log(err);
-	// 	} else {
-	// 		if(responseData.messages[0]['status'] === "0") {
-	// 			console.log("Message sent successfully.");
-	// 		} else {
-	// 			console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
-	// 		}
-	// 	}
-	// });
+	vonage.message.sendSms(from, to, text, (err, responseData) => {
+		if (err) {
+			console.log(err);
+		} else {
+			if(responseData.messages[0]['status'] === "0") {
+				console.log("Message sent successfully.");
+			} else {
+				console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
+			}
+		}
+	});
 	 res.status(201).json('Host registered!');
 
 }
@@ -879,7 +879,8 @@ QRCode.toDataURL(stringdata, function (err, code) {
 		  });
 		  const dateAndTime= visitor.date +' '+ visitor.checked_in; 
 		  const scheduledTime=DateTime.fromSQL(dateAndTime,{zone: 'CAT'}).minus({minutes: 30});
-		  const scheduledTime1=DateTime.fromSQL(dateAndTime,{zone: 'CAT'}).minus({minutes: 10});
+		  const dateAndTime1= visitor.date +' '+ visitor.checked_in; 
+		  const scheduledTime1=DateTime.fromSQL(dateAndTime1,{zone: 'CAT'}).minus({minutes: 10});
 
 
 		  const dayOfTheweek= scheduledTime.weekday;
@@ -1636,6 +1637,7 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
 			let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department,password) VALUES ($1, $2, $3, $4,$5)";
 			try {
 				csvData.forEach(row => {
+					if(row.length != 0){
 					let pass=crypto.randomBytes(8).toString('hex');
 					process.postgresql.query(query, [row[1],row[2], row[3],row[4],pass]);
 
@@ -1659,6 +1661,7 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
 			  console.log('Email sent: ' + info.response);
 			}
 		  });
+		}
 				});
 			  }
 			  catch(error){
