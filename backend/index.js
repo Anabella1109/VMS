@@ -21,7 +21,7 @@ const vonage = new Vonage({
   apiKey: process.env.API_KEY,
   apiSecret:process.env.API_SECRET
 })
-
+const sendEMail= require('./send_email');
 const PORT = process.env.PORT || 3001;
 const accountSid = config.twilio.accountSid;
 const authToken = config.twilio.authToken;
@@ -189,13 +189,15 @@ app.post('/api/hosts', async (req, res) => {
 		  html: htmlBody,
 		};
 	
-		transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
-			if (error) {
-			  console.log(error);
-			} else {
-			  console.log('Email sent: ' + info.response);
-			}
-		  });
+		// transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
+		// 	if (error) {
+		// 	  console.log(error);
+		// 	} else {
+		// 	  console.log('Email sent: ' + info.response);
+		// 	}
+		//   });
+
+		sendEMail(mailOptions);
 	
 	
 	const from = "250787380054";
