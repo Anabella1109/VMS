@@ -63,7 +63,7 @@ const corsOptions ={
 ;
 app.use(bodyParser.json());
 // app.use(require('connect').bodyParser.json({type: '*/*'}));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/public",express.static(__dirname+'/public'));
 app.use(cors())
 
@@ -413,8 +413,8 @@ app.put('/api/visitors/:id', async (req, res) => {
 app.post('/api/visits', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const checked_in= DateTime.now().setZone('CAT');
-	const checkin_date= checked_in.toFormat("yyyy-MM--dd");
-	const checkin_time= checked_in.toFormat(DateTime.TIME_24_SIMPLE);
+	const checkin_date= checked_in.toFormat("yyyy-MM-dd");
+	const checkin_time= checked_in.toLocaleString(DateTime.TIME_24_WITH_SECONDS);
 	console.log(req.body);
 	const visit = {
 		
@@ -517,7 +517,7 @@ app.post('/api/checkin', async (req, res) => {
 	
 	const checked_in= DateTime.now().setZone('CAT');
 	const checkin_date= checked_in.toFormat("yyyy-MM--dd");
-	const checkin_time= checked_in.toFormat(DateTime.TIME_24_SIMPLE);
+	const checkin_time= checked_in.toLocaleString(DateTime.TIME_24_WITH_SECONDS);
 	
 	try{
 		// const obj = Object.assign({},req.body)
@@ -533,18 +533,6 @@ app.post('/api/checkin', async (req, res) => {
 	};
 		const visit=getvisit();
 		const checked_out=null;
-		// const visit = {
-			
-		// 	host_name: req.body.host_name,
-		// 	visitor_name: req.body.visitor_name,
-		// 	visitor_email: req.body.visitor_email,
-		// 	visitor_no: req.body.visitor_no,
-		// 	date:checkin_date,
-		// 	checked_in: checkin_time,
-		// 	checked_out:null,
-		// 	role: req.body.role
-			
-		// };
 		
 		if(visit != "No Result"){
 			console.log(visit);
@@ -610,10 +598,6 @@ vonage.message.sendSms(from, to, text, (err, responseData) => {
 });
 
 
-
-
-
-// })
 	 res.status(200).send('Visit registered!');
 
 }
@@ -1619,24 +1603,28 @@ app.post('/uploadfiles', upload.single("file"), async (req, res) =>{
 let UploadCsvDataToMyDatabase= (filePath)=>{
 	let stream = fs.createReadStream(filePath);
     let csvData = [];
+	let emails=[];
     let csvStream = fastcsv
         .parse()
         .on("data", function (data) {
             csvData.push(data);
         })
         .on("end", function () {
-            // Remove Header ROW
             csvData.shift();
 			console.log(csvData);
-			// csvData.forEach(function(x){ delete x[0] });
-			console.log(csvData);
+			
   
-          
-            
-               
+            let rows= process.postgresql.query(`SELECT * FROM hosts`); 
+			for(item in rows){
+				emails.push(item.email_id);
+			};
+
 			let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department,password) VALUES ($1, $2, $3, $4,$5)";
 			try {
 				csvData.forEach(row => {
+					let check= emails.includes(row[2]);
+					if(check){console.log("Email already exits in database")}
+					else{
 					if(row.length != 0){
 					let pass=crypto.randomBytes(8).toString('hex');
 					process.postgresql.query(query, [row[1],row[2], row[3],row[4],pass]);
@@ -1662,15 +1650,13 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
 			}
 		  });
 		}
-				});
+				}	});
 			  }
 			  catch(error){
 				console.error(error);
 			  };
                
-      
-             
-            // delete file after saving to MySQL database
+
             // -> you can comment the statement to see the uploaded CSV file.
             // fs.unlinkSync(filePath)
         });
@@ -1679,64 +1665,8 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
 	
 };
 
-app.post('/uploadfile', async (res, req)=>{
-	req.setHeader('Accept','application/json');
-	req.setHeader('Content-Type','application/json');
-	req.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 
-	req.writeHead(200, {
-		'Content-Type': 'application/json',
-		'Accept':'application/json'
-	  });
-	console.log(req.body);
-	let csvData= req.body;
-	
-	try {
-		csvData.shift();
-	// csvData.forEach(function(x){ delete x[0] });
-	
 
-	let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department) VALUES ($1, $2, $3, $4)";
-		csvData.forEach(row => {
-			 process.postgresql.query(query, row);
-		});
-	  }
-	  catch(error){
-		console.error(error);
-		// res.json(error);
-	  };
-
-})
-
-app.post('/uploadfile/data',async (res, req)=>{
-	res.setHeader('Content-Type', 'application/json');
-	console.log(req.body);
-	let csvData= req.body;
-	req.writeHead(200, {
-		'Content-Type': 'application/csv'
-	  });
-	
-	try {
-		csvData.shift();
-	// csvData.forEach(function(x){ delete x[0] });
-	
-
-	let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department,password) VALUES ($1, $2, $3, $4,$5)";
-		csvData.forEach(row => {
-			let pass=crypto.randomBytes(8).toString('hex');
-			 process.postgresql.query(query, [row[1] , row[2],row[3],row[4],pass]);
-		});
-	  }
-	  catch(error){
-		console.error(error);
-		// res.send(error);
-	  };
-
-})
-
-//   app.get("/", (req, res) => {
-// 	res.sendFile('../views/index.html')
-//   });
 app.use('*', (req, res) => {
 	res.status(503).json({
 	  success: 'false',

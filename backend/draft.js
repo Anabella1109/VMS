@@ -327,3 +327,36 @@ execute(createregister).then(result => {
    
 // Converting the data into base64
 
+
+
+// app.post('/uploadfile', async (res, req)=>{
+// 	req.setHeader('Accept','application/json');
+// 	req.setHeader('Content-Type','application/json');
+// 	req.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+
+// 	req.writeHead(200, {
+// 		'Content-Type': 'application/json',
+// 		'Accept':'application/json'
+// 	  });
+// 	console.log(req.body);
+// 	let csvData= req.body;
+	
+// 	try {
+// 		csvData.shift();
+// 	// csvData.forEach(function(x){ delete x[0] });
+	
+
+// 	let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department) VALUES ($1, $2, $3, $4)";
+// 		csvData.forEach(row => {
+// 			 process.postgresql.query(query, row);
+// 		});
+// 	  }
+// 	  catch(error){
+// 		console.error(error);
+// 		// res.json(error);
+// 	  };
+
+// })
+
+// csvData.forEach(function(x){ delete x[0] });
+
