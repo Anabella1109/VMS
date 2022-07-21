@@ -1617,8 +1617,8 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
             let rows= await process.postgresql.query(`SELECT * FROM hosts;`); 
 			console.log(rows);
 			for(item in rows){
-				emails.push(item.email_id);
-				console.log(item[0])
+				emails.push(item[2]);
+				console.log(item[2])
 			};
 			console.log(emails);
 
