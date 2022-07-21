@@ -1600,7 +1600,7 @@ app.post('/uploadfiles', upload.single("file"), async (req, res) =>{
     
 });
 	
-let UploadCsvDataToMyDatabase= (filePath)=>{
+let UploadCsvDataToMyDatabase= async (filePath)=>{
 	let stream = fs.createReadStream(filePath);
     let csvData = [];
 	let emails=[];
@@ -1614,7 +1614,7 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
 			console.log(csvData);
 			
   
-            let rows= process.postgresql.query(`SELECT * FROM hosts`); 
+            let rows= await process.postgresql.query(`SELECT * FROM hosts;`); 
 			console.log(rows);
 			for(item in rows){
 				emails.push(item.email_id);
