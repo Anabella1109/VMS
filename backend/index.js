@@ -1617,7 +1617,9 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
             let rows= process.postgresql.query(`SELECT * FROM hosts`); 
 			for(item in rows){
 				emails.push(item.email_id);
+				console.log(item.email_id)
 			};
+			console.log(emails);
 
 			let query =   "INSERT INTO hosts ( name, email_id, mobile_no, department,password) VALUES ($1, $2, $3, $4,$5)";
 			try {
