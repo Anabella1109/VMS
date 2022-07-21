@@ -360,3 +360,19 @@ execute(createregister).then(result => {
 
 // csvData.forEach(function(x){ delete x[0] });
 
+// res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+
+
+// var storage = multer.diskStorage({
+//     destination: (req, file, callBack) => {
+//         callBack(null, '/uploads/')    
+//     },
+//     filename: (req, file, callBack) => {
+// 		callBack(null, "file" );
+// 		// console.log("test1")
+// 		// callBack(null, file.fieldname )
+//         // callBack(null, file.fieldname + '-' + new Date().toISOString().replace(/:/g, '-')+ path.extname(file.originalname))
+//     }
+// })
+ 
+

@@ -22,6 +22,7 @@ const vonage = new Vonage({
   apiSecret:process.env.API_SECRET
 })
 const sendEMail= require('./send_email');
+const sendSmsNotif= require('./send-sms');
 const PORT = process.env.PORT || 3001;
 const accountSid = config.twilio.accountSid;
 const authToken = config.twilio.authToken;
@@ -166,6 +167,7 @@ app.get("/", (req, res) => {
 app.post('/api/hosts', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
     const pass=crypto.randomBytes(8).toString('hex');
+	if(req.body != "undefined"){
 	const host = {
 		name: req.body.name,
 		email_id: req.body.email_id,
@@ -188,14 +190,6 @@ app.post('/api/hosts', async (req, res) => {
 		  subject: "Login information.",
 		  html: htmlBody,
 		};
-	
-		// transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
-		// 	if (error) {
-		// 	  console.log(error);
-		// 	} else {
-		// 	  console.log('Email sent: ' + info.response);
-		// 	}
-		//   });
 
 		sendEMail(mailOptions);
 	
@@ -207,17 +201,7 @@ app.post('/api/hosts', async (req, res) => {
 	   Password: ${host.password}
 	  `;
 	
-	vonage.message.sendSms(from, to, text, (err, responseData) => {
-		if (err) {
-			console.log(err);
-		} else {
-			if(responseData.messages[0]['status'] === "0") {
-				console.log("Message sent successfully.");
-			} else {
-				console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
-			}
-		}
-	});
+	sendSmsNotif(from, to,text);
 	 res.status(201).json('Host registered!');
 
 }
@@ -225,6 +209,7 @@ catch(error){
 	console.error(error);
 	res.send(error);
 }
+	};
   });
 
   //___________________________________ editing a host ________________________________________________
@@ -259,8 +244,13 @@ app.put('/api/hosts/:id', async (req, res) => {
 		password:req.body.password
 	}
 	try{
+		if(pk !='undefined'){
 	 await process.postgresql.query('UPDATE "hosts" SET "password" = $1 WHERE id=$2', [host.passsword,pk])
 	 res.status(200).send(JSON.stringify('Password changed'));
+		}
+		else{
+			console.log('Id undefined');
+		}
 	}
 	catch(error){
 		console.error(error);
@@ -299,10 +289,7 @@ try {
 } catch (error) {
 	console.error(error);
 	res.status(400).json('Resource not found')
-}
-	
-
-	
+}	
   });
   
 //___________________________________ regitering a visitor ________________________________________________
@@ -332,8 +319,13 @@ app.put('/api/visitors/:id', async (req, res) => {
 			mobile_no: req.body.mobile_no
 		}
 		try{
+			if(pk != 'undefined' && visitor.mobile_no !="undefined"){
 		await process.postgresql.query('UPDATE "visitors" SET "name" = $1, "email_id" = $2,"mobile_no" = $3 WHERE id=$4', [visitor.name,visitor.email_id,visitor.mobile_no,pk]);
 		res.status(200).send(JSON.stringify('Visitor updated!'));
+			}else{
+				console.log('Data undefined')
+				res.status(404).json('Data undefined')
+			}
 		}
 		catch(error){
 			console.error(error);}
@@ -345,12 +337,16 @@ app.put('/api/visitors/:id', async (req, res) => {
 		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const pk=req.params['id'];
 		try {
+			if ( pk != 'undefined'){
 			const rows = await process.postgresql.query('SELECT * FROM visitors WHERE id=$1', [pk]);
 		res.json(rows);
+		}else{
+			console.log('Id not defined');
+			res.status(404).json('Data not defined');
+		}
 		} catch (error) {
 			console.error(error);
 		}
-		
 	  });
 	
 	   //___________________________________ Deleting a single visitor _____________________________________________
@@ -358,8 +354,13 @@ app.put('/api/visitors/:id', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params['id'];
 	try {
+		if ( pk != 'undefined'){
 		await process.postgresql.query('DELETE FROM "visitors" WHERE "id" = $1', [pk]);
 	res.json('Visitor deleted');
+		}else{
+			console.log('Id not defined');
+			res.status(404).json('Data not defined');
+		}
 	} catch (error) {
 		console.error(error);
 	}
@@ -389,7 +390,9 @@ app.put('/api/visitors/:id', async (req, res) => {
 
  //___________________________________ sending visits for current day ________________________________________________
  app.get('/api/visits/today', async (req, res) => {
-	const date=new Date().toLocaleDateString();
+	// const date=new Date().toLocaleDateString();
+	const checked_in= DateTime.now().setZone('CAT');
+	const date= checked_in.toFormat("yyyy-MM-dd");
 	const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1', [date]);
 
 	res.status(200).json(rows);
@@ -462,14 +465,7 @@ app.post('/api/visits', async (req, res) => {
           subject: "New guest for you has arrived.",
           html: htmlBody,
         };
-
-		transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
-			if (error) {
-			  console.log(error);
-			} else {
-			  console.log('Email sent: ' + info.response);
-			}
-		  });
+        sendEMail(mailOptions);
 
 
 
@@ -481,23 +477,8 @@ Name: ${visit.visitor_name}
    email: ${visit.visitor_email}
    Checkin Time:${visit.checked_in}`;
 
-vonage.message.sendSms(from, to, text, (err, responseData) => {
-    if (err) {
-        console.log(err);
-    } else {
-        if(responseData.messages[0]['status'] === "0") {
-            console.log("Message sent successfully.");
-        } else {
-            console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
-        }
-    }
-});
+  sendSmsNotif(from, to, text);
 
-
-
-		
-
-// })
 	 res.status(200).send('Visit registered!');
 
 }
@@ -515,21 +496,15 @@ catch(error){
 
   //___________________________________ qr checkin________________________________________________
 app.post('/api/checkin', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	
+
 	const checked_in= DateTime.now().setZone('CAT');
 	const checkin_date= checked_in.toFormat("yyyy-MM--dd");
 	const checkin_time= checked_in.toLocaleString(DateTime.TIME_24_WITH_SECONDS);
 	
 	try{
-		// const obj = Object.assign({},req.body)
-		const obj = JSON.parse(JSON.stringify(req.body)); // req.body = [Object: null prototype] { title: 'product' }
 
-		// console.log(obj);
-		// console.log(req.body);
+		const obj = JSON.parse(JSON.stringify(req.body)); // req.body = [Object: null prototype] { title: 'product' }
 		const getvisit= ()=>{for(entry in obj){
-			// console.log(entry);
-		
 			return JSON.parse(entry);;
 		}
 	};
@@ -537,13 +512,7 @@ app.post('/api/checkin', async (req, res) => {
 		const checked_out=null;
 		
 		if(visit != "No Result"){
-			console.log(visit);
-			console.log(typeof(visit));
 	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE name=$1' , [visit.host_name]);
-	console.log(host);
-	
-	
-
 	const visitor = await process.postgresql.query('SELECT * FROM visitors WHERE name=$1 AND email_id=$2' , [visit.visitor_name, visit.visitor_email]);
 	if(visitor.length == 0){
 		await process.postgresql.query(`INSERT INTO visitors (name, email_id, mobile_no) VALUES ('${visit.visitor_name}', '${visit.visitor_email}', '${visit.visitor_no}') ON CONFLICT DO NOTHING;`);
@@ -569,15 +538,7 @@ app.post('/api/checkin', async (req, res) => {
           html: htmlBody,
         };
 
-		transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
-			if (error) {
-			  console.log(error);
-			} else {
-			  console.log('Email sent: ' + info.response);
-			}
-		  });
-
-
+     sendEMail(mailOptions);
 
 const from = "250787380054";
 const to =`250${host[0].mobile_no}`;
@@ -587,17 +548,7 @@ Name: ${visit.visitor_name}
    email: ${visit.visitor_email}
    Checkin Time:${visit.checked_in}`;
 
-vonage.message.sendSms(from, to, text, (err, responseData) => {
-    if (err) {
-        console.log(err);
-    } else {
-        if(responseData.messages[0]['status'] === "0") {
-            console.log("Message sent successfully.");
-        } else {
-            console.log(`Message failed with error: ${responseData.messages[0]['error-text']}`);
-        }
-    }
-});
+sendSmsNotif(from, to, text);
 
 
 	 res.status(200).send('Visit registered!');
@@ -647,15 +598,11 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params.id;
 	const checkout= DateTime.now().setZone('CAT');
-	console.log(checkout);
-	const checkout_time= checkout.toLocaleString(DateTime.TIME_24_SIMPLE);
-	// const checkout_time= checkout.toFormat(DateTime.TIME_24_SIMPLE);
-	console.log(checkout_time);
-
+	const checkout_time= checkout.toLocaleString(DateTime.TIME_24_WITH_SECONDS);
 	const visit = {
 		checked_out: checkout_time,
 	}
-	console.log(visit);
+
 	try{
 		if( pk !="undefined"){
 	await process.postgresql.query('UPDATE "register" SET "checked_out"=$1  WHERE id=$2', [visit.checked_out,pk]);
@@ -681,7 +628,7 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 		res.json(rows);
 			}
 			else{
-				res.status(404).json("data undefined")
+				res.status(404).json("Data undefined")
 			}
 		}
 		catch(error){
@@ -748,7 +695,6 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 
   //___________________________________ register user ________________________________________________
 app.post('/api/registeruser', async(req,res)=>{
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 const user={
 	email: req.body.email,
 	pass: req.body.password
@@ -782,7 +728,6 @@ try {
 						  session=req.session;
 						  session.userid=user.email;
 						  session.isAdmin= true;
-						  console.log(req.session)
 						  res.json(session);
 					  }
 					  else{
@@ -810,7 +755,6 @@ app.get('/api/admin/logout',(req,res) => {
 
 //___________________________________ Booking ________________________________________________
 
-
 //___________________________________ generating qrcode ________________________________________________
   app.post('/qrgenerate', async(req,res) => {
 	if( req.body.visitor_no !="undefined"){
@@ -821,11 +765,11 @@ app.get('/api/admin/logout',(req,res) => {
 		checked_in: req.body.checked_in,
 		visitor_no: req.body.visitor_no,
 		host_name: req.body.host_name,
-		role: req.body.role
+		role: req.body.role,
+		token:''
 	};
 
 	const host = await process.postgresql.query('SELECT * FROM hosts WHERE name=$1', [visitor.host_name]);
-	console.log(host[0].email_id);
 	try {
 		await process.postgresql.query(`INSERT INTO booking (visitor_name, visitor_email, visitor_no,host_name,date,checked_in, role) VALUES ('${visitor.visitor_name}','${visitor.visitor_email}','${visitor.visitor_no}','${visitor.host_name}','${visitor.date}','${visitor.checked_in}', '${visitor.role}') ON CONFLICT DO NOTHING;`);
      console.log('Booking registered')
@@ -856,13 +800,7 @@ QRCode.toDataURL(stringdata, function (err, code) {
 		]
         };
 
-		transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
-			if (error) {
-			  console.log(error);
-			} else {
-			  console.log('Email sent: ' + info.response);
-			}
-		  });
+		sendEMail(mailOptions);
 		  const dateAndTime= visitor.date +' '+ visitor.checked_in; 
 		  const scheduledTime=DateTime.fromSQL(dateAndTime,{zone: 'CAT'}).minus({minutes: 30});
 		  const dateAndTime1= visitor.date +' '+ visitor.checked_in; 
@@ -885,9 +823,6 @@ QRCode.toDataURL(stringdata, function (err, code) {
 		  const hour1= scheduledTime1.hour;
 		  const minute1= scheduledTime1.minute;
 		  const second1= scheduledTime1.second;
-//    console.log(`${second} ${minute} ${hour} ${day} ${month} ${dayOfTheweek}`);
-//    console.log(`${second1} ${minute1} ${hour1} ${day1} ${month1} ${dayOfTheweek1}`);
-
 		 
 		let mailOptions30=  {
 			from: process.env.EMAIL,
@@ -909,43 +844,26 @@ QRCode.toDataURL(stringdata, function (err, code) {
 	
 try {
 	cron.schedule(`${second} ${minute} ${hour} ${day} ${month} ${dayOfTheweek}`,()=>{
-		transporter.sendMail(mailOptions30, function(error, info){             // SEnding Mail
-			if (error) {
-			  console.log(error);
-			} else {
-			  console.log('Email sent: ' + info.response);
-			}
-		  });
+		sendEMail(mailOptions30);
 	  }, {
 		scheduled: true,
 		timezone: "CAT"
 	  } );
 } catch (error) {
 	console.error(error);
-}
+};
 		 
 try {
 	cron.schedule(`${second1} ${minute1} ${hour1} ${day1} ${month1} ${dayOfTheweek1}`,()=>{
-		transporter.sendMail(mailOptions10, function(error, info){             // SEnding Mail
-			if (error) {
-			  console.log(error);
-			} else {
-			  console.log('Email sent: ' + info.response);
-			}
-		  });
+		sendEMail(mailOptions10);
 	  } , {
 		scheduled: true,
 		timezone: "CAT"
-	  })
+	  });
 } catch (error) {
 	console.error(error);
 }
-		  
-
-
-	res.status(200).json('Qr code sent')
-
-	
+	res.status(200).json('Qr code sent');
 })
 }
 else{
@@ -960,7 +878,6 @@ app.get('/api/bookings', async (req, res) => {
   });
 
 app.get('/api/bookings/today', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const today=DateTime.now().toFormat("yyyy-MM-dd");
 	const time= DateTime.now().toLocaleString(DateTime.TIME_24_SIMPLE);
 	let data=[];
@@ -999,7 +916,6 @@ app.get('/api/bookings/:id', async (req, res) => {
 	
   });
 
-    
 	   //___________________________________ Deleting a single booking ________________________________________________
 	   app.delete('/api/bookings/delete/:id', async (req, res) => {
 		const pk=req.params['id'];
@@ -1140,12 +1056,9 @@ app.get('/api/pdf/visits', async(req,res)=>{
 			  { label: "Role", property: 'role', width: 80, renderer: null },
 			 
 			],
-			// complex data
 			datas:rows,
-			// simeple data
 	
 		  };
-		  // the magic
 		  doc.table(table, {
 			prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
 			prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
@@ -1153,8 +1066,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 			  indexColumn === 0 && doc.addBackground(rectRow, 'blue', 0.15);
 			},
 		  });
-		  // done!
-		//   doc.pipe(res);
+
 		doc.pipe(fs.createWriteStream(__dirname+'/public/visits.pdf'));
 		const src = fs.createReadStream(__dirname+'/public/visits.pdf');
 		
@@ -1194,12 +1106,10 @@ app.get('/api/pdf/visits', async(req,res)=>{
 				  { label: "Role", property: 'role', width: 80, renderer: null },
 				 
 				],
-				// complex data
+
 				datas:rows,
-				// simeple data
 		
 			  };
-			  // the magic
 			  doc.table(table, {
 				prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
 				prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
@@ -1207,8 +1117,6 @@ app.get('/api/pdf/visits', async(req,res)=>{
 				  indexColumn === 0 && doc.addBackground(rectRow, 'blue', 0.15);
 				},
 			  });
-			  // done!
-			//   doc.pipe(res);
 			doc.pipe(fs.createWriteStream(__dirname+'/public/visits.pdf'));
 			const src = fs.createReadStream(__dirname+'/public/visits.pdf');
 			
@@ -1228,8 +1136,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 			});
 	
 
-
-	app.get('/api/pdf/visitors', async(req,res)=>{
+app.get('/api/pdf/visitors', async(req,res)=>{
 		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const rows = await process.postgresql.query('SELECT * FROM visitors');
 		const name= new Date().toLocaleDateString();
@@ -1243,12 +1150,11 @@ app.get('/api/pdf/visits', async(req,res)=>{
 			  { label: "Email", property: 'email_id', width: 150, renderer: null }, 
 			  { label: "Phone nnumber", property: 'mobile_no', width: 150, renderer: null }, 
 			],
-			// complex data
+
 			datas:rows,
-			// simeple data
+
 	
 		  };
-		  // the magic
 		  doc.table(table, {
 			prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
 			prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
@@ -1256,8 +1162,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 			  indexColumn === 0 && doc.addBackground(rectRow, 'blue', 0.15);
 			},
 		  });
-		  // done!
-		//   doc.pipe(res);
+
 		doc.pipe(fs.createWriteStream(__dirname+'/public/visitors.pdf'));
 		const src = fs.createReadStream(__dirname+'/public/visitors.pdf');
 		
@@ -1273,7 +1178,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 		});
 	
 
-		app.get('/api/pdf/hosts', async(req,res)=>{
+app.get('/api/pdf/hosts', async(req,res)=>{
 			res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 			const rows = await process.postgresql.query('SELECT * FROM hosts');
 			const name= new Date().toLocaleDateString();
@@ -1287,12 +1192,10 @@ app.get('/api/pdf/visits', async(req,res)=>{
 				  { label: "Email", property: 'email_id', width: 150, renderer: null }, 
 				  { label: "Phone nnumber", property: 'mobile_no', width: 150, renderer: null }, 
 				],
-				// complex data
+
 				datas:rows,
-				// simeple data
 		
 			  };
-			  // the magic
 			  doc.table(table, {
 				prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
 				prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
@@ -1300,8 +1203,6 @@ app.get('/api/pdf/visits', async(req,res)=>{
 				  indexColumn === 0 && doc.addBackground(rectRow, 'blue', 0.15);
 				},
 			  });
-			  // done!
-			//   doc.pipe(res);
 			doc.pipe(fs.createWriteStream(__dirname+'/public/hosts.pdf'));
 			const src = fs.createReadStream(__dirname+'/public/hosts.pdf');
 			
@@ -1319,7 +1220,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 // _____________________________________________csv______________________________________________________________________
 app.get('/api/csv/hosts', async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	// const rows = await process.postgresql.query('SELECT * FROM hosts');
+
 	const csvWriter = createCsvWriter({
 		path:__dirname+'/public/hosts.csv',
 		header: [
@@ -1351,8 +1252,6 @@ app.get('/api/csv/hosts', async (req, res) => {
 //   +++++++++++++++++++++++++++++++++++++++++++++===csv visitors++++++++++++++++++++++++++++++++++++++
   
 app.get('/api/csv/visitors', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	// const rows = await process.postgresql.query('SELECT * FROM visitors');
 	const name= new Date().toLocaleDateString();
 	const csvWriter = createCsvWriter({
 		path:__dirname+'/public/visitors.csv',
@@ -1385,8 +1284,6 @@ app.get('/api/csv/visitors', async (req, res) => {
 // ++++++++++++++++++++++++++++++++++++++++++++++csv visits++++++++++++++++++++++++++++++++++++++++
 
   app.get('/api/csv/visits', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
-	// const rows = await process.postgresql.query('SELECT * FROM register');
 	const name= new Date().toLocaleDateString();
 	const csvWriter = createCsvWriter({
 		path:__dirname+`/public/visits.csv`,
@@ -1419,15 +1316,12 @@ app.get('/api/csv/visitors', async (req, res) => {
 	  });
 	
 	  src.pipe(res); 
-	//   res.send(Buffer.from(records));
   });
 
 //   ++++++++++++++++++++++++++++++++++++++++++++++++++csv visits for current day++++++++++++++++++++++++++++++++++++++++++++++
 
   app.get('/api/csv/visits/today', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const date= req.params.date;
-	// const rows = await process.postgresql.query('SELECT * FROM register');
 	try {
 		const name= new Date().toLocaleDateString();
 	const csvWriter = createCsvWriter({
@@ -1471,10 +1365,7 @@ app.get('/api/csv/visitors', async (req, res) => {
 //   +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++csv visits by date++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   app.get('/api/csv/visits/date', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const date= req.query.date;
-	// const tdate= date.toLocaleDateString();
-	// const rows = await process.postgresql.query('SELECT * FROM register');
 	// https://vmsapi1.herokuapp.com/api/csv/visits/date?date=6%2F27%2F2022
 	try {
 		const name= new Date().toLocaleDateString();
@@ -1512,17 +1403,14 @@ app.get('/api/csv/visitors', async (req, res) => {
 	} catch (error) {
 		console.error(error);
 	}
-	
-	//   res.send(Buffer.from(records));
   });
 	
 
 //   +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++csv visits by host+++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   app.get('/api/csv/visits/host/:host', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+
 	const host= req.params.host;
-	// const rows = await process.postgresql.query('SELECT * FROM register');
 	try {
 		const name= new Date().toLocaleDateString();
 	const csvWriter = createCsvWriter({
@@ -1559,24 +1447,11 @@ app.get('/api/csv/visitors', async (req, res) => {
 	} catch (error) {
 		console.error(error);
 	}
-	
-	//   res.send(Buffer.from(records));
+
   });
 
 //   ______________________________________________upload csv______________________________________________
 
-var storage = multer.diskStorage({
-    destination: (req, file, callBack) => {
-        callBack(null, '/uploads/')    
-    },
-    filename: (req, file, callBack) => {
-		callBack(null, "file" );
-		// console.log("test1")
-		// callBack(null, file.fieldname )
-        // callBack(null, file.fieldname + '-' + new Date().toISOString().replace(/:/g, '-')+ path.extname(file.originalname))
-    }
-})
- 
 var upload = multer({
 
     // storage: storage
@@ -1586,8 +1461,7 @@ var upload = multer({
             return filename;
 	}
 });
-// console.log(upload.storage.getFilename());
-// { dest: 'public/images/servers' }
+
 app.post('/uploadfiles', upload.single("file"), async (req, res) =>{
 	console.log(req);
 	try {
@@ -1646,14 +1520,7 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
 		  subject: "Login information.",
 		  html: htmlBody,
 		};
-	
-		transporter.sendMail(mailOptions, function(error, info){             // SEnding Mail
-			if (error) {
-			  console.log(error);
-			} else {
-			  console.log('Email sent: ' + info.response);
-			}
-		  });
+	sendEMail(mailOptions)
 		}
 				}	});
 			  }
@@ -1669,8 +1536,6 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
     stream.pipe(csvStream);
 	
 };
-
-
 
 app.use('*', (req, res) => {
 	res.status(503).json({
