@@ -1614,7 +1614,7 @@ let UploadCsvDataToMyDatabase= async (filePath)=>{
 			console.log(csvData);
 			
   
-            let rows= await process.postgresql.query(`SELECT * FROM hosts;`); 
+            let rows= process.postgresql.query(`SELECT * FROM hosts;`); 
 			console.log(rows);
 			for(item in rows){
 				emails.push(item.email_id);
