@@ -1,6 +1,5 @@
 const express = require("express");
 const bodyParser= require('body-parser');
-const nodemailer= require('nodemailer');
 const QRCode= require('qrcode');
 const postgresql=require('./postgresql.js');
 const config=require('./config.json');
@@ -9,7 +8,6 @@ const fs = require('fs');
 const {stringify} = require('csv-stringify');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const fastcsv= require('fast-csv');
-const Vonage = require('@vonage/server-sdk')
 const PDFDocument = require("pdfkit-table");
 const cors = require('cors')
 const cookieParser = require("cookie-parser");
@@ -17,39 +15,13 @@ const sessions = require('express-session');
 const { DateTime } = require("luxon");    
 const cron = require('node-cron');
 const multer = require('multer');
-const vonage = new Vonage({
-  apiKey: process.env.API_KEY,
-  apiSecret:process.env.API_SECRET
-})
 const sendEMail= require('./send_email');
 const sendSmsNotif= require('./send-sms');
+
 const PORT = process.env.PORT || 3001;
-const accountSid = config.twilio.accountSid;
-const authToken = config.twilio.authToken;
-// const client = require('twilio')(accountSid, authToken);
 
-
-// const { Client } = require('pg');
-
-// const QRCode=qrcode;
 
 const oneDay = 1000 * 60 * 60 * 24;
-
-
-
-
-//___________________________________ Nodemailer ________________________________________________
-
-let transporter = nodemailer.createTransport({
-	host: config.email_setting.host,
-	port: 587,
-	secure: false,
-	requireTLS: true,
-	auth: {
-	  user: process.env.EMAIL,
-	  pass: process.env.EMAIL_PASSWORD,
-	},
-  });
   
 
 
@@ -63,7 +35,6 @@ const corsOptions ={
 // const router = express.Router();
 ;
 app.use(bodyParser.json());
-// app.use(require('connect').bodyParser.json({type: '*/*'}));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/public",express.static(__dirname+'/public'));
 app.use(cors())
@@ -88,9 +59,6 @@ postgresql(async (connection) => {
 
 
 app.get("/", (req, res) => {
-	session=req.session;
-		session.userid="user.email";
-		console.log(req.session)
 	res.sendFile(__dirname+'/index.html');
   });
 
