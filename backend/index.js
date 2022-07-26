@@ -105,15 +105,16 @@ app.get("/", (req, res) => {
 	const user={
 		email: req.body.email,
 		pass: req.body.password
-	}
+	};
+	const host=await process.postgresql.query(`SELECT * 
+	FROM hosts
+   WHERE email_id = '${user.email}' 
+	 AND password = '${user.pass}';`);
 	try{
-	  const host=await process.postgresql.query(`SELECT * 
-	  FROM hosts
-	 WHERE email_id = '${user.email}' 
-	   AND password = '${user.pass}';`);
+	
 	   if (host.length != 0){
 		session=req.session;
-		session.userid=host.id;
+		session.userid=user.email;
 		session.isAdmin=false;
 		// session.hostId= host.id;
 		console.log(session)
