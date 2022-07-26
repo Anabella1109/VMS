@@ -109,7 +109,7 @@ app.get("/", (req, res) => {
 	try{
 	  const host=await process.postgresql.query(`SELECT * 
 	  FROM hosts
-	 WHERE email = '${user.email}' 
+	 WHERE email_id = '${user.email}' 
 	   AND password = '${user.pass}';`);
 	   if (host.length != 0){
 		session=req.session;
