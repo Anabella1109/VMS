@@ -115,7 +115,7 @@ app.get("/", (req, res) => {
 		session=req.session;
 		session.userid=user.email;
 		session.isAdmin=false;
-		session.hostId= host.email_id;
+		// session.hostId= host.id;
 		console.log(session)
 		console.log(host);
 		res.json(session);
@@ -1506,16 +1506,16 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
 	
 };
 
-app.use('*', (req, res) => {
-	res.status(503).json({
-	  success: 'false',
-	  message: 'Request Timeout',
-	  error: {
-		statusCode: 503,
-		message: 'Request timeout, check sent data',
-	  },
-	});
-  });
+// app.use('*', (req, res) => {
+// 	res.status(503).json({
+// 	  success: 'false',
+// 	  message: 'Request Timeout',
+// 	  error: {
+// 		statusCode: 503,
+// 		message: 'Request timeout, check sent data',
+// 	  },
+// 	});
+//   });
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
