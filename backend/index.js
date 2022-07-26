@@ -117,6 +117,7 @@ app.get("/", (req, res) => {
 		session.isAdmin=false;
 		session.hostId= host.email_id;
 		console.log(session)
+		console.log(host);
 		res.json(session);
 	}
 	else{
