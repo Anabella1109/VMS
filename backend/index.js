@@ -161,7 +161,7 @@ app.post('/api/hosts', async (req, res) => {
 		  html: htmlBody,
 		};
 
-		// sendEMail(mailOptions);
+		sendEMail(mailOptions);
 	
 	
 	const from = "250787380054";
@@ -171,7 +171,7 @@ app.post('/api/hosts', async (req, res) => {
 	   Password: ${host.password}
 	  `;
 	
-	// sendSmsNotif(from, to,text);
+	sendSmsNotif(from, to,text);
 	 res.status(201).json('Host registered!');
 
 }
@@ -435,7 +435,7 @@ app.post('/api/visits', async (req, res) => {
           subject: "New guest for you has arrived.",
           html: htmlBody,
         };
-        // sendEMail(mailOptions);
+        sendEMail(mailOptions);
 
 
 
@@ -447,7 +447,7 @@ Name: ${visit.visitor_name}
    email: ${visit.visitor_email}
    Checkin Time:${visit.checked_in}`;
 
-//   sendSmsNotif(from, to, text);
+  sendSmsNotif(from, to, text);
 
 	 res.status(200).send('Visit registered!');
 
@@ -508,7 +508,7 @@ app.post('/api/checkin', async (req, res) => {
           html: htmlBody,
         };
 
-    //  sendEMail(mailOptions);
+     sendEMail(mailOptions);
 
 const from = "250787380054";
 const to =`250${host[0].mobile_no}`;
@@ -518,7 +518,7 @@ Name: ${visit.visitor_name}
    email: ${visit.visitor_email}
    Checkin Time:${visit.checked_in}`;
 
-// sendSmsNotif(from, to, text);
+sendSmsNotif(from, to, text);
 
 
 	 res.status(200).send('Visit registered!');
@@ -607,7 +607,7 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 		}
 	  });
 
-	     //___________________________________ Sending a single visit ________________________________________________
+	     //___________________________________ Sending a svisits by hosts ________________________________________________
 		 app.get('/api/visits/host/:host_id', async (req, res) => {
 			const pk=req.params['host_id'];
 			try{
@@ -1055,7 +1055,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 		 
 		});
 
-		app.get('/api/pdf/visits/date', async(req,res)=>{
+app.get('/api/pdf/visits/date', async(req,res)=>{
 			res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 			const name= new Date().toLocaleDateString();
 			const date= req.query.date;
