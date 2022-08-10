@@ -374,5 +374,11 @@ execute(createregister).then(result => {
 //         // callBack(null, file.fieldname + '-' + new Date().toISOString().replace(/:/g, '-')+ path.extname(file.originalname))
 //     }
 // })
+
+// const corsOptions ={
+//     origin:'https://amalitech-visitors-system.netlify.app', 
+//     credentials:true,            //access-control-allow-credentials:true
+//     optionSuccessStatus:200
+// }
  
 

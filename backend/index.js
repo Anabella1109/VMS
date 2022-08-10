@@ -22,18 +22,11 @@ const { validationResult } = require('express-validator');
 
 const PORT = process.env.PORT || 3001;
 
-
 const oneDay = 1000 * 60 * 60 * 24;
-  
-
 
 const app = express();
 const path = require('path');
-const corsOptions ={
-    origin:'https://amalitech-visitors-system.netlify.app', 
-    credentials:true,            //access-control-allow-credentials:true
-    optionSuccessStatus:200
-}
+
 // const router = express.Router();
 ;
 app.use(bodyParser.json());
@@ -97,19 +90,15 @@ app.get("/", (req, res) => {
 
 	const pk=req.params['id'];
 	
-	try {
-		if(pk !="undefined"){
+		try {
+
 		const rows = await process.postgresql.query('SELECT * FROM hosts WHERE id=$1', [pk]);
-	res.json(rows);
-		}
-		else{
-			console.log('Data undefined');
-			res.status(404).json("Data undefined");
-		}
+		res.json(rows);
+			
 	} catch (error) {
-		console.error(error);
-	}
-	
+			console.error(error);
+		}
+		
   });
 
    //___________________________________ login host ________________________________________________
@@ -119,16 +108,13 @@ app.get("/", (req, res) => {
 		pass: req.body.password
 	}
 	try{
-	  const host=await process.postgresql.query(`SELECT * 
-	  FROM hosts
-	 WHERE email_id = '${user.email}' 
-	   AND password = '${user.pass}';`);
-	   if (host.length != 0){
-		session=req.session;
-		session.userid=user.email;
-		session.isAdmin=false;
-		session.hostId= host[0].id;
-		res.json(session);
+		const host=await process.postgresql.query(`SELECT * FROM hosts WHERE email_id = '${user.email}' AND password = '${user.pass}';`);
+		if (host.length != 0){
+			session=req.session;
+			session.userid=user.email;
+			session.isAdmin=false;
+			session.hostId= host[0].id;
+			res.json(session);
 	}
 	else{
 		
@@ -172,21 +158,21 @@ app.post('/api/hosts', async (req, res) => {
 		sendEMail(mailOptions);
 	
 	
-	const from = "250787380054";
-	const to =`25${host.mobile_no}`;
-	const text =` Your new login information
-	   Email: ${host.email_id} 
-	   Password: ${host.password}
-	  `;
-	
-	sendSmsNotif(from, to,text);
-	 res.status(201).json('Host registered!');
+		const from = "250787380054";
+		const to =`25${host.mobile_no}`;
+		const text =` Your new login information
+		Email: ${host.email_id} 
+		Password: ${host.password}
+		`;
+		
+		sendSmsNotif(from, to,text);
+		res.status(201).json('Host registered!');
 
 }
-catch(error){
-	console.error(error);
-	res.send(error);
-}
+	catch(error){
+		console.error(error);
+		res.send(error);
+	}
 	};
   });
 
