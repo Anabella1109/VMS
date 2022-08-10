@@ -44,11 +44,20 @@ app.use(cookieParser());
 app.use((req,res,next)=>{
 	if(req.method=== 'PUT' || req.method === 'DELETE' || req.method ==='PATCH'){
 		validators.checkIfIdIsInt();
+		next();
+		
+	}
+	else{
+		next();
 	}
 });
 app.use((req,res,next)=>{
 	if(req.method === 'PUT' || req.method === 'DELETE' || req.method ==='PATCH' || req.method ==='POST'){
 		validators.checkValidationResult();
+		next();
+	}
+	else{
+		next();
 	}
 })
 
