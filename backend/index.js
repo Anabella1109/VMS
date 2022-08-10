@@ -95,7 +95,7 @@ app.get("/", (req, res) => {
 
 
   //___________________________________ Sending single host ________________________________________________
-  app.get('/api/hosts/:id', validators.checkIfIdIsInt,validators.checkValidationResult, async (req, res) => {
+  app.get('/api/hosts/:id', validators.checkIfIdIsInt, async (req, res) => {
 
 	const pk=req.params['id'];
 	
