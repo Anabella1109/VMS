@@ -6,15 +6,6 @@
 		  "password":"xxxxxxxx",
 		  "host":"smtp.outlook.com"
     },
-	"twilio":{
-    	"accountSid":"AC00484d8fc366187b0ce200813b2e6a10",
-    	"authToken":"adc557f09b65b02c4e87f5bce8c71e7d",
-    	"from_number":"+19107883930"
-    },
-	"vonage":{
-		"apiKey":"c264a",
-		"apiSecret": "O8JEN8Rm6CQO"
-	},
 	"session":{
 		"secret":"1234567890abcdefghi"
 	}

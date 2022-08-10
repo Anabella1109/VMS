@@ -57,7 +57,6 @@ postgresql(async (connection) => {
  });
 
 
-
 app.get("/", (req, res) => {
 	res.sendFile(__dirname+'/index.html');
   });
@@ -71,7 +70,8 @@ app.get("/", (req, res) => {
 
   app.get('/api/hosts', async (req, res) => {
 	try {
-		const rows= await process.postgresql.query('SELECT * FROM hosts;');
+		const query=`SELECT * FROM hosts;`;
+		const rows= await process.postgresql.query(query);
 	res.json(rows);
 	} catch (error) {
 		console.error(error);
@@ -135,7 +135,6 @@ app.get("/", (req, res) => {
 
 //___________________________________ registering a host ________________________________________________
 app.post('/api/hosts', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
     const pass=crypto.randomBytes(8).toString('hex');
 	if(req.body != "undefined"){
 	const host = {
@@ -184,7 +183,6 @@ catch(error){
 
   //___________________________________ editing a host ________________________________________________
 app.put('/api/hosts/:id', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params['id'];
 	const host = {
 		name: req.body.name,
@@ -377,8 +375,7 @@ app.put('/api/visitors/:id', async (req, res) => {
 	  });
 
     //___________________________________ sending checkedout visitors ________________________________________________
-	app.get('/api/checkedout/visits', async (req, res) => {
-		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+app.get('/api/checkedout/visits', async (req, res) => {
 		const checked_out="null";
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE checked_out!=$1', [checked_out]);
 		res.status(200).json(rows);
@@ -386,11 +383,9 @@ app.put('/api/visitors/:id', async (req, res) => {
 
 //___________________________________ registering a visit ________________________________________________
 app.post('/api/visits', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const checked_in= DateTime.now().setZone('CAT');
 	const checkin_date= checked_in.toFormat("yyyy-MM-dd");
 	const checkin_time= checked_in.toLocaleString(DateTime.TIME_24_WITH_SECONDS);
-	console.log(req.body);
 	const visit = {
 		
 		host_name: req.body.host_name,
@@ -403,7 +398,6 @@ app.post('/api/visits', async (req, res) => {
 		role: req.body.role
 		
 	};
-	console.log(visit);
 	try{
 		if( visit.visitor_no != "undefined"){
 	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE name=$1' , [visit.host_name]);
