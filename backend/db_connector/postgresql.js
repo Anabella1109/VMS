@@ -2,7 +2,7 @@
 // import os from 'os';
 const postgresql= require('pg');
 const os= require('os');
-const config=require('./config.json');
+const config=require('../config.json');
 
 const { Pool } = postgresql;
 

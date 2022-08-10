@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser= require('body-parser');
 const QRCode= require('qrcode');
-const postgresql=require('./postgresql.js');
+const postgresql=require('./db_connector/postgresql.js');
 const config=require('./config.json');
 const crypto = require('crypto');
 const fs = require('fs');
@@ -15,9 +15,10 @@ const sessions = require('express-session');
 const { DateTime } = require("luxon");    
 const cron = require('node-cron');
 const multer = require('multer');
-const sendEMail= require('./send_email');
-const sendSmsNotif= require('./send-sms');
+const sendEMail= require('./sendNotifications/send_email');
+const sendSmsNotif= require('./sendNotifications/send-sms');
 const validators=require('./validators.js');
+const { validationResult } = require('express-validator');
 
 const PORT = process.env.PORT || 3001;
 
@@ -50,6 +51,11 @@ app.use(cookieParser());
 app.use((req,res,next)=>{
 	if(req.method=== 'PUT' || req.method === 'DELETE' || req.method ==='PATCH'){
 		validators.checkIfIdIsInt();
+	}
+});
+app.use((req,res,next)=>{
+	if(req.method === 'PUT' || req.method === 'DELETE' || req.method ==='PATCH' || req.method ==='POST'){
+		validators.checkValidationResult();
 	}
 })
 
@@ -122,9 +128,6 @@ app.get("/", (req, res) => {
 		session.userid=user.email;
 		session.isAdmin=false;
 		session.hostId= host[0].id;
-		// session.host=host[0].id;
-		console.log(session)
-		console.log(host);
 		res.json(session);
 	}
 	else{
