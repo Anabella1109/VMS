@@ -1,4 +1,4 @@
-const { body, validationResult } = require('express-validator');
+const { body,param, validationResult } = require('express-validator');
 
 var resultsNotFound = {
     "errorCode": 0,
@@ -42,5 +42,13 @@ module.exports = {
 		body('password').isLength({
 			min: 6
 		})
-      }
+      },
+	  checkVisitortDataQuality: function(req,res){
+        body('name').isString(),
+		body('email_id').isEmail().normalizeEmail(),
+		body('mobile_no').isInt()
+	  },
+	  checkIfIdIsInt: function(){
+		param('id').isInt();
+	  }
   };

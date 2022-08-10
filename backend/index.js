@@ -262,7 +262,6 @@ try {
   
 //___________________________________ regitering a visitor ________________________________________________
 app.post('/api/visitors', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const visitor = {
 		name: req.body.name,
 		email_id: req.body.email_id,
@@ -279,7 +278,6 @@ app.post('/api/visitors', async (req, res) => {
 
     //___________________________________ editing a visitor ________________________________________________
 app.put('/api/visitors/:id', async (req, res) => {
-		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const pk=req.params['id'];
 		const visitor = {
 			name: req.body.name,
@@ -344,7 +342,7 @@ app.put('/api/visitors/:id', async (req, res) => {
   });
 
     //___________________________________ sending visits by date ________________________________________________
-	app.get('/api/date/visits', async (req, res) => {
+app.get('/api/date/visits', async (req, res) => {
 		const date=req.query.date;
 		try{
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1', [date]);
@@ -433,17 +431,17 @@ app.post('/api/visits', async (req, res) => {
 
 
 
-const from = "250787380054";
-const to =`250${host[0].mobile_no}`;
-const text =` A new  guest for you has arrived
-Name: ${visit.visitor_name} 
-   Number: ${visit.visitor_no}
-   email: ${visit.visitor_email}
-   Checkin Time:${visit.checked_in}`;
+		const from = "250787380054";
+		const to =`250${host[0].mobile_no}`;
+		const text =` A new  guest for you has arrived
+		Name: ${visit.visitor_name} 
+		Number: ${visit.visitor_no}
+		email: ${visit.visitor_email}
+		Checkin Time:${visit.checked_in}`;
 
-  sendSmsNotif(from, to, text);
+  		sendSmsNotif(from, to, text);
 
-	 res.status(200).send('Visit registered!');
+		res.status(200).send('Visit registered!');
 
 }
 else{
@@ -467,7 +465,7 @@ app.post('/api/checkin', async (req, res) => {
 	
 	try{
 
-		const obj = JSON.parse(JSON.stringify(req.body)); // req.body = [Object: null prototype] { title: 'product' }
+		const obj = JSON.parse(JSON.stringify(req.body));
 		const getvisit= ()=>{for(entry in obj){
 			return JSON.parse(entry);;
 		}
@@ -504,15 +502,15 @@ app.post('/api/checkin', async (req, res) => {
 
      sendEMail(mailOptions);
 
-const from = "250787380054";
-const to =`250${host[0].mobile_no}`;
-const text =` A new  guest for you has arrived
-Name: ${visit.visitor_name} 
-   Number: ${visit.visitor_no}
-   email: ${visit.visitor_email}
-   Checkin Time:${visit.checked_in}`;
+		const from = "250787380054";
+		const to =`250${host[0].mobile_no}`;
+		const text =` A new  guest for you has arrived
+		Name: ${visit.visitor_name} 
+		Number: ${visit.visitor_no}
+		email: ${visit.visitor_email}
+		Checkin Time:${visit.checked_in}`;
 
-sendSmsNotif(from, to, text);
+		sendSmsNotif(from, to, text);
 
 
 	 res.status(200).send('Visit registered!');
@@ -529,9 +527,7 @@ catch(error){
 //___________________________________ Editing a visit ________________________________________________
 app.put('/api/visits/:id', async (req, res) => {
 	const pk=req.params['id'];
-	console.log(req.body);
 	const visit = {
-		host_id: req.body.host_id,
 		host_name: req.body.host_name,
 		visitor_name: req.body.visitor_name,
 		visitor_email: req.body.visitor_email,
@@ -542,7 +538,6 @@ app.put('/api/visits/:id', async (req, res) => {
 		role: req.body.role
 		
 	}
-	console.log(visit);
 	try{
 		if(pk!= "undefined" && visit.visitor_no != "undefined"){
 	await process.postgresql.query('UPDATE "register" SET "host_name" = $1, "visitor_name" = $2, "visitor_email" = $3, "visitor_no" = $4, "role"=$5  WHERE id=$6', [visit.host_name,visit.visitor_name, visit.visitor_email,visit.visitor_no, visit.role,pk]);
