@@ -50,6 +50,8 @@ module.exports = {
 	  },
 	  checkIfIdIsInt: function(){
 		param('id').isInt();
+		console.log('good');
+
 	  },
 	  checkBookingDataQuality: function(){
         body('host_name').isString(),
