@@ -50,5 +50,14 @@ module.exports = {
 	  },
 	  checkIfIdIsInt: function(){
 		param('id').isInt();
+	  },
+	  checkBookingDataQuality: function(){
+        body('host_name').isString(),
+		body('visitor_name').isString(),
+		body('visitor_email').isEmail().normalizeEmail(),
+		body('visitor_no').isInt(),
+		body('role').isString(),
+		body('date').isString(),
+		body('checked_in').isString()
 	  }
   };

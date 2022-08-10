@@ -17,6 +17,7 @@ const cron = require('node-cron');
 const multer = require('multer');
 const sendEMail= require('./send_email');
 const sendSmsNotif= require('./send-sms');
+const validators=require('./validators.js');
 
 const PORT = process.env.PORT || 3001;
 
@@ -46,6 +47,11 @@ app.use(sessions({
     resave: false
 }));
 app.use(cookieParser());
+app.use((req,res,next)=>{
+	if(req.method=== 'PUT' || req.method === 'DELETE' || req.method ==='PATCH'){
+		validators.checkIfIdIsInt();
+	}
+})
 
 
 
@@ -721,7 +727,7 @@ app.get('/api/admin/logout',(req,res) => {
 		visitor_name: req.body.visitor_name,
 		visitor_email: req.body.visitor_email,
 		date:req.body.date,
-		checked_in: req.body.checked_in,
+		arrival_time: req.body.checked_in,
 		visitor_no: req.body.visitor_no,
 		host_name: req.body.host_name,
 		role: req.body.role,
@@ -730,7 +736,7 @@ app.get('/api/admin/logout',(req,res) => {
 
 	const host = await process.postgresql.query('SELECT * FROM hosts WHERE name=$1', [visitor.host_name]);
 	try {
-		await process.postgresql.query(`INSERT INTO booking (visitor_name, visitor_email, visitor_no,host_name,date,checked_in, role) VALUES ('${visitor.visitor_name}','${visitor.visitor_email}','${visitor.visitor_no}','${visitor.host_name}','${visitor.date}','${visitor.checked_in}', '${visitor.role}') ON CONFLICT DO NOTHING;`);
+		await process.postgresql.query(`INSERT INTO booking (visitor_name, visitor_email, visitor_no,host_name,date,checked_in, role) VALUES ('${visitor.visitor_name}','${visitor.visitor_email}','${visitor.visitor_no}','${visitor.host_name}','${visitor.date}','${visitor.arrival_time}', '${visitor.role}') ON CONFLICT DO NOTHING;`);
      console.log('Booking registered')
 	} catch (error) {
 		console.error(error);
@@ -762,12 +768,10 @@ QRCode.toDataURL(stringdata, function (err, code) {
 		sendEMail(mailOptions);
 		  const dateAndTime= visitor.date +' '+ visitor.checked_in; 
 		  const scheduledTime=DateTime.fromSQL(dateAndTime,{zone: 'CAT'}).minus({minutes: 30});
-		  const dateAndTime1= visitor.date +' '+ visitor.checked_in; 
-		  const scheduledTime1=DateTime.fromSQL(dateAndTime1,{zone: 'CAT'}).minus({minutes: 10});
+		  const scheduledTime1=DateTime.fromSQL(scheduledTime,{zone: 'CAT'}).plus({minutes: 20});
 
 
 		  const dayOfTheweek= scheduledTime.weekday;
-		  const year= scheduledTime.year;
 		  const month= scheduledTime.month;
 		  const day= scheduledTime.day;
 		  const hour= scheduledTime.hour;
@@ -776,7 +780,6 @@ QRCode.toDataURL(stringdata, function (err, code) {
 	
 
 		  const dayOfTheweek1= scheduledTime1.weekday;
-		  const year1= scheduledTime1.year;
 		  const month1= scheduledTime1.month;
 		  const day1= scheduledTime1.day;
 		  const hour1= scheduledTime1.hour;
@@ -845,7 +848,6 @@ app.get('/api/bookings/today', async (req, res) => {
 
 	for (let index = 0; index < rows.length; index++) {
 		const element = rows[index];
-		// console.log(element);
 		if( today < element.date && time < element.checked_in){
 			data.push(element);
 
@@ -945,7 +947,6 @@ app.get('/api/pdf/visits', async(req,res)=>{
 	});
 
 	app.get('/api/pdf/visits/host/:host', async(req,res)=>{
-		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const host= req.params.host;
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE host_id=$1',[host]);
 		const name= new Date().toLocaleDateString();
@@ -994,6 +995,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 		});
 	
 
+// ____________________________________________pdf for current day's visits_____________________________
 
 	app.get('/api/pdf/visits/today', async(req,res)=>{
 		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
@@ -1044,8 +1046,8 @@ app.get('/api/pdf/visits', async(req,res)=>{
 		 
 		});
 
+// ________________________________________________________________pdf of visits by date______________________________________________
 app.get('/api/pdf/visits/date', async(req,res)=>{
-			res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 			const name= new Date().toLocaleDateString();
 			const date= req.query.date;
 			try {
@@ -1096,7 +1098,6 @@ app.get('/api/pdf/visits/date', async(req,res)=>{
 	
 
 app.get('/api/pdf/visitors', async(req,res)=>{
-		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 		const rows = await process.postgresql.query('SELECT * FROM visitors');
 		const name= new Date().toLocaleDateString();
 		let doc = new PDFDocument({ margin: 30, size: 'A4' });
@@ -1138,7 +1139,6 @@ app.get('/api/pdf/visitors', async(req,res)=>{
 	
 
 app.get('/api/pdf/hosts', async(req,res)=>{
-			res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 			const rows = await process.postgresql.query('SELECT * FROM hosts');
 			const name= new Date().toLocaleDateString();
 			let doc = new PDFDocument({ margin: 30, size: 'A4' });
@@ -1178,7 +1178,7 @@ app.get('/api/pdf/hosts', async(req,res)=>{
 
 // _____________________________________________csv______________________________________________________________________
 app.get('/api/csv/hosts', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+
 
 	const csvWriter = createCsvWriter({
 		path:__dirname+'/public/hosts.csv',
@@ -1496,16 +1496,10 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
 	
 };
 
-// app.use('*', (req, res) => {
-// 	res.status(503).json({
-// 	  success: 'false',
-// 	  message: 'Request Timeout',
-// 	  error: {
-// 		statusCode: 503,
-// 		message: 'Request timeout, check sent data',
-// 	  },
-// 	});
-//   });
+// app.use((err, req, res, next) => {
+// 	console.error(err.stack)
+// 	res.status(500).send('Something broke!')
+//   })
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
