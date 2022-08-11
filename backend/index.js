@@ -135,7 +135,7 @@ app.get("/", (req, res) => {
 	}
 	else{
 		
-			res.json('Invalid username or password');
+			res.status(404).json('Invalid username or password');
 	
 	};
 	}
