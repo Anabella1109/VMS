@@ -17,7 +17,7 @@ const cron = require('node-cron');
 const multer = require('multer');
 const sendEMail= require('./sendNotifications/send_email');
 const sendSmsNotif= require('./sendNotifications/send-sms');
-const validators=require('./validators.js');
+const validators=require('./validations/validators.js');
 const { param,validationResult } = require('express-validator');
 
 const PORT = process.env.PORT || 3001;
@@ -54,7 +54,7 @@ postgresql(async (connection) => {
 
 
 app.get("/", (req, res) => {
-	res.sendFile(__dirname+'/index.html');
+	res.sendFile(__dirname+'/views/index.html');
   });
 
 
@@ -1470,7 +1470,7 @@ app.get('/api/csv/visitors', async (req, res) => {
 
 	const host= req.params.host;
 	try {
-		const name= new Date().toLocaleDateString();
+	const name= new Date().toLocaleDateString();
 	const csvWriter = createCsvWriter({
 		path:__dirname+`/public/visits.csv`,
 		header: [
@@ -1585,10 +1585,7 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
 			  catch(error){
 				console.error(error);
 			  };
-               
 
-            // -> you can comment the statement to see the uploaded CSV file.
-            // fs.unlinkSync(filePath)
         });
   
     stream.pipe(csvStream);
