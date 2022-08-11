@@ -14,46 +14,56 @@ module.exports = {
         if (!req.body) return res.send(resultsNotFound);
     },
     checkLoginDataQuality: function(req, res) {
+		return [
 		body('email').isEmail().normalizeEmail(),
 		body('password').isLength({
 			min: 6
 		})
+	]
       },
 	  checkRegisterDataQuality: function(req, res) {
+		return [
 		body('email').isEmail().normalizeEmail(),
 		body('password').isLength({
 			min: 6
 		})
+	]
       },
 	  checkCheckinDataQuality: function(req, res) {
+		return [
 		body('host_name').isString(),
 		body('visitor_name').isString(),
 		body('visitor_email').isEmail().normalizeEmail(),
 		body('visitor_no').isInt(),
 		body('role').isString()
+		]
       },
 	  checkHostDataQuality: function(req,res){
+		return[
         body('name').isString(),
 		body('email_id').isEmail().normalizeEmail(),
 		body('mobile_no').isInt(),
 		body('department').isString()
+		]
 	  },
 	  checkHostEditPasswordQaulity: function(req, res) {
-		body('password').isLength({
+		return body('password').isLength({
 			min: 6
 		})
       },
 	  checkVisitortDataQuality: function(req,res){
+		return[
         body('name').isString(),
 		body('email_id').isEmail().normalizeEmail(),
 		body('mobile_no').isInt()
+		]
 	  },
 	  checkIfIdIsInt: function(){
-		param('id').isInt();
+		return param('id').isInt();
 		// console.log(param('id').isInt());
 
 	  },
-	  checkBookingDataQuality: function(req,res){
+	  checkBookingDataQuality: function(){
 		return [
         body('host_name').isString(),
 		body('visitor_name').isString(),

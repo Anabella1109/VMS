@@ -77,7 +77,7 @@ app.get("/", (req, res) => {
 
 
   //___________________________________ Sending single host ________________________________________________
-  app.get('/api/hosts/:id', param('id').isInt(), async (req, res) => {
+  app.get('/api/hosts/:id', validators.checkIfIdIsInt(), async (req, res) => {
 	const errors = validationResult(req);
 
 		if (!errors.isEmpty()) {
@@ -101,7 +101,16 @@ app.get("/", (req, res) => {
   });
 
    //___________________________________ login host ________________________________________________
- app.post('/api/login/host', async(req,res)=>{;
+ app.post('/api/login/host', validators.checkLoginDataQuality(), async(req,res)=>{
+	const errors = validationResult(req);
+
+		if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+    else{
 	const user={
 		email: req.body.email,
 		pass: req.body.password
@@ -124,13 +133,23 @@ app.get("/", (req, res) => {
 	catch(error){
     console.error(error);
 	}
+}
 	});
 
 
 //___________________________________ registering a host ________________________________________________
-app.post('/api/hosts', async (req, res) => {
+app.post('/api/hosts', validators.checkHostDataQuality(), async (req, res) => {
+	const errors = validationResult(req);
+
+	if (!errors.isEmpty()) {
+		return res.status(400).json({
+			success: false,
+			errors: errors.array()
+		});
+	}
+else{
     const pass=crypto.randomBytes(8).toString('hex');
-	if(req.body != "undefined"){
+
 	const host = {
 		name: req.body.name,
 		email_id: req.body.email_id,
@@ -172,11 +191,20 @@ app.post('/api/hosts', async (req, res) => {
 		console.error(error);
 		res.send(error);
 	}
-	};
+}
   });
 
   //___________________________________ editing a host ________________________________________________
-app.put('/api/hosts/:id', param('id').isInt(), async (req, res) => {
+app.put('/api/hosts/:id', validators.checkIfIdIsInt(), validators.checkHostDataQuality(), async (req, res) => {
+	const errors = validationResult(req);
+
+		if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+    else{
 	const pk=req.params['id'];
 	const host = {
 		name: req.body.name,
@@ -196,46 +224,56 @@ app.put('/api/hosts/:id', param('id').isInt(), async (req, res) => {
 	catch(error){
 		console.error(error);
 	}	
-	
+}
   });
 
   //___________________________________ editing a host password ________________________________________________
-  app.patch('/api/hosts/:id',param('id').isInt(), async (req, res) => {
+  app.patch('/api/hosts/:id',validators.checkIfIdIsInt(),validators.checkHostEditPasswordQaulity(), async (req, res) => {
+	const errors = validationResult(req);
+
+		if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+    else{
 	const pk=req.params['id'];
 	const host = {
 		password:req.body.password
 	}
 	try{
-		if(pk !='undefined'){
+		
 	 await process.postgresql.query('UPDATE "hosts" SET "password" = $1 WHERE id=$2', [host.passsword,pk])
 	 res.status(200).send(JSON.stringify('Password changed'));
-		}
-		else{
-			console.log('Id undefined');
-		}
 	}
 	catch(error){
 		console.error(error);
 	}
-	
+}
   });
    //___________________________________ Deleting a single host ________________________________________________
- app.delete('/api/hosts/:id', param('id').isInt(),async (req, res) => {
+ app.delete('/api/hosts/:id',validators.checkIfIdIsInt(),async (req, res) => {
+	const errors = validationResult(req);
+
+		if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+    else{
 	const pk=req.params['id'];
 	try {
-		if(pk !="undefined"){
+		
 			await process.postgresql.query('DELETE FROM "hosts" WHERE "id" = $1', [pk]);
 	res.json('Host deleted');
-			}
-			else{
-				console.log('Data undefined');
-				res.status(404).json("Data undefined");
-			}
+			
 	} catch (error) {
 		console.error(error);
 		res.status(400).json(error);
 	}
-	
+	}	
   });
 
 
@@ -255,7 +293,16 @@ try {
   });
   
 //___________________________________ regitering a visitor ________________________________________________
-app.post('/api/visitors', async (req, res) => {
+app.post('/api/visitors',validators.checkVisitortDataQuality(), async (req, res) => {
+	const errors = validationResult(req);
+
+		if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+    else{
 	const visitor = {
 		name: req.body.name,
 		email_id: req.body.email_id,
@@ -267,11 +314,20 @@ app.post('/api/visitors', async (req, res) => {
 	}
 	 catch(error){
 		console.error(error);}
-
+	 }
   });
 
     //___________________________________ editing a visitor ________________________________________________
-app.put('/api/visitors/:id', async (req, res) => {
+app.put('/api/visitors/:id',validators.checkIfIdIsInt(), validators.checkVisitortDataQuality(), async (req, res) => {
+	const errors = validationResult(req);
+
+	if (!errors.isEmpty()) {
+		return res.status(400).json({
+			success: false,
+			errors: errors.array()
+		});
+	}
+else{
 		const pk=req.params['id'];
 		const visitor = {
 			name: req.body.name,
@@ -279,52 +335,59 @@ app.put('/api/visitors/:id', async (req, res) => {
 			mobile_no: req.body.mobile_no
 		}
 		try{
-			if(pk != 'undefined' && visitor.mobile_no !="undefined"){
+	
 		await process.postgresql.query('UPDATE "visitors" SET "name" = $1, "email_id" = $2,"mobile_no" = $3 WHERE id=$4', [visitor.name,visitor.email_id,visitor.mobile_no,pk]);
 		res.status(200).send(JSON.stringify('Visitor updated!'));
-			}else{
-				console.log('Data undefined')
-				res.status(404).json('Data undefined')
-			}
+			
 		}
 		catch(error){
 			console.error(error);}
-		
+		}	
 	  });
 	 
-	  //___________________________________ Sending a single visitor ________________________________________________
-	  app.get('/api/visitors/:id', async (req, res) => {
-		res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+//___________________________________ Sending a single visitor ________________________________________________
+	  app.get('/api/visitors/:id',validators.checkIfIdIsInt(), async (req, res) => {
+		const errors = validationResult(req);
+
+		if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+    else{
 		const pk=req.params['id'];
 		try {
-			if ( pk != 'undefined'){
+		
 			const rows = await process.postgresql.query('SELECT * FROM visitors WHERE id=$1', [pk]);
 		res.json(rows);
-		}else{
-			console.log('Id not defined');
-			res.status(404).json('Data not defined');
-		}
+		
 		} catch (error) {
 			console.error(error);
 		}
+	}
 	  });
 	
 	   //___________________________________ Deleting a single visitor _____________________________________________
  app.delete('/api/visitors/:id', async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+	const errors = validationResult(req);
+
+	if (!errors.isEmpty()) {
+		return res.status(400).json({
+			success: false,
+			errors: errors.array()
+		});
+	}
+else{
 	const pk=req.params['id'];
 	try {
-		if ( pk != 'undefined'){
+
 		await process.postgresql.query('DELETE FROM "visitors" WHERE "id" = $1', [pk]);
 	res.json('Visitor deleted');
-		}else{
-			console.log('Id not defined');
-			res.status(404).json('Data not defined');
-		}
 	} catch (error) {
 		console.error(error);
 	}
-	
+}	
   });
 
    //___________________________________VISITS ________________________________________________
@@ -374,7 +437,16 @@ app.get('/api/checkedout/visits', async (req, res) => {
 	  });
 
 //___________________________________ registering a visit ________________________________________________
-app.post('/api/visits', async (req, res) => {
+app.post('/api/visits', validators.checkCheckinDataQuality(), async (req, res) => {
+	const errors = validationResult(req);
+
+		if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+    else{
 	const checked_in= DateTime.now().setZone('CAT');
 	const checkin_date= checked_in.toFormat("yyyy-MM-dd");
 	const checkin_time= checked_in.toLocaleString(DateTime.TIME_24_WITH_SECONDS);
@@ -391,12 +463,9 @@ app.post('/api/visits', async (req, res) => {
 		
 	};
 	try{
-		if( visit.visitor_no != "undefined"){
-	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE name=$1' , [visit.host_name]);
-	console.log(host);
-	
-	
 
+	const host=  await process.postgresql.query('SELECT * FROM hosts WHERE name=$1' , [visit.host_name]);
+	
 	const visitor = await process.postgresql.query('SELECT * FROM visitors WHERE name=$1 AND email_id=$2' , [visit.visitor_name, visit.visitor_email]);
 	if(visitor.length == 0){
 		await process.postgresql.query(`INSERT INTO visitors (name, email_id, mobile_no) VALUES ('${visit.visitor_name}', '${visit.visitor_email}', '${visit.visitor_no}') ON CONFLICT DO NOTHING;`);
@@ -437,16 +506,13 @@ app.post('/api/visits', async (req, res) => {
 
 		res.status(200).send('Visit registered!');
 
-}
-else{
-	res.status(404).json("Data undefined");
-	}
+
 	
 	}
 catch(error){
 	console.error(error);
 } 
-
+	}
 	
   });
 
@@ -519,7 +585,16 @@ catch(error){
   });
 
 //___________________________________ Editing a visit ________________________________________________
-app.put('/api/visits/:id',param('id').isInt(), async (req, res) => {
+app.put('/api/visits/:id',validators.checkIfIdIsInt(),validators.checkBookingDataQuality(), async (req, res) => {
+	const errors = validationResult(req);
+
+		if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+    else{
 	const pk=req.params['id'];
 	const visit = {
 		host_name: req.body.host_name,
@@ -533,22 +608,28 @@ app.put('/api/visits/:id',param('id').isInt(), async (req, res) => {
 		
 	}
 	try{
-		if(pk!= "undefined" && visit.visitor_no != "undefined"){
+		
 	await process.postgresql.query('UPDATE "register" SET "host_name" = $1, "visitor_name" = $2, "visitor_email" = $3, "visitor_no" = $4, "role"=$5  WHERE id=$6', [visit.host_name,visit.visitor_name, visit.visitor_email,visit.visitor_no, visit.role,pk]);
 	 res.status(200).send(JSON.stringify('Visit edited'));
-		}else{
-			res.status(404).json("Data undefined");
-		}
+	
 	}
 	catch(error){
 		console.error(error);
 	}
-	
+}
   });
 
   //___________________________________ Editing a visit checkout ________________________________________________
-app.patch('/api/visits/checkout/:id', param('id').isInt(),async (req, res) => {
-	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
+app.patch('/api/visits/checkout/:id', validators.checkIfIdIsInt(),async (req, res) => {
+	const errors = validationResult(req);
+
+		if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+    else{
 	const pk=req.params.id;
 	const checkout= DateTime.now().setZone('CAT');
 	const checkout_time= checkout.toLocaleString(DateTime.TIME_24_WITH_SECONDS);
@@ -557,59 +638,66 @@ app.patch('/api/visits/checkout/:id', param('id').isInt(),async (req, res) => {
 	}
 
 	try{
-		if( pk !="undefined"){
 	await process.postgresql.query('UPDATE "register" SET "checked_out"=$1  WHERE id=$2', [visit.checked_out,pk]);
 	 res.status(200).json('Checked out');
-	}
-	else{
-		res.status(404).json("Data undefined")
-	}
+	
 }
 	catch(error){
 		console.error(error);
 		res.status(404).json('Visit not found');
 	}
-	
+	}	
   });
 
      //___________________________________ Sending a single visit ________________________________________________
-	 app.get('/api/visits/:id',param('id').isInt(), async (req, res) => {
+	 app.get('/api/visits/:id',validators.checkIfIdIsInt(), async (req, res) => {
+		const errors = validationResult(req);
+
+		if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+    else{
 		const pk=req.params['id'];
 		try{
-			if(pk!="undefined"){
+			
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE id=$1', [pk]);
 		res.json(rows);
-			}
-			else{
-				res.status(404).json("Data undefined")
-			}
 		}
 		catch(error){
 			console.error(error);
 			res.status(404).json('Visit not found');
 		}
+	}
 	  });
 
-	     //___________________________________ Sending a svisits by hosts ________________________________________________
-		 app.get('/api/visits/host/:host_id', param('host_id').isInt(),async (req, res) => {
+	 //___________________________________ Sending a svisits by hosts ________________________________________________
+ app.get('/api/visits/host/:host_id', param('host_id').isInt(),async (req, res) => {
+	const errors = validationResult(req);
+
+		if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+    else{
 			const pk=req.params['host_id'];
 			try{
-				if(pk!="undefined"){
 			const rows = await process.postgresql.query('SELECT * FROM register WHERE host_id=$1', [pk]);
 			res.json(rows);
-				}
-				else{
-					res.status(404).json("data undefined")
-				}
 			}
 			catch(error){
 				console.error(error);
 				res.status(404).json('Visit not found');
 			}
+		}
 		  });
 	
-		 //___________________________________ Sending a visits by date and time ________________________________________________
-		 app.get('/api/visits/date/time', async (req, res) => {
+//___________________________________ Sending a visits by date and time ________________________________________________
+app.get('/api/visits/date/time', async (req, res) => {
 			const date=req.query.date;
 			const time= req.query.time;
 	        try{
@@ -626,20 +714,26 @@ app.patch('/api/visits/checkout/:id', param('id').isInt(),async (req, res) => {
 	
 	  
 	   //___________________________________ Deleting a single visit ________________________________________________
-	 app.delete('/api/visits/:id',param('id').isInt(), async (req, res) => {
+	 app.delete('/api/visits/:id',validators.checkIfIdIsInt(), async (req, res) => {
+		const errors = validationResult(req);
+
+		if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+    else{
 		const pk=req.params['id'];
 		try {
-			if( pk!= "undefined"){
+
 			await process.postgresql.query('DELETE FROM "register" WHERE "id" = $1', [pk]);
 		res.send('Record deleted');
-			}
-			else{
-				res.status(404).json("Data undefined");
-			}
+			
 		} catch (error) {
 			console.error(error);
 		}
-		
+	}	
 	  });
 
 
@@ -647,7 +741,16 @@ app.patch('/api/visits/checkout/:id', param('id').isInt(),async (req, res) => {
 //___________________________________ USER/ ADMIN ________________________________________________
 
   //___________________________________ register user ________________________________________________
-app.post('/api/registeruser', async(req,res)=>{
+app.post('/api/registeruser',validators.checkRegisterDataQuality(), async(req,res)=>{
+	const errors = validationResult(req);
+
+		if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+    else{
 const user={
 	email: req.body.email,
 	pass: req.body.password
@@ -661,12 +764,21 @@ try {
 } catch (error) {
 	console.error(error);
 }
- 
+}
 });
 
  //___________________________________ login user ________________________________________________
 
-	app.post('/api/login/admin', async(req,res)=>{
+	app.post('/api/login/admin', validators.checkLoginDataQuality(), async(req,res)=>{
+		const errors = validationResult(req);
+
+		if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+    else{
 		const user={
 			email: req.body.email,
 			pass: req.body.password
@@ -692,7 +804,7 @@ try {
 		} catch (error) {
 			console.error(error);
 		}
-				 
+	}				 
 		});
 
 // ______________________________________________logout user________________________________________
@@ -719,7 +831,6 @@ app.get('/api/admin/logout',(req,res) => {
             });
         }
     else{
-	if( req.body.visitor_no !="undefined"){
 	const visitor = {
 		visitor_name: req.body.visitor_name,
 		visitor_email: req.body.visitor_email,
@@ -742,92 +853,72 @@ app.get('/api/admin/logout',(req,res) => {
 	
 	let stringdata = JSON.stringify(visitor);
 
-QRCode.toDataURL(stringdata, function (err, code) {
-    if(err) return console.log("error occurred")
+	QRCode.toDataURL(stringdata, function (err, code) {
+		if(err) return console.log("error occurred")
 
-        let mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
-        {
-          from: process.env.EMAIL,
-          to: visitor.visitor_email,
-          subject: "Qr Code.",
-		  text: 'Dear guest, find attached the qr code for your visit to AmaliTech',
-		  attachDataUrls: true,
-        //   html:'<img src= '+code+'> ',
-		  attachments: [
+			let mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
 			{
-				filename: 'qrcode.png',
-            contentType: 'image',
-          path: `${code}`
-			}
-		]
-        };
-
-		sendEMail(mailOptions);
-		  const dateAndTime= visitor.date +' '+ visitor.arrival_time; 
-		  const scheduledTime=DateTime.fromSQL(dateAndTime,{zone: 'CAT'}).minus({minutes: 30}); 
-		  const scheduledTime1=DateTime.fromSQL(scheduledTime,{zone: 'CAT'}).plus({minutes: 20});
-
-
-		  const dayOfTheweek= scheduledTime.weekday;
-		  const month= scheduledTime.month;
-		  const day= scheduledTime.day;
-		  const hour= scheduledTime.hour;
-		  const minute= scheduledTime.minute;
-		  const second= scheduledTime.second;
-	
-
-		  const dayOfTheweek1= scheduledTime1.weekday;
-		  const month1= scheduledTime1.month;
-		  const day1= scheduledTime1.day;
-		  const hour1= scheduledTime1.hour;
-		  const minute1= scheduledTime1.minute;
-		  const second1= scheduledTime1.second;
-		 
-		let mailOptions30=  {
 			from: process.env.EMAIL,
-			to: host[0].email_id,
-			subject: "Reminder",
-			text: `You have a scheduled visit from ${visitor.visitor_name}  in 30 minutes`,
-			
-		  };
+			to: visitor.visitor_email,
+			subject: "Qr Code.",
+			text: 'Dear guest, find attached the qr code for your visit to AmaliTech',
+			attachDataUrls: true,
+			//   html:'<img src= '+code+'> ',
+			attachments: [
+				{
+					filename: 'qrcode.png',
+				contentType: 'image',
+			path: `${code}`
+				}
+			]
+			};
 
-		  let mailOptions10=  {
-			from: process.env.EMAIL,
-			to: host[0].email_id,
-			subject: "Reminder",
-			text: `You have a scheduled visit from ${visitor.visitor_name}  in 10 minutes`,
+				sendEMail(mailOptions);
+			const dateAndTime= visitor.date +' '+ visitor.arrival_time; 
+			const scheduledTime=DateTime.fromSQL(dateAndTime,{zone: 'CAT'}).minus({minutes: 30}); 
+			const scheduledTime1=DateTime.fromSQL(scheduledTime,{zone: 'CAT'}).plus({minutes: 20});
 			
-		  };
+			let mailOptions30=  {
+				from: process.env.EMAIL,
+				to: host[0].email_id,
+				subject: "Reminder",
+				text: `You have a scheduled visit from ${visitor.visitor_name}  in 30 minutes`,
+				
+			};
+
+			let mailOptions10=  {
+				from: process.env.EMAIL,
+				to: host[0].email_id,
+				subject: "Reminder",
+				text: `You have a scheduled visit from ${visitor.visitor_name}  in 10 minutes`,
+				
+			};
 
 
 	
-try {
-	cron.schedule(`${second} ${minute} ${hour} ${day} ${month} ${dayOfTheweek}`,()=>{
-		sendEMail(mailOptions30);
-	  }, {
-		scheduled: true,
-		timezone: "CAT"
-	  } );
-} catch (error) {
-	console.error(error);
-};
-		 
-try {
-	cron.schedule(`${second1} ${minute1} ${hour1} ${day1} ${month1} ${dayOfTheweek1}`,()=>{
-		sendEMail(mailOptions10);
-	  } , {
-		scheduled: true,
-		timezone: "CAT"
-	  });
-} catch (error) {
-	console.error(error);
-}
-	res.status(200).json('Qr code sent');
-})
-}
-else{
-	res.status(404).json("Data undefined");
-}
+	try {
+		cron.schedule(`${scheduledTime.second} ${scheduledTime.minute} ${scheduledTime.hour} ${scheduledTime.day} ${scheduledTime.month} ${scheduledTime.weekday}`,()=>{
+			sendEMail(mailOptions30);
+		}, {
+			scheduled: true,
+			timezone: "CAT"
+		} );
+	} catch (error) {
+		console.error(error);
+	};
+			
+	try {
+		cron.schedule(`${scheduledTime1.second} ${scheduledTime1.minute} ${scheduledTime1.hour} ${scheduledTime1.day} ${scheduledTime1.month} ${scheduledTime1.weekday}`,()=>{
+			sendEMail(mailOptions10);
+		} , {
+			scheduled: true,
+			timezone: "CAT"
+		});
+	} catch (error) {
+		console.error(error);
+	}
+		res.status(200).json('Qr code sent');
+	})
 	}
   });
 // _________________________________________sending bookings______________________________
@@ -858,38 +949,49 @@ app.get('/api/bookings/today', async (req, res) => {
   });
 
 //___________________________________ Sending a single booking ________________________________________________
-app.get('/api/bookings/:id', param('id').isInt(),async (req, res) => {
+app.get('/api/bookings/:id', validators.checkIfIdIsInt(),async (req, res) => {
+	const errors = validationResult(req);
+
+		if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+    else{
 	const pk=req.params['id'];
 	try {
-		if(pk != "undefined"){
+
 		const rows = await process.postgresql.query('SELECT * FROM booking WHERE id=$1', [pk]);
 	res.json(rows);
-		}
-		else{
-			res.status(404).json("Data undefined");
-		}
+		
 	} catch (error) {
 		console.error(error);
 	}
-	
+	}	
   });
 
 	   //___________________________________ Deleting a single booking ________________________________________________
-	   app.delete('/api/bookings/delete/:id',param('id').isInt(), async (req, res) => {
-		const pk=req.params['id'];
-		try {
-			if(pk != "undefined"){
-			await process.postgresql.query('DELETE FROM "booking" WHERE "id" = $1', [pk]);
-		   res.json('Record deleted');
+ app.delete('/api/bookings/delete/:id',validators.checkIfIdIsInt(), async (req, res) => {
+			const errors = validationResult(req);
+
+			if (!errors.isEmpty()) {
+				return res.status(400).json({
+					success: false,
+					errors: errors.array()
+				});
 			}
-			else{
-				res.status(404).json("data undefined");
+		else{
+			const pk=req.params['id'];
+			try {
+				await process.postgresql.query('DELETE FROM "booking" WHERE "id" = $1', [pk]);
+			res.json('Record deleted');
+				
+			} catch (error) {
+				console.error(error);
 			}
-		} catch (error) {
-			console.error(error);
 		}
-		
-	  });
+		});
 
 // ___________________________________________pdf________________________________________________________________
 app.get('/api/pdf/visits', async(req,res)=>{
