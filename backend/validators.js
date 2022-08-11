@@ -50,10 +50,11 @@ module.exports = {
 	  },
 	  checkIfIdIsInt: function(){
 		param('id').isInt();
-		console.log(param('id').isInt());
+		// console.log(param('id').isInt());
 
 	  },
-	  checkBookingDataQuality: function(){
+	  checkBookingDataQuality: function(req,res){
+		return [
         body('host_name').isString(),
 		body('visitor_name').isString(),
 		body('visitor_email').isEmail().normalizeEmail(),
@@ -61,6 +62,7 @@ module.exports = {
 		body('role').isString(),
 		body('date').isString(),
 		body('checked_in').isString()
+		]
 	  },
 	  checkValidationResult: function(req,res){
 		const errors = validationResult(req);

@@ -41,25 +41,7 @@ app.use(sessions({
     resave: false
 }));
 app.use(cookieParser());
-app.use((req,res,next)=>{
-	if(req.method=== 'PUT' || req.method === 'DELETE' || req.method ==='PATCH'){
-		validators.checkIfIdIsInt();
-		next();
-		
-	}
-	else{
-		next();
-	}
-});
-// app.use((req,res,next)=>{
-// 	if(req.method === 'PUT' || req.method === 'DELETE' || req.method ==='PATCH' || req.method ==='POST'){
-// 		validators.checkValidationResult();
-// 		next();
-// 	}
-// 	else{
-// 		next();
-// 	}
-// })
+
 
 
 
@@ -194,7 +176,7 @@ app.post('/api/hosts', async (req, res) => {
   });
 
   //___________________________________ editing a host ________________________________________________
-app.put('/api/hosts/:id', async (req, res) => {
+app.put('/api/hosts/:id', param('id').isInt(), async (req, res) => {
 	const pk=req.params['id'];
 	const host = {
 		name: req.body.name,
@@ -218,7 +200,7 @@ app.put('/api/hosts/:id', async (req, res) => {
   });
 
   //___________________________________ editing a host password ________________________________________________
-  app.patch('/api/hosts/:id', async (req, res) => {
+  app.patch('/api/hosts/:id',param('id').isInt(), async (req, res) => {
 	const pk=req.params['id'];
 	const host = {
 		password:req.body.password
@@ -238,7 +220,7 @@ app.put('/api/hosts/:id', async (req, res) => {
 	
   });
    //___________________________________ Deleting a single host ________________________________________________
- app.delete('/api/hosts/:id', async (req, res) => {
+ app.delete('/api/hosts/:id', param('id').isInt(),async (req, res) => {
 	const pk=req.params['id'];
 	try {
 		if(pk !="undefined"){
@@ -537,7 +519,7 @@ catch(error){
   });
 
 //___________________________________ Editing a visit ________________________________________________
-app.put('/api/visits/:id', async (req, res) => {
+app.put('/api/visits/:id',param('id').isInt(), async (req, res) => {
 	const pk=req.params['id'];
 	const visit = {
 		host_name: req.body.host_name,
@@ -565,7 +547,7 @@ app.put('/api/visits/:id', async (req, res) => {
   });
 
   //___________________________________ Editing a visit checkout ________________________________________________
-app.patch('/api/visits/checkout/:id', async (req, res) => {
+app.patch('/api/visits/checkout/:id', param('id').isInt(),async (req, res) => {
 	res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" );
 	const pk=req.params.id;
 	const checkout= DateTime.now().setZone('CAT');
@@ -591,7 +573,7 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
   });
 
      //___________________________________ Sending a single visit ________________________________________________
-	 app.get('/api/visits/:id', async (req, res) => {
+	 app.get('/api/visits/:id',param('id').isInt(), async (req, res) => {
 		const pk=req.params['id'];
 		try{
 			if(pk!="undefined"){
@@ -609,7 +591,7 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 	  });
 
 	     //___________________________________ Sending a svisits by hosts ________________________________________________
-		 app.get('/api/visits/host/:host_id', async (req, res) => {
+		 app.get('/api/visits/host/:host_id', param('host_id').isInt(),async (req, res) => {
 			const pk=req.params['host_id'];
 			try{
 				if(pk!="undefined"){
@@ -644,7 +626,7 @@ app.patch('/api/visits/checkout/:id', async (req, res) => {
 	
 	  
 	   //___________________________________ Deleting a single visit ________________________________________________
-	 app.delete('/api/visits/:id', async (req, res) => {
+	 app.delete('/api/visits/:id',param('id').isInt(), async (req, res) => {
 		const pk=req.params['id'];
 		try {
 			if( pk!= "undefined"){
@@ -727,7 +709,16 @@ app.get('/api/admin/logout',(req,res) => {
 //___________________________________ Booking ________________________________________________
 
 //___________________________________ generating qrcode ________________________________________________
-  app.post('/qrgenerate', async(req,res) => {
+  app.post('/qrgenerate',validators.checkBookingDataQuality(), async(req,res) => {
+	const errors = validationResult(req);
+
+		if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
+    else{
 	if( req.body.visitor_no !="undefined"){
 	const visitor = {
 		visitor_name: req.body.visitor_name,
@@ -772,10 +763,9 @@ QRCode.toDataURL(stringdata, function (err, code) {
         };
 
 		sendEMail(mailOptions);
-		  const dateAndTime= visitor.date +' '+ visitor.checked_in; 
-		  const scheduledTime=DateTime.fromSQL(dateAndTime,{zone: 'CAT'}).minus({minutes: 30});
-		  const dateAndTime1= visitor.date +' '+ visitor.checked_in; 
-		  const scheduledTime1=DateTime.fromSQL(dateAndTime1,{zone: 'CAT'}).minus({minutes: 10});
+		  const dateAndTime= visitor.date +' '+ visitor.arrival_time; 
+		  const scheduledTime=DateTime.fromSQL(dateAndTime,{zone: 'CAT'}).minus({minutes: 30}); 
+		  const scheduledTime1=DateTime.fromSQL(scheduledTime,{zone: 'CAT'}).plus({minutes: 20});
 
 
 		  const dayOfTheweek= scheduledTime.weekday;
@@ -838,7 +828,7 @@ try {
 else{
 	res.status(404).json("Data undefined");
 }
-
+	}
   });
 // _________________________________________sending bookings______________________________
 app.get('/api/bookings', async (req, res) => {
@@ -868,7 +858,7 @@ app.get('/api/bookings/today', async (req, res) => {
   });
 
 //___________________________________ Sending a single booking ________________________________________________
-app.get('/api/bookings/:id', async (req, res) => {
+app.get('/api/bookings/:id', param('id').isInt(),async (req, res) => {
 	const pk=req.params['id'];
 	try {
 		if(pk != "undefined"){
@@ -885,7 +875,7 @@ app.get('/api/bookings/:id', async (req, res) => {
   });
 
 	   //___________________________________ Deleting a single booking ________________________________________________
-	   app.delete('/api/bookings/delete/:id', async (req, res) => {
+	   app.delete('/api/bookings/delete/:id',param('id').isInt(), async (req, res) => {
 		const pk=req.params['id'];
 		try {
 			if(pk != "undefined"){
