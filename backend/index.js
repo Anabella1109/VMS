@@ -993,6 +993,7 @@ app.get('/api/pdf/visits', async(req,res)=>{
 	const rows = await process.postgresql.query('SELECT * FROM register');
 	const name= new Date().toLocaleDateString();
 	  try {
+		tableVisits.datas=rows;
 		doc.table(tableVisits, {
 			prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
 			prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
@@ -1001,7 +1002,6 @@ app.get('/api/pdf/visits', async(req,res)=>{
 			},
 		  });
 	
-		//   doc.pipe(res);
 		doc.pipe(fs.createWriteStream(__dirname+'/public/visits.pdf'));
 		const src = fs.createReadStream(__dirname+'/public/visits.pdf');
 		
@@ -1025,7 +1025,7 @@ app.get('/api/pdf/visits/host/:host', async(req,res)=>{
 		const host= req.params.host;
 		const rows = await process.postgresql.query('SELECT * FROM register WHERE host_id=$1',[host]);
 		const name= new Date().toLocaleDateString();
-		  // the magic
+		tableVisits.datas=rows;
 		  doc.table(tableVisits, {
 			prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
 			prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
@@ -1057,7 +1057,8 @@ app.get('/api/pdf/visits/today', async(req,res)=>{
 		const name= new Date().toLocaleDateString();
 		try {
 			const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1',[name]);
-		  doc.table(tableVisits, {
+			tableVisits.datas=rows;
+			doc.table(tableVisits, {
 			prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
 			prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
 			  doc.font("Helvetica").fontSize(8);
@@ -1089,7 +1090,8 @@ app.get('/api/pdf/visits/date', async(req,res)=>{
 			const date= req.query.date;
 			try {
 				const rows = await process.postgresql.query('SELECT * FROM register WHERE date=$1',[date]);
-			  doc.table(tableVisits, {
+				tableVisits.datas=rows;
+				doc.table(tableVisits, {
 				prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
 				prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
 				  doc.font("Helvetica").fontSize(8);
@@ -1118,6 +1120,7 @@ app.get('/api/pdf/visits/date', async(req,res)=>{
 app.get('/api/pdf/visitors', async(req,res)=>{
 		const rows = await process.postgresql.query('SELECT * FROM visitors');
 		const name= new Date().toLocaleDateString();
+		tableVisitors.datas=rows;
 		  doc.table(tableVisitors, {
 			prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
 			prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
@@ -1144,7 +1147,7 @@ app.get('/api/pdf/visitors', async(req,res)=>{
 app.get('/api/pdf/hosts', async(req,res)=>{
 			const rows = await process.postgresql.query('SELECT * FROM hosts');
 			const name= new Date().toLocaleDateString();
-			
+			tableHosts.datas=rows;
 			  doc.table(tableHosts, {
 				prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
 				prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {

@@ -13,7 +13,7 @@ const tableVisits = {
 	 
 	],
 
-	datas:rows,
+	datas: [],
 
   };
 
@@ -27,7 +27,7 @@ const tableVisits = {
 	  { label: "Phone nnumber", property: 'mobile_no', width: 150, renderer: null }, 
 	],
 
-	datas:rows,
+	datas:[],
 
 
   };
@@ -42,7 +42,7 @@ const tableVisits = {
 	  { label: "Phone nnumber", property: 'mobile_no', width: 150, renderer: null }, 
 	],
 
-	datas:rows,
+	datas:[],
 
   };
 
