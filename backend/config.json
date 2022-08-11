@@ -2,12 +2,11 @@
 {
     
     "email_setting":{
-    	"email":"amali@outlook.com",
 		  "password":"xxxxxxxx",
 		  "host":"smtp.outlook.com"
     },
 	"session":{
-		"secret":"1234567890abcdefghi"
+		"secret":"xxxxxxxxxxxxxxxxxxx"
 	}
 
 }
