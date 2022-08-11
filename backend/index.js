@@ -774,7 +774,8 @@ QRCode.toDataURL(stringdata, function (err, code) {
 		sendEMail(mailOptions);
 		  const dateAndTime= visitor.date +' '+ visitor.checked_in; 
 		  const scheduledTime=DateTime.fromSQL(dateAndTime,{zone: 'CAT'}).minus({minutes: 30});
-		  const scheduledTime1=DateTime.fromSQL(scheduledTime,{zone: 'CAT'}).plus({minutes: 20});
+		  const dateAndTime1= visitor.date +' '+ visitor.checked_in; 
+		  const scheduledTime1=DateTime.fromSQL(dateAndTime1,{zone: 'CAT'}).minus({minutes: 10});
 
 
 		  const dayOfTheweek= scheduledTime.weekday;
@@ -1502,10 +1503,10 @@ let UploadCsvDataToMyDatabase= (filePath)=>{
 	
 };
 
-// app.use((err, req, res, next) => {
-// 	console.error(err.stack)
-// 	res.status(500).send('Something broke!')
-//   })
+app.use((err, req, res, next) => {
+	console.error(err.stack)
+	res.status(500).send('Something broke!')
+  })
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
