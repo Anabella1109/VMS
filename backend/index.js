@@ -244,7 +244,8 @@ app.put('/api/hosts/:id', validators.checkIfIdIsInt(), validators.checkHostDataQ
 		}
 	}
 	});
-   //___________________________________ Deleting a single host ________________________________________________
+
+//___________________________________ Deleting a single host ________________________________________________
  app.delete('/api/hosts/:id',validators.checkIfIdIsInt(),async (req, res) => {
 		const errors = validationResult(req);
 
@@ -308,7 +309,7 @@ app.post('/api/visitors',validators.checkVisitortDataQuality(), async (req, res)
 		}
 	});
 
-    //___________________________________ editing a visitor ________________________________________________
+ //___________________________________ editing a visitor ________________________________________________
 app.put('/api/visitors/:id',validators.checkIfIdIsInt(), validators.checkVisitortDataQuality(), async (req, res) => {
 		const errors = validationResult(req);
 
@@ -1027,8 +1028,7 @@ app.get('/api/pdf/visits/host/:host', async(req,res)=>{
 			  indexColumn === 0 && doc.addBackground(rectRow, 'blue', 0.15);
 			},
 		  });
-		  // done!
-		//   doc.pipe(res);
+	
 		doc.pipe(fs.createWriteStream(__dirname+'/public/visits.pdf'));
 		const src = fs.createReadStream(__dirname+'/public/visits.pdf');
 		
