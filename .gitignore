@@ -1,4 +1,4 @@
 
 node_modules
 crud_db.sql
-backend/draft.js
+./backend/draft.js
