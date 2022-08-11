@@ -219,6 +219,7 @@ app.put('/api/hosts/:id', validators.checkIfIdIsInt(), validators.checkHostDataQ
 }
   });
 
+
   //___________________________________ editing a host password ________________________________________________
   app.patch('/api/hosts/:id',validators.checkIfIdIsInt(),validators.checkHostEditPasswordQaulity(), async (req, res) => {
 		const errors = validationResult(req);
@@ -271,7 +272,7 @@ app.put('/api/hosts/:id', validators.checkIfIdIsInt(), validators.checkHostDataQ
 
  //___________________________________ VISITORS ________________________________________________
 
-  //___________________________________ sending visitors ________________________________________________
+//___________________________________ sending visitors ________________________________________________
 app.get('/api/visitors', async (req, res) => {
 		try {
 			const rows = await process.postgresql.query('SELECT * FROM visitors');
@@ -697,8 +698,6 @@ app.get('/api/visits/date/time', async (req, res) => {
 				res.status(404).json("Record not found");
 			}
 		  });
-	
-	
 	
 	  
 //___________________________________ Deleting a single visit ________________________________________________
