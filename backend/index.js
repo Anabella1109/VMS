@@ -95,7 +95,7 @@ app.get("/", (req, res) => {
 
 
   //___________________________________ Sending single host ________________________________________________
-  app.get('/api/hosts/:id', validators.checkIfIdIsInt, async (req, res) => {
+  app.get('/api/hosts/:id', param('id').isInt(), async (req, res) => {
 	const errors = validationResult(req);
 
 		if (!errors.isEmpty()) {
