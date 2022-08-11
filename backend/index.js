@@ -18,7 +18,7 @@ const multer = require('multer');
 const sendEMail= require('./sendNotifications/send_email');
 const sendSmsNotif= require('./sendNotifications/send-sms');
 const validators=require('./validators.js');
-// const { validationResult } = require('express-validator');
+const { param,validationResult } = require('express-validator');
 
 const PORT = process.env.PORT || 3001;
 
