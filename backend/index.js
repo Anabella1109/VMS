@@ -62,7 +62,7 @@ app.get("/", (req, res) => {
 //___________________________________ Send hosts ________________________________________________
 app.get('/api/hosts', async (req, res) => {
 	try {
-		const query=`SELECT * FROM hosts;`;
+		const query=`SELECT name,email_id,mobile_no, department FROM hosts;`;
 		const rows= await process.postgresql.query(query);
 	res.json(rows);
 	} catch (error) {
@@ -87,7 +87,7 @@ app.get('/api/hosts/:id', validators.checkIfIdIsInt(), async (req, res) => {
 	
 		try {
 
-		const rows = await process.postgresql.query('SELECT * FROM hosts WHERE id=$1', [pk]);
+		const rows = await process.postgresql.query('SELECT name,email_id,mobile_no, department FROM hosts WHERE id=$1', [pk]);
 		res.json(rows);
 			
 	} catch (error) {
