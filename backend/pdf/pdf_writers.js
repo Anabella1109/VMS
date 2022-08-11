@@ -1,3 +1,4 @@
+const name= new Date().toLocaleDateString();
 const tableVisits = {
 	title: "Visits",
 	subtitle: "Visits report by date",
