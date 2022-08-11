@@ -62,7 +62,7 @@ app.get("/", (req, res) => {
 //___________________________________ Send hosts ________________________________________________
 app.get('/api/hosts', async (req, res) => {
 	try {
-		const query=`SELECT name,email_id,mobile_no, department FROM hosts;`;
+		const query=`SELECT id,name, department FROM hosts;`;
 		const rows= await process.postgresql.query(query);
 	res.json(rows);
 	} catch (error) {
@@ -87,7 +87,7 @@ app.get('/api/hosts/:id', validators.checkIfIdIsInt(), async (req, res) => {
 	
 		try {
 
-		const rows = await process.postgresql.query('SELECT name,email_id,mobile_no, department FROM hosts WHERE id=$1', [pk]);
+		const rows = await process.postgresql.query('SELECT id,name,email_id,mobile_no, department FROM hosts WHERE id=$1', [pk]);
 		res.json(rows);
 			
 	} catch (error) {
@@ -210,13 +210,8 @@ app.put('/api/hosts/:id', validators.checkIfIdIsInt(), validators.checkHostDataQ
 		department: req.body.department
 	}
 	try{
-		if(host.mobile_no != "undefined"){
 	 await process.postgresql.query('UPDATE "hosts" SET "name" = $1, "email_id" = $2, "mobile_no" = $3, "department"= $4 WHERE id=$5', [host.name,host.email_id,host.mobile_no,host.department,pk])
 		res.status(200).send(JSON.stringify('Host edited!'));
-		}else{
-			console.log("Data undefined");
-			res.status(404).json("data undefined");
-		}
 	}
 	catch(error){
 		console.error(error);
@@ -537,7 +532,7 @@ app.post('/api/checkin', async (req, res) => {
 		await process.postgresql.query(`INSERT INTO register (host_id,host_name,visitor_name, visitor_email, visitor_no,date,checked_in,checked_out, role) VALUES ('${host[0].id}', '${visit.host_name}','${visit.visitor_name}','${visit.visitor_email}','${visit.visitor_no}','${checkin_date}','${checkin_time}','${checked_out}', '${visit.role}') ON CONFLICT DO NOTHING;`);
 		
 		
-		let htmlBody = "New visitor information : \n";                     // Preparing Msg for sending Mail to the expected visitor of the Meeting 
+		let htmlBody = "New visitor information : \n"; 
 			htmlBody += "Name : " + visit.visitor_name + " \n " + "\n" + 
 			" Email : " + visit.visitor_email + " \n " + "\n" +
 			"Mobile Number : " +visit.visitor_no + " \n " + "\n" +
@@ -545,7 +540,7 @@ app.post('/api/checkin', async (req, res) => {
 			" Check In Time :" +visit.checked_in;
 		
 			
-			var mailOptions =                                                   // Step 2 - Setting Mail Options of Nodemailer
+			var mailOptions = 
 			{
 			from: process.env.EMAIL,
 			to: host[0].email_id,
