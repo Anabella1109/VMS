@@ -62,7 +62,7 @@ app.get("/", (req, res) => {
 //___________________________________ Send hosts ________________________________________________
 app.get('/api/hosts', async (req, res) => {
 	try {
-		const query=`SELECT name,email_id,mobile_no, department FROM hosts;`;
+		const query=`SELECT id,name,email_id,mobile_no, department FROM hosts;`;
 		const rows= await process.postgresql.query(query);
 	res.json(rows);
 	} catch (error) {
